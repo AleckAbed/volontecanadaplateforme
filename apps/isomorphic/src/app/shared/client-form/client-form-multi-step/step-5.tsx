@@ -12,7 +12,7 @@ export default function StepFive() {
   const { step, gotoNextStep } = useStepper();
   const [formData, setFormData] = useAtom(formDataAtom);
   const [addressHistory, setAddressHistory] = useState<AddressEntry[]>(
-    formData.addressHistory || []
+    formData?.addressHistory || []
   );
 
   const { handleSubmit } = useForm();

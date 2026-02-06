@@ -12,7 +12,7 @@ export default function StepSix() {
   const { step, gotoNextStep } = useStepper();
   const [formData, setFormData] = useAtom(formDataAtom);
   const [personalBackground, setPersonalBackground] = useState<PersonalBackgroundEntry[]>(
-    formData.personalBackground || []
+    formData?.personalBackground || []
   );
 
   const { handleSubmit } = useForm();

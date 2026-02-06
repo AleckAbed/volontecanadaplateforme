@@ -12,8 +12,8 @@ import type { TravelEntry } from '@/validators/client-form.schema';
 export default function StepEight() {
   const { step, gotoNextStep } = useStepper();
   const [formData, setFormData] = useAtom(formDataAtom);
-  const [travels, setTravels] = useState<TravelEntry[]>(formData.travels || []);
-  const [noTrips, setNoTrips] = useState(formData.noTrips || false);
+  const [travels, setTravels] = useState<TravelEntry[]>(formData?.travels || []);
+  const [noTrips, setNoTrips] = useState(formData?.noTrips || false);
 
   const { handleSubmit, control } = useForm();
 

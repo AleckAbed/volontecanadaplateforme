@@ -222,11 +222,14 @@ export const initialFormData: FormDataType = {
 };
 
 // Stockage sûr pour SSR (évite les erreurs quand localStorage n'existe pas)
+// Si la valeur lue est null/invalide, on ne la retourne pas pour que l'atom utilise initialFormData
 const safeClientFormStorage = {
   getItem: (key: string): string | null => {
     if (typeof window === 'undefined') return null;
     try {
-      return localStorage.getItem(key);
+      const raw = localStorage.getItem(key);
+      if (raw == null || raw === 'null' || raw === 'undefined') return null;
+      return raw;
     } catch {
       return null;
     }

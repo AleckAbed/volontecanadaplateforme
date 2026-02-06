@@ -51,21 +51,21 @@ export default function StepOne() {
   } = useForm<ClientFormStep1Input>({
     resolver: zodResolver(clientFormStep1Schema),
     defaultValues: {
-      numberOfFamilyMembers: formData.numberOfFamilyMembers || '',
-      preferredLanguageCorrespondence: formData.preferredLanguageCorrespondence || 'Français',
-      preferredLanguageInterview: formData.preferredLanguageInterview || 'Français',
-      hasCSQ: formData.hasCSQ || 'no',
-      csqNumber: formData.csqNumber || '',
-      csqApplicationDate: formData.csqApplicationDate || '',
-      lastName: formData.lastName || '',
-      firstName: formData.firstName || '',
-      uci: formData.uci || '',
-      sex: formData.sex || '',
-      eyeColor: formData.eyeColor || '',
-      height: formData.height || '',
-      dateOfBirth: formData.dateOfBirth || '',
-      placeOfBirth: formData.placeOfBirth || '',
-      countryOfBirth: formData.countryOfBirth || '',
+      numberOfFamilyMembers: formData?.numberOfFamilyMembers || '',
+      preferredLanguageCorrespondence: formData?.preferredLanguageCorrespondence || 'Français',
+      preferredLanguageInterview: formData?.preferredLanguageInterview || 'Français',
+      hasCSQ: formData?.hasCSQ || 'no',
+      csqNumber: formData?.csqNumber || '',
+      csqApplicationDate: formData?.csqApplicationDate || '',
+      lastName: formData?.lastName || '',
+      firstName: formData?.firstName || '',
+      uci: formData?.uci || '',
+      sex: formData?.sex || '',
+      eyeColor: formData?.eyeColor || '',
+      height: formData?.height || '',
+      dateOfBirth: formData?.dateOfBirth || '',
+      placeOfBirth: formData?.placeOfBirth || '',
+      countryOfBirth: formData?.countryOfBirth || '',
     },
   });
 
@@ -75,23 +75,23 @@ export default function StepOne() {
   // Utiliser un ref pour éviter les boucles infinies
   const isInitialLoad = useRef(true);
   useEffect(() => {
-    if (isInitialLoad.current) {
+    if (isInitialLoad.current && formData != null) {
       reset({
-        numberOfFamilyMembers: formData.numberOfFamilyMembers || '',
-        preferredLanguageCorrespondence: formData.preferredLanguageCorrespondence || 'Français',
-        preferredLanguageInterview: formData.preferredLanguageInterview || 'Français',
-        hasCSQ: formData.hasCSQ || 'no',
-        csqNumber: formData.csqNumber || '',
-        csqApplicationDate: formData.csqApplicationDate || '',
-        lastName: formData.lastName || '',
-        firstName: formData.firstName || '',
-        uci: formData.uci || '',
-        sex: formData.sex || '',
-        eyeColor: formData.eyeColor || '',
-        height: formData.height || '',
-        dateOfBirth: formData.dateOfBirth || '',
-        placeOfBirth: formData.placeOfBirth || '',
-        countryOfBirth: formData.countryOfBirth || '',
+        numberOfFamilyMembers: formData?.numberOfFamilyMembers || '',
+        preferredLanguageCorrespondence: formData?.preferredLanguageCorrespondence || 'Français',
+        preferredLanguageInterview: formData?.preferredLanguageInterview || 'Français',
+        hasCSQ: formData?.hasCSQ || 'no',
+        csqNumber: formData?.csqNumber || '',
+        csqApplicationDate: formData?.csqApplicationDate || '',
+        lastName: formData?.lastName || '',
+        firstName: formData?.firstName || '',
+        uci: formData?.uci || '',
+        sex: formData?.sex || '',
+        eyeColor: formData?.eyeColor || '',
+        height: formData?.height || '',
+        dateOfBirth: formData?.dateOfBirth || '',
+        placeOfBirth: formData?.placeOfBirth || '',
+        countryOfBirth: formData?.countryOfBirth || '',
       });
       isInitialLoad.current = false;
     }

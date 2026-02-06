@@ -19,18 +19,18 @@ export default function StepThree() {
 
   const methods = useForm<ClientFormStep3Input>({
     defaultValues: {
-      passportNumber: formData.passportNumber || '',
-      passportIssueCountry: formData.passportIssueCountry || '',
-      passportIssueDate: formData.passportIssueDate || '',
-      passportExpiryDate: formData.passportExpiryDate || '',
-      nationalIdNumber: formData.nationalIdNumber || '',
-      nationalIdIssueCountry: formData.nationalIdIssueCountry || '',
-      nationalIdIssueDate: formData.nationalIdIssueDate || '',
-      nationalIdExpiryDate: formData.nationalIdExpiryDate || '',
-      highestEducationLevel: formData.highestEducationLevel || '',
-      totalYearsOfStudy: formData.totalYearsOfStudy || '',
-      currentEmployment: formData.currentEmployment || '',
-      plannedEmployment: formData.plannedEmployment || '',
+      passportNumber: formData?.passportNumber || '',
+      passportIssueCountry: formData?.passportIssueCountry || '',
+      passportIssueDate: formData?.passportIssueDate || '',
+      passportExpiryDate: formData?.passportExpiryDate || '',
+      nationalIdNumber: formData?.nationalIdNumber || '',
+      nationalIdIssueCountry: formData?.nationalIdIssueCountry || '',
+      nationalIdIssueDate: formData?.nationalIdIssueDate || '',
+      nationalIdExpiryDate: formData?.nationalIdExpiryDate || '',
+      highestEducationLevel: formData?.highestEducationLevel || '',
+      totalYearsOfStudy: formData?.totalYearsOfStudy || '',
+      currentEmployment: formData?.currentEmployment || '',
+      plannedEmployment: formData?.plannedEmployment || '',
     },
   });
 
@@ -39,7 +39,7 @@ export default function StepThree() {
   // Mettre à jour le formulaire quand formData change (chargement depuis la DB)
   const isInitialLoad = useRef(true);
   useEffect(() => {
-    if (isInitialLoad.current && typeof methods.reset === 'function') {
+    if (isInitialLoad.current && formData != null && typeof methods.reset === 'function') {
       methods.reset({
         passportNumber: formData.passportNumber || '',
         passportIssueCountry: formData.passportIssueCountry || '',

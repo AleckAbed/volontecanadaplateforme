@@ -23,8 +23,8 @@ const maritalStatusOptions = [
 export default function StepSeven() {
   const { step, gotoNextStep } = useStepper();
   const [formData, setFormData] = useAtom(formDataAtom);
-  const [children, setChildren] = useState<FamilyMember[]>(formData.children || []);
-  const [siblings, setSiblings] = useState<FamilyMember[]>(formData.siblings || []);
+  const [children, setChildren] = useState<FamilyMember[]>(formData?.children || []);
+  const [siblings, setSiblings] = useState<FamilyMember[]>(formData?.siblings || []);
 
   const {
     register,
@@ -32,30 +32,30 @@ export default function StepSeven() {
     control,
   } = useForm({
     defaultValues: {
-      applicantFullName: formData.applicant?.fullName || '',
-      applicantDateOfBirth: formData.applicant?.dateOfBirth || '',
-      applicantCountryOfBirth: formData.applicant?.countryOfBirth || '',
-      applicantMaritalStatus: formData.applicant?.maritalStatus || '',
-      applicantEmail: formData.applicant?.email || '',
-      applicantCurrentAddress: formData.applicant?.currentAddress || '',
-      spouseFullName: formData.spouse?.fullName || '',
-      spouseDateOfBirth: formData.spouse?.dateOfBirth || '',
-      spouseCountryOfBirth: formData.spouse?.countryOfBirth || '',
-      spouseMaritalStatus: formData.spouse?.maritalStatus || '',
-      spouseEmail: formData.spouse?.email || '',
-      spouseCurrentAddress: formData.spouse?.currentAddress || '',
-      motherFullName: formData.mother?.fullName || '',
-      motherDateOfBirth: formData.mother?.dateOfBirth || '',
-      motherCountryOfBirth: formData.mother?.countryOfBirth || '',
-      motherMaritalStatus: formData.mother?.maritalStatus || '',
-      motherEmail: formData.mother?.email || '',
-      motherCurrentAddress: formData.mother?.currentAddress || '',
-      fatherFullName: formData.father?.fullName || '',
-      fatherDateOfBirth: formData.father?.dateOfBirth || '',
-      fatherCountryOfBirth: formData.father?.countryOfBirth || '',
-      fatherMaritalStatus: formData.father?.maritalStatus || '',
-      fatherEmail: formData.father?.email || '',
-      fatherCurrentAddress: formData.father?.currentAddress || '',
+      applicantFullName: formData?.applicant?.fullName || '',
+      applicantDateOfBirth: formData?.applicant?.dateOfBirth || '',
+      applicantCountryOfBirth: formData?.applicant?.countryOfBirth || '',
+      applicantMaritalStatus: formData?.applicant?.maritalStatus || '',
+      applicantEmail: formData?.applicant?.email || '',
+      applicantCurrentAddress: formData?.applicant?.currentAddress || '',
+      spouseFullName: formData?.spouse?.fullName || '',
+      spouseDateOfBirth: formData?.spouse?.dateOfBirth || '',
+      spouseCountryOfBirth: formData?.spouse?.countryOfBirth || '',
+      spouseMaritalStatus: formData?.spouse?.maritalStatus || '',
+      spouseEmail: formData?.spouse?.email || '',
+      spouseCurrentAddress: formData?.spouse?.currentAddress || '',
+      motherFullName: formData?.mother?.fullName || '',
+      motherDateOfBirth: formData?.mother?.dateOfBirth || '',
+      motherCountryOfBirth: formData?.mother?.countryOfBirth || '',
+      motherMaritalStatus: formData?.mother?.maritalStatus || '',
+      motherEmail: formData?.mother?.email || '',
+      motherCurrentAddress: formData?.mother?.currentAddress || '',
+      fatherFullName: formData?.father?.fullName || '',
+      fatherDateOfBirth: formData?.father?.dateOfBirth || '',
+      fatherCountryOfBirth: formData?.father?.countryOfBirth || '',
+      fatherMaritalStatus: formData?.father?.maritalStatus || '',
+      fatherEmail: formData?.father?.email || '',
+      fatherCurrentAddress: formData?.father?.currentAddress || '',
     },
   });
 

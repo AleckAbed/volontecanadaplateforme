@@ -13,7 +13,7 @@ export default function StepFour() {
   const { step, gotoNextStep } = useStepper();
   const [formData, setFormData] = useAtom(formDataAtom);
   const [educationHistory, setEducationHistory] = useState<EducationEntry[]>(
-    formData.educationHistory || []
+    formData?.educationHistory || []
   );
 
   const {
@@ -21,10 +21,10 @@ export default function StepFour() {
     handleSubmit,
   } = useForm({
     defaultValues: {
-      elementaryYears: formData.elementaryYears || '',
-      secondaryYears: formData.secondaryYears || '',
-      universityYears: formData.universityYears || '',
-      vocationalYears: formData.vocationalYears || '',
+      elementaryYears: formData?.elementaryYears || '',
+      secondaryYears: formData?.secondaryYears || '',
+      universityYears: formData?.universityYears || '',
+      vocationalYears: formData?.vocationalYears || '',
     },
   });
 
