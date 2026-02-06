@@ -1,5 +1,6 @@
 /**
  * Service API pour communiquer avec le backend Laravel
+ * URL configurée via NEXT_PUBLIC_API_URL (Vercel ou .env.local)
  */
 
 import { getAuthToken, setAuthToken as setAuthTokenStorage, removeAuthToken } from '@/lib/auth-storage';
