@@ -3,7 +3,7 @@
 
 ---
 
-## 1. Objectif
+## 1. Objectif 1
 Ce document décrit **intégralement** le système de pointage du **Programme de sélection des travailleurs qualifiés (PSTQ)** afin de permettre l’implémentation :
 - d’un **formulaire de déclaration d’intérêt**,
 - d’un **calculateur automatique de score**,
