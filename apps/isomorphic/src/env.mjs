@@ -6,12 +6,9 @@ export const env = createEnv({
    * ServerSide Environment variables, not available on the client.
    */
   server: {
-    NODE_ENV: z.enum(['development', 'test', 'production']),
-    NEXTAUTH_SECRET:
-      process.env.NODE_ENV === 'production'
-        ? z.string().min(1)
-        : z.string().min(1).optional(),
-    NEXTAUTH_URL: z.string().url(),
+    NODE_ENV: z.enum(['development', 'test', 'production']).default('production'),
+    NEXTAUTH_SECRET: z.string().min(1).optional(),
+    NEXTAUTH_URL: z.string().url().optional(),
 
     // email
     SMTP_HOST: z.string().optional(),
