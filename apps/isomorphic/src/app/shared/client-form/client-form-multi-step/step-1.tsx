@@ -438,14 +438,6 @@ export default function StepOne() {
                     />
                   </>
                 )}
-                {hasCSQ === 'no' && (
-                  <DateField
-                    name="csqApplicationDate"
-                    control={control}
-                    label={t.csqDateLabel}
-                    className="mt-4"
-                  />
-                )}
               </div>
             </div>
           </div>
