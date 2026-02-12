@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import FormSummary from '@/app/shared/client-form/client-form-multi-step/form-summary';
 import { formDataAtom, useStepper } from '@/app/shared/client-form/client-form-multi-step';
+import { questionnaireLocaleAtom } from '@/app/shared/questionnaire-locale';
 import { Input, Select, RadioGroup, AdvancedRadio, Checkbox } from 'rizzui';
 import {
   clientFormStep2Schema,
@@ -15,23 +16,128 @@ import {
 import CountrySelect from '@/app/shared/client-form/country-select';
 import DateField from '@/app/shared/client-form/date-field';
 
-const maritalStatusOptions = [
-  { label: 'Célibataire', value: 'single' },
-  { label: 'Marié(e)', value: 'married' },
-  { label: 'Divorcé(e)', value: 'divorced' },
-  { label: 'Veuf(ve)', value: 'widowed' },
-  { label: 'Union de fait', value: 'common-law' },
-  { label: 'Séparé(e)', value: 'separated' },
-];
+const STEP2_T = {
+  fr: {
+    summaryTitle: 'Citoyenneté, Résidence et État matrimonial',
+    summaryDesc: "Veuillez fournir vos informations sur la citoyenneté, la résidence et l'état matrimonial",
+    citizenships: 'Citoyenneté(s)',
+    howManyCitizenships: 'Combien de citoyenneté(s) avez-vous?',
+    select: 'Sélectionner',
+    oneCitizenship: '1 citoyenneté',
+    citizenshipsCount: (n: number) => (n === 1 ? '1 citoyenneté' : `${n} citoyennetés`),
+    citizenshipNum: (n: number) => `Citoyenneté ${n}:`,
+    lastEntryTitle: 'Date et lieu de votre dernière entrée au Canada',
+    date: 'Date (AAAA/MM/JJ):',
+    place: 'Lieu:',
+    previousResidenceTitle: 'Pays de résidence antérieur(s)',
+    previousResidenceIntro: "Au cours des cinq dernières années, avez-vous vécu dans un pays autre que celui de votre citoyenneté ou de votre résidence actuelle (indiqué ci-dessus) pendant plus de six mois?",
+    yes: 'Oui',
+    no: 'Non',
+    previousResidenceDetails: 'Si vous avez répondu « oui », veuillez fournir des détails:',
+    maritalTitle: 'État matrimonial et relationnel',
+    maritalLabel: 'Votre état civil actuel:',
+    marriedIntro: '(Si vous êtes marié ou en union de fait) Fournir la date à laquelle vous vous êtes marié ou avez commencé à vivre en union de fait.',
+    spouseIntro: 'Fournissez le nom de votre époux/conjoint de fait actuel.',
+    surname: 'Nom(s) de famille:',
+    givenName: 'Prénom(s):',
+    previousSpouseTitle: 'Avez-vous déjà été marié ou en union de fait?',
+    previousSpouseIntro: 'Fournissez les informations suivantes pour votre ancien conjoint/conjoint de fait:',
+    dob: 'Date de naissance (AAAA/MM/JJ):',
+    relationshipType: 'Type de relation:',
+    relationshipStart: 'Date de début de la relation (AAAA/MM/JJ):',
+    relationshipEnd: 'Date de fin de la relation (AAAA/MM/JJ):',
+    contactTitle: 'Coordonnées',
+    contactIntro: 'Adresse postale actuelle de votre domicile',
+    aptUnit: "No d'app./unité:",
+    streetNumber: 'Numéro de rue:',
+    streetName: 'Nom de rue:',
+    city: 'Village/ville:',
+    province: 'Province ou État:',
+    country: 'Pays:',
+    postalCode: 'Code postal:',
+    single: 'Célibataire',
+    married: 'Marié(e)',
+    divorced: 'Divorcé(e)',
+    widowed: 'Veuf(ve)',
+    commonLaw: 'Union de fait',
+    separated: 'Séparé(e)',
+    marriage: 'Mariage',
+  },
+  en: {
+    summaryTitle: 'Citizenship, Residence and Marital Status',
+    summaryDesc: 'Please provide your citizenship, residence and marital status information',
+    citizenships: 'Citizenship(s)',
+    howManyCitizenships: 'How many citizenship(s) do you have?',
+    select: 'Select',
+    oneCitizenship: '1 citizenship',
+    citizenshipsCount: (n: number) => (n === 1 ? '1 citizenship' : `${n} citizenships`),
+    citizenshipNum: (n: number) => `Citizenship ${n}:`,
+    lastEntryTitle: 'Date and place of your last entry to Canada',
+    date: 'Date (YYYY/MM/DD):',
+    place: 'Place:',
+    previousResidenceTitle: 'Previous country/countries of residence',
+    previousResidenceIntro: 'In the past five years, have you lived in a country other than your country of citizenship or your current residence (indicated above) for more than six months?',
+    yes: 'Yes',
+    no: 'No',
+    previousResidenceDetails: 'If you answered "yes", please provide details:',
+    maritalTitle: 'Marital and relationship status',
+    maritalLabel: 'Your current marital status:',
+    marriedIntro: '(If you are married or in a common-law relationship) Provide the date you were married or started living in a common-law relationship.',
+    spouseIntro: 'Provide the name of your current spouse or common-law partner.',
+    surname: 'Surname(s):',
+    givenName: 'Given name(s):',
+    previousSpouseTitle: 'Have you ever been married or in a common-law relationship?',
+    previousSpouseIntro: 'Provide the following information for your former spouse or common-law partner:',
+    dob: 'Date of birth (YYYY/MM/DD):',
+    relationshipType: 'Type of relationship:',
+    relationshipStart: 'Relationship start date (YYYY/MM/DD):',
+    relationshipEnd: 'Relationship end date (YYYY/MM/DD):',
+    contactTitle: 'Contact information',
+    contactIntro: 'Current mailing address of your residence',
+    aptUnit: 'Apt/Unit no.:',
+    streetNumber: 'Street number:',
+    streetName: 'Street name:',
+    city: 'City/Town:',
+    province: 'Province or State:',
+    country: 'Country:',
+    postalCode: 'Postal code:',
+    single: 'Single',
+    married: 'Married',
+    divorced: 'Divorced',
+    widowed: 'Widowed',
+    commonLaw: 'Common-law',
+    separated: 'Separated',
+    marriage: 'Marriage',
+  },
+} as const;
 
-const relationshipTypeOptions = [
-  { label: 'Mariage', value: 'marriage' },
-  { label: 'Union de fait', value: 'common-law' },
-];
+function getMaritalOptions(locale: 'fr' | 'en') {
+  const t = STEP2_T[locale];
+  return [
+    { label: t.single, value: 'single' },
+    { label: t.married, value: 'married' },
+    { label: t.divorced, value: 'divorced' },
+    { label: t.widowed, value: 'widowed' },
+    { label: t.commonLaw, value: 'common-law' },
+    { label: t.separated, value: 'separated' },
+  ];
+}
+
+function getRelationshipOptions(locale: 'fr' | 'en') {
+  const t = STEP2_T[locale];
+  return [
+    { label: t.marriage, value: 'marriage' },
+    { label: t.commonLaw, value: 'common-law' },
+  ];
+}
 
 export default function StepTwo() {
   const { step, gotoNextStep } = useStepper();
   const [formData, setFormData] = useAtom(formDataAtom);
+  const [locale] = useAtom(questionnaireLocaleAtom);
+  const t = STEP2_T[locale] || STEP2_T.fr;
+  const maritalStatusOptions = getMaritalOptions(locale);
+  const relationshipTypeOptions = getRelationshipOptions(locale);
 
   const {
     register,
@@ -43,8 +149,12 @@ export default function StepTwo() {
   } = useForm<ClientFormStep2Input>({
     resolver: zodResolver(clientFormStep2Schema),
     defaultValues: {
+      numberOfCitizenships: formData?.numberOfCitizenships || '1',
       citizenship1: formData?.citizenship1 || '',
       citizenship2: formData?.citizenship2 || '',
+      citizenship3: formData?.citizenship3 || '',
+      citizenship4: formData?.citizenship4 || '',
+      citizenship5: formData?.citizenship5 || '',
       lastEntryDate: formData?.lastEntryDate || '',
       lastEntryPlace: formData?.lastEntryPlace || '',
       hasPreviousResidence: formData.hasPreviousResidence || 'no',
@@ -70,18 +180,24 @@ export default function StepTwo() {
     },
   });
 
+  const numberOfCitizenships = watch('numberOfCitizenships');
   const currentMaritalStatus = watch('currentMaritalStatus');
   const hasPreviousResidence = watch('hasPreviousResidence');
   const hasPreviousSpouse = watch('hasPreviousSpouse');
   const isMarriedOrCommonLaw = currentMaritalStatus === 'married' || currentMaritalStatus === 'common-law';
+  const nCitizenships = Math.min(5, Math.max(1, parseInt(String(numberOfCitizenships || '1'), 10) || 1));
 
   // Mettre à jour le formulaire quand formData change (chargement depuis la DB)
   const isInitialLoad = useRef(true);
   useEffect(() => {
     if (isInitialLoad.current) {
       reset({
+        numberOfCitizenships: formData?.numberOfCitizenships || '1',
         citizenship1: formData?.citizenship1 || '',
         citizenship2: formData?.citizenship2 || '',
+        citizenship3: formData?.citizenship3 || '',
+        citizenship4: formData?.citizenship4 || '',
+        citizenship5: formData?.citizenship5 || '',
         lastEntryDate: formData?.lastEntryDate || '',
         lastEntryPlace: formData?.lastEntryPlace || '',
         hasPreviousResidence: formData.hasPreviousResidence || 'no',
@@ -157,8 +273,8 @@ export default function StepTwo() {
       <div className="col-span-full flex flex-col justify-center @4xl:col-span-5">
         <FormSummary
           descriptionClassName="@7xl:me-10"
-          title="Citoyenneté, Résidence et État matrimonial"
-          description="Veuillez fournir vos informations sur la citoyenneté, la résidence et l'état matrimonial"
+          title={t.summaryTitle}
+          description={t.summaryDesc}
         />
       </div>
 
@@ -171,47 +287,62 @@ export default function StepTwo() {
           {/* Citoyenneté(s) */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              Citoyenneté(s)
+              {t.citizenships}
             </h3>
-            <div className="grid gap-4 @3xl:grid-cols-2">
-              <Controller
-                name="citizenship1"
-                control={control}
-                render={({ field: { value, onChange } }) => (
-                  <CountrySelect
-                    label="Pays:"
-                    value={value}
-                    onChange={onChange}
-                  />
-                )}
-              />
-              <Controller
-                name="citizenship2"
-                control={control}
-                render={({ field: { value, onChange } }) => (
-                  <CountrySelect
-                    label="Pays:"
-                    value={value}
-                    onChange={onChange}
-                  />
-                )}
-              />
+            <Controller
+              name="numberOfCitizenships"
+              control={control}
+              render={({ field: { value, onChange } }) => (
+                <Select
+                  label={t.howManyCitizenships}
+                  placeholder={t.select}
+                  options={[1, 2, 3, 4, 5].map((n) => ({
+                    label: t.citizenshipsCount(n),
+                    value: String(n),
+                  }))}
+                  value={value || '1'}
+                  onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value ?? '1')}
+                  getOptionValue={(option) => option.value}
+                  displayValue={(selected) => {
+                    const n = parseInt(String(selected), 10) || 1;
+                    return t.citizenshipsCount(n);
+                  }}
+                  error={errors.numberOfCitizenships?.message}
+                />
+              )}
+            />
+            <div className="mt-4 grid gap-4 @3xl:grid-cols-2">
+              {Array.from({ length: nCitizenships }, (_, i) => i + 1).map((num) => (
+                <Controller
+                  key={num}
+                  name={num === 1 ? 'citizenship1' : num === 2 ? 'citizenship2' : num === 3 ? 'citizenship3' : num === 4 ? 'citizenship4' : 'citizenship5'}
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <CountrySelect
+                      label={t.citizenshipNum(num)}
+                      value={value}
+                      onChange={onChange}
+                      error={num === 1 ? errors.citizenship1?.message : undefined}
+                    />
+                  )}
+                />
+              ))}
             </div>
           </div>
 
           {/* Dernière entrée au Canada */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              Date et lieu de votre dernière entrée au Canada
+              {t.lastEntryTitle}
             </h3>
             <div className="grid gap-4 @3xl:grid-cols-2">
               <Input
-                label="Date (AAAA/MM/JJ):"
+                label={t.date}
                 type="date"
                 {...register('lastEntryDate')}
               />
               <Input
-                label="Lieu:"
+                label={t.place}
                 {...register('lastEntryPlace')}
               />
             </div>
@@ -220,28 +351,28 @@ export default function StepTwo() {
           {/* Pays de résidence antérieur */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              Pays de résidence antérieur(s)
+              {t.previousResidenceTitle}
             </h3>
             <p className="mb-4 text-sm text-gray-600">
-              Au cours des cinq dernières années, avez-vous vécu dans un pays autre que celui de votre citoyenneté ou de votre résidence actuelle (indiqué ci-dessus) pendant plus de six mois?
+              {t.previousResidenceIntro}
             </p>
             <Controller
               name="hasPreviousResidence"
               control={control}
               render={({ field: { value, onChange } }) => (
                 <Select
-                  placeholder="Sélectionner"
+                  placeholder={t.select}
                   options={[
-                    { label: 'Oui', value: 'yes' },
-                    { label: 'Non', value: 'no' },
+                    { label: t.yes, value: 'yes' },
+                    { label: t.no, value: 'no' },
                   ]}
                   value={value || ''}
                   onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
                   getOptionValue={(option) => option.value}
                   displayValue={(selected) => {
                     const option = [
-                      { label: 'Oui', value: 'yes' },
-                      { label: 'Non', value: 'no' },
+                      { label: t.yes, value: 'yes' },
+                      { label: t.no, value: 'no' },
                     ].find((opt) => opt.value === selected);
                     return option?.label || '';
                   }}
@@ -250,7 +381,7 @@ export default function StepTwo() {
             />
             {hasPreviousResidence === 'yes' && (
               <Input
-                label="Si vous avez répondu « oui », veuillez fournir des détails:"
+                label={t.previousResidenceDetails}
                 {...register('previousResidenceDetails')}
                 className="mt-4"
                 rows={3}
@@ -261,15 +392,15 @@ export default function StepTwo() {
           {/* État matrimonial actuel */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              État matrimonial et relationnel
+              {t.maritalTitle}
             </h3>
             <Controller
               name="currentMaritalStatus"
               control={control}
               render={({ field: { value, onChange } }) => (
                 <Select
-                  label="Votre état civil actuel:"
-                  placeholder="Sélectionner"
+                  label={t.maritalLabel}
+                  placeholder={t.select}
                   options={maritalStatusOptions}
                   value={value || ''}
                   onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
@@ -285,23 +416,23 @@ export default function StepTwo() {
             {isMarriedOrCommonLaw && (
               <div className="mt-4 grid gap-4">
                 <p className="text-sm text-gray-600">
-                  (Si vous êtes marié ou en union de fait) Fournir la date à laquelle vous vous êtes marié ou avez commencé à vivre en union de fait.
+                  {t.marriedIntro}
                 </p>
                 <DateField
                   name="marriageDate"
                   control={control}
-                  label="Date (AAAA/MM/JJ):"
+                  label={t.date}
                 />
                 <p className="text-sm text-gray-600">
-                  Fournissez le nom de votre époux/conjoint de fait actuel.
+                  {t.spouseIntro}
                 </p>
                 <div className="grid gap-4 @3xl:grid-cols-2">
                   <Input
-                    label="Nom(s) de famille:"
+                    label={t.surname}
                     {...register('spouseLastName')}
                   />
                   <Input
-                    label="Prénom(s):"
+                    label={t.givenName}
                     {...register('spouseFirstName')}
                   />
                 </div>
@@ -312,25 +443,25 @@ export default function StepTwo() {
           {/* Ancien conjoint */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              Avez-vous déjà été marié ou en union de fait?
+              {t.previousSpouseTitle}
             </h3>
             <Controller
               name="hasPreviousSpouse"
               control={control}
               render={({ field: { value, onChange } }) => (
                 <Select
-                  placeholder="Sélectionner"
+                  placeholder={t.select}
                   options={[
-                    { label: 'Oui', value: 'yes' },
-                    { label: 'Non', value: 'no' },
+                    { label: t.yes, value: 'yes' },
+                    { label: t.no, value: 'no' },
                   ]}
                   value={value || ''}
                   onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
                   getOptionValue={(option) => option.value}
                   displayValue={(selected) => {
                     const option = [
-                      { label: 'Oui', value: 'yes' },
-                      { label: 'Non', value: 'no' },
+                      { label: t.yes, value: 'yes' },
+                      { label: t.no, value: 'no' },
                     ].find((opt) => opt.value === selected);
                     return option?.label || '';
                   }}
@@ -340,29 +471,29 @@ export default function StepTwo() {
             {hasPreviousSpouse === 'yes' && (
               <div className="mt-4 grid gap-4">
                 <p className="text-sm text-gray-600">
-                  Fournissez les informations suivantes pour votre ancien conjoint/conjoint de fait:
+                  {t.previousSpouseIntro}
                 </p>
                 <div className="grid gap-4 @3xl:grid-cols-2">
                   <Input
-                    label="Nom(s) de famille:"
+                    label={t.surname}
                     {...register('previousSpouseLastName')}
                   />
                   <Input
-                    label="Prénom(s):"
+                    label={t.givenName}
                     {...register('previousSpouseFirstName')}
                   />
                   <DateField
                     name="previousSpouseDateOfBirth"
                     control={control}
-                    label="Date de naissance (AAAA/MM/JJ):"
+                    label={t.dob}
                   />
                   <Controller
                     name="previousSpouseRelationshipType"
                     control={control}
                     render={({ field: { value, onChange } }) => (
                       <Select
-                        label="Type de relation:"
-                        placeholder="Sélectionner"
+                        label={t.relationshipType}
+                        placeholder={t.select}
                         options={relationshipTypeOptions}
                         value={value || ''}
                         onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
@@ -377,12 +508,12 @@ export default function StepTwo() {
                   <DateField
                     name="previousSpouseRelationshipStartDate"
                     control={control}
-                    label="Date de début de la relation (AAAA/MM/JJ):"
+                    label={t.relationshipStart}
                   />
                   <DateField
                     name="previousSpouseRelationshipEndDate"
                     control={control}
-                    label="Date de fin de la relation (AAAA/MM/JJ):"
+                    label={t.relationshipEnd}
                   />
                 </div>
               </div>
@@ -392,34 +523,40 @@ export default function StepTwo() {
           {/* Coordonnées */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              Coordonnées
+              {t.contactTitle}
             </h3>
             <p className="mb-4 text-sm font-medium text-gray-700 dark:text-gray-300">
-              Adresse postale actuelle de votre domicile
+              {t.contactIntro}
             </p>
             <div className="grid gap-4">
-              <Input
-                label="No d'app./unité:"
-                {...register('apartmentUnit')}
-              />
-              <div className="grid gap-4 @3xl:grid-cols-2">
-                <Input
-                  label="Numéro de rue:"
-                  {...register('streetNumber')}
-                />
-                <Input
-                  label="Nom de rue:"
-                  {...register('streetName')}
-                />
+              <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-6">
+                  <Input
+                    label={t.aptUnit}
+                    {...register('apartmentUnit')}
+                  />
+                </div>
+                <div className="col-span-6">
+                  <Input
+                    label={t.streetNumber}
+                    {...register('streetNumber')}
+                  />
+                </div>
+                <div className="col-span-12">
+                  <Input
+                    label={t.streetName}
+                    {...register('streetName')}
+                  />
+                </div>
               </div>
               <div className="grid gap-4 @3xl:grid-cols-2">
                 <Input
-                  label="Village/ville:"
+                  label={t.city}
                   {...register('city')}
                   error={errors.city?.message}
                 />
                 <Input
-                  label="Province ou État:"
+                  label={t.province}
                   {...register('province')}
                 />
               </div>
@@ -429,7 +566,7 @@ export default function StepTwo() {
                   control={control}
                   render={({ field: { value, onChange } }) => (
                     <CountrySelect
-                      label="Pays:"
+                      label={t.country}
                       value={value}
                       onChange={onChange}
                       error={errors.country?.message}
@@ -437,7 +574,7 @@ export default function StepTwo() {
                   )}
                 />
                 <Input
-                  label="Code postal:"
+                  label={t.postalCode}
                   {...register('postalCode')}
                 />
               </div>

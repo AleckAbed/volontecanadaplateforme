@@ -98,6 +98,16 @@ export const routes = {
     list: '/questionnaires',
     details: (id: string) => `/questionnaires/${id}`,
   },
+  clients: {
+    list: '/admin/clients',
+    create: '/admin/clients/create',
+    details: (id: string) => `/admin/clients/${id}`,
+  },
+  dossiers: {
+    list: '/admin/dossiers',
+    create: '/admin/dossiers/create',
+    details: (id: string) => `/admin/dossiers/${id}`,
+  },
   questionnaireVerify: '/questionnaire/verify',
   invoice: {
     home: '/invoice',

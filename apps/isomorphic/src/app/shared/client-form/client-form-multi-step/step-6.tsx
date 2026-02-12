@@ -5,12 +5,16 @@ import { useAtom } from 'jotai';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import FormSummary from '@/app/shared/client-form/client-form-multi-step/form-summary';
 import { formDataAtom, useStepper } from '@/app/shared/client-form/client-form-multi-step';
+import { questionnaireLocaleAtom } from '@/app/shared/questionnaire-locale';
+import { STEP6_T } from '@/app/shared/client-form/client-form-translations';
 import DynamicTable from './dynamic-table';
 import type { PersonalBackgroundEntry } from '@/validators/client-form.schema';
 
 export default function StepSix() {
   const { step, gotoNextStep } = useStepper();
   const [formData, setFormData] = useAtom(formDataAtom);
+  const [locale] = useAtom(questionnaireLocaleAtom);
+  const t = STEP6_T[locale] || STEP6_T.fr;
   const [personalBackground, setPersonalBackground] = useState<PersonalBackgroundEntry[]>(
     formData?.personalBackground || []
   );
@@ -44,8 +48,8 @@ export default function StepSix() {
       <div className="col-span-full flex flex-col justify-center @4xl:col-span-5">
         <FormSummary
           descriptionClassName="@7xl:me-10"
-          title="Antécédents personnels"
-          description="Veuillez préciser vos antécédents personnels au cours des 10 dernières années ou depuis votre 18e anniversaire de naissance si cela remonte à moins de 10 ans. Commencez par l'information la plus récente."
+          title={t.summaryTitle}
+          description={t.summaryDesc}
         />
       </div>
 
@@ -55,7 +59,8 @@ export default function StepSix() {
         className="col-span-full rounded-lg bg-white p-5 @4xl:col-span-7 @4xl:p-7 dark:bg-gray-0"
       >
         <p className="mb-4 text-sm text-gray-600">
-          À la rubrique « Activité, » inscrivez votre profession ou votre emploi, si vous travaillez. Si vous ne travaillez pas, donnez des renseignements sur ce que vous faisiez (p.ex., sans emploi, études, voyage, retraite, en détention, etc.). Si vous étiez à l'extérieur de votre pays ou territoire de nationalité, indiquez votre statut dans le pays ou le territoire où vous étiez. Remarque: Veuillez ne laisser aucune période inexpliquée.
+        Veuillez préciser vos antécédents personnels au cours des 10 dernières années ou depuis votre 18e anniversaire de naissance si cela remonte à moins de 10 ans. Commencez
+        par l’information la plus récente. À la rubrique « Activité, » inscrivez votre profession ou votre emploi, si vous travaillez. Si vous ne travaillez pas, donnez des renseignements sur ce que vous faisiez (p.ex., sans emploi, études, voyage, retraite, en détention, etc.). Si vous étiez à l'extérieur de votre pays ou territoire de nationalité, indiquez votre statut dans le pays ou le territoire où vous étiez. Remarque: Veuillez ne laisser aucune période inexpliquée.
         </p>
         <DynamicTable<PersonalBackgroundEntry>
           title="Antécédents personnels"

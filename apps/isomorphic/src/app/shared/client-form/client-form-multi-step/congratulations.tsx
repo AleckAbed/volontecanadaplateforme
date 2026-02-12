@@ -1,17 +1,21 @@
 'use client';
 
-import { PiCheckCircleFill } from 'react-icons/pi';
+import { PiCheckCircleFill, PiFilePdf } from 'react-icons/pi';
 import { Button } from 'rizzui';
 import { useRouter } from 'next/navigation';
 import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { formDataAtom } from './index';
+import { questionnaireLocaleAtom } from '@/app/shared/questionnaire-locale';
+import { CONGRATULATIONS_T } from '@/app/shared/client-form/client-form-translations';
 import { apiService } from '@/services/api';
 import toast from 'react-hot-toast';
 
 export default function Congratulations() {
   const router = useRouter();
   const [formData] = useAtom(formDataAtom);
+  const [locale] = useAtom(questionnaireLocaleAtom);
+  const t = CONGRATULATIONS_T[locale] || CONGRATULATIONS_T.fr;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -52,29 +56,65 @@ export default function Congratulations() {
           <>
             <div className="mx-auto h-20 w-20 animate-spin rounded-full border-4 border-white border-t-transparent" />
             <h1 className="mt-6 text-2xl font-semibold text-white @3xl:text-3xl">
-          Soumission en cours...
-        </h1>
+              {t.submitting}
+            </h1>
             <p className="mt-4 text-base text-white/80">
-              Veuillez patienter pendant que nous enregistrons votre formulaire.
+              {t.pleaseWait}
             </p>
           </>
         ) : (
           <>
             <PiCheckCircleFill className="mx-auto h-20 w-20 text-white" />
             <h1 className="mt-6 text-2xl font-semibold text-white @3xl:text-3xl">
-              Formulaire soumis avec succès !
+              {t.success}
             </h1>
             <p className="mt-4 text-base text-white/80">
-              Votre formulaire a été soumis avec succès. Nous vous contacterons
-              bientôt pour la suite du processus.
+              {t.successDesc}
             </p>
-            <Button
-              onClick={() => router.push('/')}
-              className="mt-8"
-              size="lg"
-            >
-              Retour à l'accueil
-            </Button>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <Button
+                variant="outline"
+                className="border-white text-white hover:bg-white/10"
+                size="lg"
+                onClick={async () => {
+                  try {
+                    const { buildClientFormPdf } = await import('./build-client-form-pdf');
+                    const data = formData != null && typeof formData === 'object' && !Array.isArray(formData) ? formData : {};
+                    await buildClientFormPdf(data, locale === 'en' ? 'en' : 'fr', { preview: true });
+                  } catch (e: any) {
+                    console.error(e);
+                    toast.error(e?.message ? `PDF: ${e.message}` : 'Erreur lors de la génération du PDF');
+                  }
+                }}
+              >
+                <PiFilePdf className="me-2 h-5 w-5" />
+                {t.previewPdf}
+              </Button>
+              <Button
+                variant="outline"
+                className="border-white text-white hover:bg-white/10"
+                size="lg"
+                onClick={async () => {
+                  try {
+                    const { buildClientFormPdf } = await import('./build-client-form-pdf');
+                    const data = formData != null && typeof formData === 'object' && !Array.isArray(formData) ? formData : {};
+                    await buildClientFormPdf(data, locale === 'en' ? 'en' : 'fr');
+                  } catch (e: any) {
+                    console.error(e);
+                    toast.error(e?.message ? `PDF: ${e.message}` : 'Erreur lors de la génération du PDF');
+                  }
+                }}
+              >
+                <PiFilePdf className="me-2 h-5 w-5" />
+                {t.downloadPdf}
+              </Button>
+              <Button
+                onClick={() => router.push('/')}
+                size="lg"
+              >
+                {t.backHome}
+              </Button>
+            </div>
           </>
         )}
       </div>

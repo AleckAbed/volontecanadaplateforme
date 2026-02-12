@@ -7,6 +7,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import FormSummary from '@/app/shared/sponsor-form/sponsor-form-multi-step/form-summary';
 import { sponsorFormDataAtom, useSponsorStepper, useSponsorFormLoad } from '@/app/shared/sponsor-form/sponsor-form-multi-step';
+import { questionnaireLocaleAtom } from '@/app/shared/questionnaire-locale';
+import { SPONSOR_STEP2_T } from '@/app/shared/sponsor-form/sponsor-form-translations';
 import { Input, Textarea, RadioGroup, AdvancedRadio, Button } from 'rizzui';
 import {
   sponsorFormStep2Schema,
@@ -226,8 +228,8 @@ export default function StepTwo() {
 
         <FormSummary
           descriptionClassName="@7xl:me-10"
-          title="Renseignements sur le répondant"
-          description="Veuillez remplir toutes les informations personnelles et professionnelles"
+          title={t.summaryTitle}
+          description={t.summaryDesc}
         />
       </div>
 

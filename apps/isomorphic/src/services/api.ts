@@ -293,11 +293,55 @@ class ApiService {
   }
 
   /**
-   * Obtenir la liste des clients (Admin)
+   * Obtenir la liste des clients (Admin) — pour questionnaires
    */
   async getClients(): Promise<ApiResponse> {
     return this.request<ApiResponse>('/admin/clients', {
       method: 'GET',
+    });
+  }
+
+  /**
+   * Module clients : liste paginée (Admin)
+   */
+  async getModuleClients(params?: { page?: number; per_page?: number; search?: string; client_type?: string }): Promise<ApiResponse> {
+    const sp = new URLSearchParams();
+    if (params?.page != null) sp.set('page', String(params.page));
+    if (params?.per_page != null) sp.set('per_page', String(params.per_page));
+    if (params?.search) sp.set('search', params.search);
+    if (params?.client_type) sp.set('client_type', params.client_type);
+    const qs = sp.toString();
+    return this.request<ApiResponse>(`/admin/module-clients${qs ? `?${qs}` : ''}`, { method: 'GET' });
+  }
+
+  /**
+   * Créer un client (Admin) — seul ou avec membres de famille
+   */
+  async createModuleClient(payload: {
+    client_type: 'single' | 'family';
+    first_name: string;
+    last_name: string;
+    email: string;
+    password: string;
+    phone?: string;
+    date_of_birth?: string;
+    nationality?: string;
+    passport_number?: string;
+    address?: string;
+    family_members?: Array<{
+      first_name: string;
+      last_name: string;
+      relationship: string;
+      date_of_birth?: string;
+      nationality?: string;
+      passport_number?: string;
+      phone?: string;
+      email?: string;
+    }>;
+  }): Promise<ApiResponse> {
+    return this.request<ApiResponse>('/admin/module-clients', {
+      method: 'POST',
+      body: JSON.stringify(payload),
     });
   }
 

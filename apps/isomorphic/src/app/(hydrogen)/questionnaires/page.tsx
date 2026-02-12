@@ -195,12 +195,11 @@ export default function QuestionnairesPage() {
     return filtered;
   }, [questionnaires, selectedFormType, searchTerm, sortConfig]);
 
-  // Pagination des données filtrées
+  // Pagination côté serveur : l’API renvoie déjà une page, on affiche les données filtrées de cette page (sans slice)
   const itemsPerPage = 10;
-  const totalFilteredPages = Math.ceil(filteredAndSortedQuestionnaires.length / itemsPerPage);
+  const paginatedQuestionnaires = filteredAndSortedQuestionnaires;
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedQuestionnaires = filteredAndSortedQuestionnaires.slice(startIndex, endIndex);
+  const endIndex = startIndex + paginatedQuestionnaires.length;
 
   const pageHeader = {
     title: 'Questionnaires Envoyés',
@@ -397,12 +396,14 @@ export default function QuestionnairesPage() {
               </table>
             </div>
 
-            {/* Pagination */}
-            {totalFilteredPages > 1 && (
+            {/* Pagination (côté serveur : totalPages et totalItems viennent de l’API) */}
+            {totalPages > 1 && (
               <div className="mt-6 flex items-center justify-between">
                 <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Affichage de {startIndex + 1} à {Math.min(endIndex, filteredAndSortedQuestionnaires.length)} sur {filteredAndSortedQuestionnaires.length} questionnaire(s)
-                  {searchTerm || selectedFormType ? ' (filtrés)' : ''}
+                  {paginatedQuestionnaires.length > 0
+                    ? `Affichage de ${startIndex + 1} à ${startIndex + paginatedQuestionnaires.length} sur ${totalItems} questionnaire(s)`
+                    : `Aucun résultat sur cette page (${totalItems} au total)`}
+                  {searchTerm || selectedFormType ? ' (filtrés sur cette page)' : ''}
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
@@ -416,15 +417,15 @@ export default function QuestionnairesPage() {
                     Précédent
                   </Button>
                   <div className="text-sm text-gray-700 dark:text-gray-300">
-                    Page {currentPage} sur {totalFilteredPages}
+                    Page {currentPage} sur {totalPages}
                   </div>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      setCurrentPage((prev) => Math.min(totalFilteredPages, prev + 1));
+                      setCurrentPage((prev) => Math.min(totalPages, prev + 1));
                     }}
-                    disabled={currentPage === totalFilteredPages}
+                    disabled={currentPage === totalPages}
                   >
                     Suivant
                   </Button>

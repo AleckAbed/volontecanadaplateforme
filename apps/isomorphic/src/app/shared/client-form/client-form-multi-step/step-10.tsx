@@ -7,6 +7,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import FormSummary from '@/app/shared/client-form/client-form-multi-step/form-summary';
 import { formDataAtom, useStepper } from '@/app/shared/client-form/client-form-multi-step';
+import { questionnaireLocaleAtom } from '@/app/shared/questionnaire-locale';
+import { STEP10_T } from '@/app/shared/client-form/client-form-translations';
 import { Checkbox, Textarea } from 'rizzui';
 import {
   clientFormStep10Schema,
@@ -63,6 +65,8 @@ const securityQuestions = [
 export default function StepTen() {
   const { step, gotoNextStep } = useStepper();
   const [formData, setFormData] = useAtom(formDataAtom);
+  const [locale] = useAtom(questionnaireLocaleAtom);
+  const t = STEP10_T[locale] || STEP10_T.fr;
   const [hasYesAnswers, setHasYesAnswers] = useState(false);
 
   const {
@@ -118,8 +122,8 @@ export default function StepTen() {
       <div className="col-span-full flex flex-col justify-center @4xl:col-span-5">
         <FormSummary
           descriptionClassName="@7xl:me-10"
-          title="Questions de sécurité"
-          description="Est-ce que vous-même ou, si vous êtes le requérant principal, l'un des membres de votre famille nommés sur la demande de résidence permanente au Canada :"
+          title={t.summaryTitle}
+          description={t.summaryDesc}
         />
       </div>
 

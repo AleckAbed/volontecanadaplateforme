@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { FiSave, FiX } from 'react-icons/fi';
-import { Button } from 'rizzui';
+import { Button, RadioGroup, AdvancedRadio } from 'rizzui';
 import cn from '@core/utils/class-names';
 import { siteConfig } from '@/config/site.config';
 import { useAtom } from 'jotai';
@@ -12,6 +12,7 @@ import {
   sponsorFormDataAtom,
   pickSponsorFields,
 } from '@/app/shared/sponsor-form/sponsor-form-multi-step';
+import { questionnaireLocaleAtom, type FormLocale } from '@/app/shared/questionnaire-locale';
 import { apiService } from '@/services/api';
 import toast from 'react-hot-toast';
 import { useState, useEffect } from 'react';
@@ -23,6 +24,7 @@ interface HeaderProps {
 export default function SponsorFormHeader({ className }: HeaderProps) {
   const router = useRouter();
   const [formData] = useAtom(sponsorFormDataAtom);
+  const [locale, setLocale] = useAtom(questionnaireLocaleAtom);
   const [isSaving, setIsSaving] = useState(false);
   const [questionnaireCode, setQuestionnaireCode] = useState<string | null>(null);
 
@@ -73,7 +75,7 @@ export default function SponsorFormHeader({ className }: HeaderProps) {
         className
       )}
     >
-      <Link href={'/'}>
+      <Link href="https://volontecanada.ca" target="_blank" rel="noopener noreferrer">
         <Image
           src="/logo2.png"
           alt={siteConfig.title}
@@ -83,7 +85,34 @@ export default function SponsorFormHeader({ className }: HeaderProps) {
           priority
         />
       </Link>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 rounded-lg border border-white/40 bg-white/10 px-4 py-2 backdrop-blur-sm">
+          <span className="text-xs font-medium text-white/90">Langue</span>
+          <RadioGroup
+            value={locale}
+            setValue={(v) => setLocale((v as FormLocale) || 'fr')}
+            className="flex gap-4"
+          >
+            <AdvancedRadio
+              value="fr"
+              title="Français"
+              className="[&_.rizzui-advanced-radio]:flex [&_.rizzui-advanced-radio]:items-center [&_.rizzui-advanced-radio]:gap-2 [&_.rizzui-advanced-radio]:px-3 [&_.rizzui-advanced-radio]:py-1.5"
+              inputClassName="[&~span]:border-2 [&~span]:border-white/70 [&~span]:rounded-full [&:checked~span]:bg-white [&:checked~span]:border-white [&:checked~span]:ring-2 [&:checked~span]:ring-white/50"
+            >
+              <span className="text-lg leading-none" aria-hidden>🇫🇷</span>
+              <span className="text-sm text-white">Français</span>
+            </AdvancedRadio>
+            <AdvancedRadio
+              value="en"
+              title="English"
+              className="[&_.rizzui-advanced-radio]:flex [&_.rizzui-advanced-radio]:items-center [&_.rizzui-advanced-radio]:gap-2 [&_.rizzui-advanced-radio]:px-3 [&_.rizzui-advanced-radio]:py-1.5"
+              inputClassName="[&~span]:border-2 [&~span]:border-white/70 [&~span]:rounded-full [&:checked~span]:bg-white [&:checked~span]:border-white [&:checked~span]:ring-2 [&:checked~span]:ring-white/50"
+            >
+              <span className="text-lg leading-none" aria-hidden>🇬🇧</span>
+              <span className="text-sm text-white">English</span>
+            </AdvancedRadio>
+          </RadioGroup>
+        </div>
         <Button variant="text" className="text-white hover:enabled:text-white">
           Questions?
         </Button>

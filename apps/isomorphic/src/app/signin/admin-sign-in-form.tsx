@@ -10,9 +10,9 @@ import { loginSchema, LoginSchema } from '@/validators/login.schema';
 import { useAuth } from '@/hooks/useAuth';
 
 const initialValues: LoginSchema = {
-  email: 'admin@cabinet-immigration.com',
-  password: 'password',
-  rememberMe: true,
+  email: '',
+  password: '',
+  rememberMe: false,
 };
 
 export default function AdminSignInForm() {

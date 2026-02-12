@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Badge } from 'rizzui/badge';
 import { ActionIcon } from 'rizzui/action-icon';
 import cn from '@core/utils/class-names';
@@ -64,6 +65,9 @@ function HeaderMenuRight() {
 }
 
 export default function Header() {
+  const pathname = usePathname();
+  const isQuestionnaires = pathname?.startsWith('/questionnaires');
+
   return (
     <header
       className={
@@ -76,13 +80,23 @@ export default function Header() {
             <Sidebar className="static w-full xl:p-0 2xl:w-full [&>div]:xl:rounded-none" />
           }
         />
-        <Link
-          href={'/'}
-          aria-label="Site Logo"
-          className="me-4 w-9 shrink-0 text-gray-800 hover:text-gray-900 lg:me-5 xl:hidden"
-        >
-          <Logo iconOnly={true} />
-        </Link>
+        {isQuestionnaires ? (
+          <a
+            href="https://volontecanada.ca"
+            aria-label="Volonté Canada"
+            className="me-4 w-9 shrink-0 text-gray-800 hover:text-gray-900 lg:me-5 xl:hidden"
+          >
+            <Logo iconOnly={true} />
+          </a>
+        ) : (
+          <Link
+            href="/"
+            aria-label="Site Logo"
+            className="me-4 w-9 shrink-0 text-gray-800 hover:text-gray-900 lg:me-5 xl:hidden"
+          >
+            <Logo iconOnly={true} />
+          </Link>
+        )}
         <SearchWidget />
       </div>
       <HeaderMenuRight />

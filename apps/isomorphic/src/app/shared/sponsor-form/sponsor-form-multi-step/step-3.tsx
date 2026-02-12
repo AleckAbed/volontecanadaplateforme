@@ -18,6 +18,8 @@ import DateField from '@/app/shared/client-form/date-field';
 export default function StepThree() {
   const { step, gotoNextStep } = useSponsorStepper();
   const [formData, setFormData] = useAtom(sponsorFormDataAtom);
+  const [locale] = useAtom(questionnaireLocaleAtom);
+  const t = SPONSOR_STEP3_T[locale] || SPONSOR_STEP3_T.fr;
   const { dataLoadedKey } = useSponsorFormLoad();
   const [isAlertVisible, setIsAlertVisible] = useState(true);
 
@@ -298,8 +300,8 @@ export default function StepThree() {
 
         <FormSummary
           descriptionClassName="@7xl:me-10"
-          title="Renseignements sur le répondant - Suite"
-          description="Veuillez remplir les informations complémentaires"
+          title={t.summaryTitle}
+          description={t.summaryDesc}
         />
       </div>
 
@@ -448,7 +450,7 @@ export default function StepThree() {
                     { key: 'lastName', label: 'Nom', type: 'text' },
                     { key: 'firstName', label: 'Prénoms', type: 'text' },
                     { key: 'dateOfBirth', label: 'Date de naissance', type: 'date' },
-                    { key: 'placeOfBirth', label: 'Lieu de naissance', type: 'text' },
+                    { key: 'placeOfBirth', label: 'Ville de naissance', type: 'text' },
                     { key: 'deathDate', label: 'Si décédé, la date', type: 'date' },
                   ]}
                   data={watch('previousRelationships') || []}

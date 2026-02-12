@@ -1,5 +1,8 @@
 'use client';
 
+import { useAtom } from 'jotai';
+import { questionnaireLocaleAtom } from '@/app/shared/questionnaire-locale';
+import { getCommonT } from '@/app/shared/form-translations';
 import {
   sponsorStepTotalSteps,
   useSponsorStepper,
@@ -22,16 +25,15 @@ export default function SponsorFormSummary({
   descriptionClassName,
 }: FormSummaryProps) {
   const { step } = useSponsorStepper();
-  // Le sponsor-form a 3 étapes de formulaire (StepOne, StepTwo, StepThree)
-  // + 1 étape de félicitations (StepFour/Congratulations)
-  // Donc on affiche "Étape X sur 3" (on exclut l'étape Congratulations du comptage)
-  const totalFormSteps = 3; // 3 étapes de formulaire
+  const [locale] = useAtom(questionnaireLocaleAtom);
+  const ct = getCommonT(locale);
+  const totalFormSteps = 3;
   
   return (
     <div className={cn('text-base text-white', className)}>
       <div className="flex">
-        <span className="me-2 mt-2.5 h-0.5 w-11 bg-white/[.35]" /> Étape{' '}
-        {step + 1} sur {totalFormSteps}
+        <span className="me-2 mt-2.5 h-0.5 w-11 bg-white/[.35]" /> {ct.step}{' '}
+        {step + 1} {ct.of} {totalFormSteps}
       </div>
       <article className="mt-4 @3xl:mt-9">
         <h1

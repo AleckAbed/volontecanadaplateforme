@@ -1,6 +1,6 @@
 'use client';
 
-import { useAtom } from 'jotai';
+import { atom, useAtom } from 'jotai';
 import { atomWithReset, atomWithStorage } from 'jotai/utils';
 import { useEffect, useRef, useState } from 'react';
 import cn from '@core/utils/class-names';
@@ -15,7 +15,6 @@ import StepFive from '@/app/shared/client-form/client-form-multi-step/step-5';
 import StepSix from '@/app/shared/client-form/client-form-multi-step/step-6';
 import StepSeven from '@/app/shared/client-form/client-form-multi-step/step-7';
 import StepEight from '@/app/shared/client-form/client-form-multi-step/step-8';
-import StepNine from '@/app/shared/client-form/client-form-multi-step/step-9';
 import StepTen from '@/app/shared/client-form/client-form-multi-step/step-10';
 import Congratulations from '@/app/shared/client-form/client-form-multi-step/congratulations';
 
@@ -47,8 +46,12 @@ type FormDataType = {
   countryOfBirth?: string;
   
   // Étape 2: Citoyenneté, résidence et état matrimonial
+  numberOfCitizenships?: string;
   citizenship1?: string;
   citizenship2?: string;
+  citizenship3?: string;
+  citizenship4?: string;
+  citizenship5?: string;
   lastEntryDate?: string;
   lastEntryPlace?: string;
   hasPreviousResidence?: 'yes' | 'no';
@@ -151,8 +154,12 @@ export const initialFormData: FormDataType = {
   dateOfBirth: '',
   placeOfBirth: '',
   countryOfBirth: '',
+  numberOfCitizenships: '1',
   citizenship1: '',
   citizenship2: '',
+  citizenship3: '',
+  citizenship4: '',
+  citizenship5: '',
   lastEntryDate: '',
   lastEntryPlace: '',
   hasPreviousResidence: 'no',
@@ -252,10 +259,22 @@ const safeClientFormStorage = {
   },
 };
 
-export const formDataAtom = atomWithStorage<FormDataType>(
+const formDataStorageAtom = atomWithStorage<FormDataType>(
   'clientFormData',
   initialFormData,
   safeClientFormStorage as any
+);
+
+/** Langue du formulaire (réexport depuis le module partagé pour tous les formulaires) */
+export { questionnaireLocaleAtom as formLocaleAtom } from '@/app/shared/questionnaire-locale';
+export type { FormLocale } from '@/app/shared/questionnaire-locale';
+
+/** Version sûre : ne renvoie jamais null (évite "numberOfFamilyMembers" on null au premier rendu / hydratation). */
+export const formDataAtom = atom(
+  (get) => get(formDataStorageAtom) ?? initialFormData,
+  (get, set, update: FormDataType | ((prev: FormDataType) => FormDataType)) => {
+    set(formDataStorageAtom, typeof update === 'function' ? (update as (prev: FormDataType) => FormDataType)(get(formDataStorageAtom) ?? initialFormData) : update);
+  }
 );
 
 function pickClientFields(input: any): FormDataType {
@@ -280,7 +299,6 @@ export enum Step {
   StepSix,
   StepSeven,
   StepEight,
-  StepNine,
   StepTen,
   StepEleven,
 }
@@ -318,7 +336,6 @@ const MAP_STEP_TO_COMPONENT = {
   [Step.StepSix]: StepSix,
   [Step.StepSeven]: StepSeven,
   [Step.StepEight]: StepEight,
-  [Step.StepNine]: StepNine,
   [Step.StepTen]: StepTen,
   [Step.StepEleven]: Congratulations,
 };

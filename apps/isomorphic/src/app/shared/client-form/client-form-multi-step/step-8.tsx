@@ -5,6 +5,8 @@ import { useAtom } from 'jotai';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import FormSummary from '@/app/shared/client-form/client-form-multi-step/form-summary';
 import { formDataAtom, useStepper } from '@/app/shared/client-form/client-form-multi-step';
+import { questionnaireLocaleAtom } from '@/app/shared/questionnaire-locale';
+import { STEP8_T } from '@/app/shared/client-form/client-form-translations';
 import { Checkbox } from 'rizzui';
 import DynamicTable from './dynamic-table';
 import type { TravelEntry } from '@/validators/client-form.schema';
@@ -12,6 +14,8 @@ import type { TravelEntry } from '@/validators/client-form.schema';
 export default function StepEight() {
   const { step, gotoNextStep } = useStepper();
   const [formData, setFormData] = useAtom(formDataAtom);
+  const [locale] = useAtom(questionnaireLocaleAtom);
+  const t = STEP8_T[locale] || STEP8_T.fr;
   const [travels, setTravels] = useState<TravelEntry[]>(formData?.travels || []);
   const [noTrips, setNoTrips] = useState(formData?.noTrips || false);
 
@@ -45,8 +49,8 @@ export default function StepEight() {
       <div className="col-span-full flex flex-col justify-center @4xl:col-span-5">
         <FormSummary
           descriptionClassName="@7xl:me-10"
-          title="Liste des voyages"
-          description="Veuillez énumérer tous les voyages que vous et les membres de votre famille âgés de 18 ans ou plus avez effectués depuis les 10 dernières années hors de votre pays d'origine ou de résidence"
+          title={t.summaryTitle}
+          description={t.summaryDesc}
         />
       </div>
 

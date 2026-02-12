@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -25,14 +25,21 @@ export default function VerifyQuestionnaireClient() {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<VerifyInput>({
     resolver: zodResolver(verifySchema),
-    defaultValues: {
-      email: searchParams.get('email') || '',
-      code: searchParams.get('code') || '',
-    },
+    defaultValues: { email: '', code: '' },
   });
+
+  // Remplir le formulaire depuis l’URL après le montage (évite problèmes SSR / error boundary)
+  useEffect(() => {
+    const email = searchParams.get('email') ?? '';
+    const code = searchParams.get('code') ?? '';
+    if (email || code) {
+      reset({ email, code });
+    }
+  }, [searchParams, reset]);
 
   const onSubmit: SubmitHandler<VerifyInput> = async (data) => {
     setIsLoading(true);

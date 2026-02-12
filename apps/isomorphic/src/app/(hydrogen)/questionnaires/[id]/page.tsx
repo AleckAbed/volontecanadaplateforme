@@ -8,8 +8,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from 'rizzui';
 import { routes } from '@/config/routes';
 import toast from 'react-hot-toast';
-import { Loader } from 'rizzui';
-import { Badge } from 'rizzui';
+import { Loader, Badge } from 'rizzui';
+import { PiFilePdf } from 'react-icons/pi';
 import { calculatePSTQScore } from '@/services/pstq-scoring';
 
 interface QuestionnaireRequest {
@@ -230,12 +230,65 @@ export default function QuestionnaireDetailsPage() {
   return (
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
-        <Button
-          onClick={() => router.push(routes.questionnaires.list)}
-          variant="outline"
-        >
-          Retour à la liste
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          {questionnaire.form_type === 'questionnaire_demandeur_001' && questionnaire.form_data != null && (
+            <>
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  try {
+                    const { buildClientFormPdf } = await import('@/app/shared/client-form/client-form-multi-step/build-client-form-pdf');
+                    await buildClientFormPdf(questionnaire.form_data ?? {}, 'fr', {
+                      preview: true,
+                      meta: {
+                        formType: getFormTypeLabel(questionnaire.form_type),
+                        submittedAt: questionnaire.sent_at,
+                        status: questionnaire.status,
+                        completedAt: questionnaire.completed_at,
+                        updatedAt: (questionnaire as any).updated_at,
+                      },
+                    });
+                  } catch (e: any) {
+                    console.error(e);
+                    toast.error(e?.message ? `PDF: ${e.message}` : 'Erreur lors de la génération du PDF');
+                  }
+                }}
+              >
+                <PiFilePdf className="me-2 h-5 w-5" />
+                Prévisualiser le PDF
+              </Button>
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  try {
+                    const { buildClientFormPdf } = await import('@/app/shared/client-form/client-form-multi-step/build-client-form-pdf');
+                    await buildClientFormPdf(questionnaire.form_data ?? {}, 'fr', {
+                      meta: {
+                        formType: getFormTypeLabel(questionnaire.form_type),
+                        submittedAt: questionnaire.sent_at,
+                        status: questionnaire.status,
+                        completedAt: questionnaire.completed_at,
+                        updatedAt: (questionnaire as any).updated_at,
+                      },
+                    });
+                  } catch (e: any) {
+                    console.error(e);
+                    toast.error(e?.message ? `PDF: ${e.message}` : 'Erreur lors de la génération du PDF');
+                  }
+                }}
+              >
+                <PiFilePdf className="me-2 h-5 w-5" />
+                Télécharger la version PDF
+              </Button>
+            </>
+          )}
+          <Button
+            onClick={() => router.push(routes.questionnaires.list)}
+            variant="outline"
+          >
+            Retour à la liste
+          </Button>
+        </div>
       </PageHeader>
 
       <div className="mt-6 space-y-6">

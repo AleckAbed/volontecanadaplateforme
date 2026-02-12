@@ -5,6 +5,8 @@ import { useAtom } from 'jotai';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import FormSummary from '@/app/shared/client-form/client-form-multi-step/form-summary';
 import { formDataAtom, useStepper } from '@/app/shared/client-form/client-form-multi-step';
+import { questionnaireLocaleAtom } from '@/app/shared/questionnaire-locale';
+import { STEP3_T } from '@/app/shared/client-form/client-form-translations';
 import { Input } from 'rizzui';
 import {
   clientFormStep3Schema,
@@ -16,6 +18,8 @@ import DateField from '@/app/shared/client-form/date-field';
 export default function StepThree() {
   const { step, gotoNextStep } = useStepper();
   const [formData, setFormData] = useAtom(formDataAtom);
+  const [locale] = useAtom(questionnaireLocaleAtom);
+  const t = STEP3_T[locale] || STEP3_T.fr;
 
   const methods = useForm<ClientFormStep3Input>({
     defaultValues: {
@@ -100,8 +104,8 @@ export default function StepThree() {
       <div className="col-span-full flex flex-col justify-center @4xl:col-span-5">
         <FormSummary
           descriptionClassName="@7xl:me-10"
-          title="Passeport, Pièce d'identité et Scolarité/Emploi"
-          description="Veuillez fournir les informations sur votre passeport, pièce d'identité nationale et vos détails de scolarité/emploi"
+          title={t.summaryTitle}
+          description={t.summaryDesc}
         />
       </div>
 
@@ -111,14 +115,13 @@ export default function StepThree() {
         className="col-span-full rounded-lg bg-white p-5 @4xl:col-span-7 @4xl:p-7 dark:bg-gray-0"
       >
         <div className="grid gap-6">
-          {/* Passeport */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              Passeport
+              {t.passport}
             </h3>
             <div className="grid gap-4 @3xl:grid-cols-2">
               <Input
-                label="Numéro du passeport/titre de voyage:"
+                label={t.passportNumber}
                 {...register('passportNumber')}
                 className="w-full"
               />
@@ -127,7 +130,7 @@ export default function StepThree() {
                 control={control}
                 render={({ field: { value, onChange } }) => (
                   <CountrySelect
-                    label="Pays de délivrance:"
+                    label={t.issueCountry}
                     value={value}
                     onChange={onChange}
                   />
@@ -136,26 +139,25 @@ export default function StepThree() {
               <DateField
                 name="passportIssueDate"
                 control={control}
-                label="Date de délivrance (AAAA/MM/JJ):"
+                label={t.issueDate}
                 className="w-full"
               />
               <DateField
                 name="passportExpiryDate"
                 control={control}
-                label="Date d'expiration (AAAA/MM/JJ):"
+                label={t.expiryDate}
                 className="w-full"
               />
             </div>
           </div>
 
-          {/* Pièce d'identité nationale */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              Pièce d'identité nationale
+              {t.nationalId}
             </h3>
             <div className="grid gap-4 @3xl:grid-cols-2">
               <Input
-                label="Numéro Pièce d'identité nationale:"
+                label={t.nationalIdNumber}
                 {...register('nationalIdNumber')}
                 className="w-full"
               />
@@ -164,7 +166,7 @@ export default function StepThree() {
                 control={control}
                 render={({ field: { value, onChange } }) => (
                   <CountrySelect
-                    label="Pays de délivrance:"
+                    label={t.nationalIdCountry}
                     value={value}
                     onChange={onChange}
                   />
@@ -173,36 +175,35 @@ export default function StepThree() {
               <DateField
                 name="nationalIdIssueDate"
                 control={control}
-                label="Date de délivrance (AAAA/MM/JJ):"
+                label={t.issueDate}
                 className="w-full"
               />
               <DateField
                 name="nationalIdExpiryDate"
                 control={control}
-                label="Date d'expiration (AAAA/MM/JJ):"
+                label={t.expiryDate}
                 className="w-full"
               />
             </div>
           </div>
 
-          {/* Détails de scolarité/emploi */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              Détails de scolarité/emploi
+              {t.educationEmployment}
             </h3>
             <div className="grid gap-4">
               <div>
                 <h4 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Renseignements sur les études
+                  {t.educationInfo}
                 </h4>
                 <div className="grid gap-4 @3xl:grid-cols-2">
                   <Input
-                    label="Niveau de scolarité le plus élevé:"
+                    label={t.highestLevel}
                     {...register('highestEducationLevel')}
                     className="w-full"
                   />
                   <Input
-                    label="Nombre d'années d'études au total:"
+                    label={t.totalYears}
                     type="number"
                     {...register('totalYearsOfStudy')}
                     className="w-full"
@@ -211,16 +212,16 @@ export default function StepThree() {
               </div>
               <div>
                 <h4 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Renseignements sur la profession
+                  {t.employmentInfo}
                 </h4>
                 <div className="grid gap-4 @3xl:grid-cols-2">
                   <Input
-                    label="Emploi actuel:"
+                    label={t.current}
                     {...register('currentEmployment')}
                     className="w-full"
                   />
                   <Input
-                    label="Emploi prévu:"
+                    label={t.planned}
                     {...register('plannedEmployment')}
                     className="w-full"
                   />

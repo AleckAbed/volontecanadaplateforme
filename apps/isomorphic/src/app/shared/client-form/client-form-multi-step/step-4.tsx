@@ -5,6 +5,8 @@ import { useAtom } from 'jotai';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import FormSummary from '@/app/shared/client-form/client-form-multi-step/form-summary';
 import { formDataAtom, useStepper } from '@/app/shared/client-form/client-form-multi-step';
+import { questionnaireLocaleAtom } from '@/app/shared/questionnaire-locale';
+import { STEP4_T } from '@/app/shared/client-form/client-form-translations';
 import { Input } from 'rizzui';
 import DynamicTable from './dynamic-table';
 import type { EducationEntry } from '@/validators/client-form.schema';
@@ -12,6 +14,8 @@ import type { EducationEntry } from '@/validators/client-form.schema';
 export default function StepFour() {
   const { step, gotoNextStep } = useStepper();
   const [formData, setFormData] = useAtom(formDataAtom);
+  const [locale] = useAtom(questionnaireLocaleAtom);
+  const t = STEP4_T[locale] || STEP4_T.fr;
   const [educationHistory, setEducationHistory] = useState<EducationEntry[]>(
     formData?.educationHistory || []
   );
@@ -56,8 +60,8 @@ export default function StepFour() {
       <div className="col-span-full flex flex-col justify-center @4xl:col-span-5">
         <FormSummary
           descriptionClassName="@7xl:me-10"
-          title="Scolarité"
-          description="Indiquez le nombre d'années que vous avez réussies pour chacun des niveaux d'études suivants"
+          title={t.summaryTitle}
+          description={t.summaryDesc}
         />
       </div>
 
@@ -69,22 +73,22 @@ export default function StepFour() {
         <div className="grid gap-6">
           <div className="grid gap-4 @3xl:grid-cols-2">
             <Input
-              label="Élémentaire/École primaire (années):"
+              label="Élémentaire/École primaire (nombre d'années):"
               type="number"
               {...register('elementaryYears')}
             />
             <Input
-              label="Secondaire (années):"
+              label="Secondaire (nombre d'années):"
               type="number"
               {...register('secondaryYears')}
             />
             <Input
-              label="Université/Collège (années):"
+              label="Université/Collège (nombre d'années):"
               type="number"
               {...register('universityYears')}
             />
             <Input
-              label="École de formation professionnelle ou autre école postsecondaire (années):"
+              label="École de formation professionnelle ou autre école postsecondaire (nombre d'années):"
               type="number"
               {...register('vocationalYears')}
             />

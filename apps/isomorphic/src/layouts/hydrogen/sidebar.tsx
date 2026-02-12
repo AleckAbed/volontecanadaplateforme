@@ -3,9 +3,16 @@
 import Logo from '@core/components/logo';
 import cn from '@core/utils/class-names';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { SidebarMenu } from './sidebar-menu';
 
+const VOLONTE_SITE_URL = 'https://volontecanada.ca';
+
 export default function Sidebar({ className }: { className?: string }) {
+  const pathname = usePathname();
+  const isQuestionnaires = pathname?.startsWith('/questionnaires');
+  const logoHref = isQuestionnaires ? VOLONTE_SITE_URL : '/';
+
   return (
     <aside
       className={cn(
@@ -14,13 +21,23 @@ export default function Sidebar({ className }: { className?: string }) {
       )}
     >
       <div className="sticky top-0 z-40 bg-gray-0/10 px-6 pb-5 pt-5 dark:bg-gray-100/5 2xl:px-8 2xl:pt-6">
-        <Link
-          href={'/'}
-          aria-label="Site Logo"
-          className="text-gray-800 hover:text-gray-900"
-        >
-          <Logo className="max-w-[155px]" />
-        </Link>
+        {isQuestionnaires ? (
+          <a
+            href={logoHref}
+            aria-label="Volonté Canada"
+            className="text-gray-800 hover:text-gray-900"
+          >
+            <Logo className="max-w-[155px]" />
+          </a>
+        ) : (
+          <Link
+            href={logoHref}
+            aria-label="Site Logo"
+            className="text-gray-800 hover:text-gray-900"
+          >
+            <Logo className="max-w-[155px]" />
+          </Link>
+        )}
       </div>
 
       <div className="custom-scrollbar h-[calc(100%-80px)] overflow-y-auto">

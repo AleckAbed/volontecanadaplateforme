@@ -32,6 +32,8 @@ const scolariteOptions = [
 export default function StepOne() {
   const { step, gotoNextStep } = usePSTQStepper();
   const [formData, setFormData] = useAtom(pstqFormDataAtom);
+  const [locale] = useAtom(questionnaireLocaleAtom);
+  const t = PSTQ_STEP1_T[locale] || PSTQ_STEP1_T.fr;
   const [isAlertVisible, setIsAlertVisible] = useState(true);
   const [score, setScore] = useState<any>(null);
 
@@ -156,8 +158,8 @@ export default function StepOne() {
 
         <FormSummary
           descriptionClassName="@7xl:me-10"
-          title="Bloc A - Capital humain"
-          description="Renseignements sur votre capital humain (français, âge, expérience, scolarité)"
+          title={t.summaryTitle}
+          description={t.summaryDesc}
         />
 
         {/* Affichage du score en temps réel */}

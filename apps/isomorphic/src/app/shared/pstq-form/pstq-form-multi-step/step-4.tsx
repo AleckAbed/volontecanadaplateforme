@@ -32,8 +32,8 @@ export default function StepFour() {
       <div className="col-span-full flex flex-col justify-center @4xl:col-span-5">
         <FormSummary
           descriptionClassName="@7xl:me-10"
-          title="Récapitulatif du score"
-          description="Votre score total et le détail par bloc"
+          title={t.summaryTitle}
+          description={t.summaryDesc}
         />
       </div>
 

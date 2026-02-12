@@ -7,6 +7,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import FormSummary from '@/app/shared/pstq-form/pstq-form-multi-step/form-summary';
 import { pstqFormDataAtom, usePSTQStepper } from '@/app/shared/pstq-form/pstq-form-multi-step';
+import { questionnaireLocaleAtom } from '@/app/shared/questionnaire-locale';
+import { PSTQ_STEP3_T } from '@/app/shared/pstq-form/pstq-form-translations';
 import { Input, Select, RadioGroup, AdvancedRadio, Checkbox, Button } from 'rizzui';
 import {
   pstqFormBlocCSchema,
@@ -175,8 +177,8 @@ export default function StepThree() {
 
         <FormSummary
           descriptionClassName="@7xl:me-10"
-          title="Bloc C - Facteurs d'adaptation"
-          description="Renseignements sur les facteurs d'adaptation"
+          title={t.summaryTitle}
+          description={t.summaryDesc}
         />
 
         {/* Affichage du score en temps réel */}

@@ -25,15 +25,19 @@ export const clientFormStep1Schema = z.object({
   
   // Renseignements sur la naissance
   dateOfBirth: z.string().min(1, { message: 'La date de naissance est requise' }),
-  placeOfBirth: z.string().min(1, { message: 'Le lieu de naissance est requis' }),
+  placeOfBirth: z.string().min(1, { message: 'La ville de naissance est requis' }),
   countryOfBirth: z.string().min(1, { message: 'Le pays de naissance est requis' }),
 });
 
 // Étape 2: Citoyenneté, résidence et état matrimonial
 export const clientFormStep2Schema = z.object({
-  // Citoyenneté(s)
+  // Nombre de citoyennetés (1 par défaut), puis autant de pays que ce nombre
+  numberOfCitizenships: z.string().min(1, { message: 'Veuillez indiquer le nombre de citoyennetés' }),
   citizenship1: z.string().optional(),
   citizenship2: z.string().optional(),
+  citizenship3: z.string().optional(),
+  citizenship4: z.string().optional(),
+  citizenship5: z.string().optional(),
   
   // Dernière entrée au Canada
   lastEntryDate: z.string().optional(),
@@ -66,7 +70,18 @@ export const clientFormStep2Schema = z.object({
   province: z.string().optional(),
   country: z.string().min(1, { message: 'Le pays est requis' }),
   postalCode: z.string().optional(),
-});
+}).refine(
+  (data) => {
+    const n = parseInt(String(data.numberOfCitizenships || '1'), 10) || 1;
+    if (n >= 1 && !data.citizenship1?.trim()) return false;
+    if (n >= 2 && !data.citizenship2?.trim()) return false;
+    if (n >= 3 && !data.citizenship3?.trim()) return false;
+    if (n >= 4 && !data.citizenship4?.trim()) return false;
+    if (n >= 5 && !data.citizenship5?.trim()) return false;
+    return true;
+  },
+  { message: 'Veuillez sélectionner le pays pour chaque citoyenneté indiquée.', path: ['citizenship1'] }
+);
 
 // Étape 3: Passeport, pièce d'identité et scolarité/emploi
 export const clientFormStep3Schema = z.object({
@@ -143,7 +158,10 @@ export const clientFormStep6Schema = z.object({
 // Étape 7: Famille (Demandeur, Époux, Mère, Père, Enfants, Frères et sœurs)
 export const familyMemberSchema = z.object({
   fullName: z.string().optional(),
+  lastName: z.string().optional(),
+  firstName: z.string().optional(),
   dateOfBirth: z.string().optional(),
+  placeOfBirth: z.string().optional(),
   countryOfBirth: z.string().optional(),
   maritalStatus: z.string().optional(),
   email: z.string().optional(),

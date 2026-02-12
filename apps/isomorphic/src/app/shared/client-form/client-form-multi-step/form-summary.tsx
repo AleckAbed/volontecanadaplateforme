@@ -1,5 +1,7 @@
 'use client';
 
+import { useAtom } from 'jotai';
+import { questionnaireLocaleAtom } from '@/app/shared/questionnaire-locale';
 import {
   stepTotalSteps,
   useStepper,
@@ -14,6 +16,8 @@ interface FormSummaryProps {
   descriptionClassName?: string;
 }
 
+const stepLabel = { fr: { step: 'Étape', of: 'sur' }, en: { step: 'Step', of: 'of' } } as const;
+
 export default function FormSummary({
   title,
   description,
@@ -22,11 +26,13 @@ export default function FormSummary({
   descriptionClassName,
 }: FormSummaryProps) {
   const { step } = useStepper();
+  const [locale] = useAtom(questionnaireLocaleAtom);
+  const labels = stepLabel[locale] || stepLabel.fr;
   return (
     <div className={cn('text-base text-white', className)}>
       <div className="flex">
-        <span className="me-2 mt-2.5 h-0.5 w-11 bg-white/[.35]" /> Étape{' '}
-        {step + 1} sur {stepTotalSteps - 1}
+        <span className="me-2 mt-2.5 h-0.5 w-11 bg-white/[.35]" /> {labels.step}{' '}
+        {step + 1} {labels.of} {stepTotalSteps - 1}
       </div>
       <article className="mt-4 @3xl:mt-9">
         <h1

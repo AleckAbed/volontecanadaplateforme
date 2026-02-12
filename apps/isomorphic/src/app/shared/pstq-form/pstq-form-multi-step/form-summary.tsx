@@ -1,5 +1,8 @@
 'use client';
 
+import { useAtom } from 'jotai';
+import { questionnaireLocaleAtom } from '@/app/shared/questionnaire-locale';
+import { getCommonT } from '@/app/shared/form-translations';
 import {
   pstqStepTotalSteps,
   usePSTQStepper,
@@ -22,15 +25,15 @@ export default function PSTQFormSummary({
   descriptionClassName,
 }: FormSummaryProps) {
   const { step } = usePSTQStepper();
-  // Le PSTQ a 4 étapes de formulaire + 1 étape de félicitations
-  // Donc on affiche "Étape X sur 4"
-  const totalFormSteps = 4; // 4 étapes de formulaire
+  const [locale] = useAtom(questionnaireLocaleAtom);
+  const ct = getCommonT(locale);
+  const totalFormSteps = 4;
   
   return (
     <div className={cn('text-base text-white', className)}>
       <div className="flex">
-        <span className="me-2 mt-2.5 h-0.5 w-11 bg-white/[.35]" /> Étape{' '}
-        {step + 1} sur {totalFormSteps}
+        <span className="me-2 mt-2.5 h-0.5 w-11 bg-white/[.35]" /> {ct.step}{' '}
+        {step + 1} {ct.of} {totalFormSteps}
       </div>
       <article className="mt-4 @3xl:mt-9">
         <h1

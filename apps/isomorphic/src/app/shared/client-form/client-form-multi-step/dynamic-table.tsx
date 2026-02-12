@@ -6,6 +6,7 @@ import { DatePicker } from '@core/ui/datepicker';
 
 interface DynamicTableProps<T> {
   title: string;
+  description?: string;
   columns: Array<{
     key: string;
     label: string;
@@ -22,6 +23,7 @@ interface DynamicTableProps<T> {
 
 export default function DynamicTable<T extends Record<string, any>>({
   title,
+  description,
   columns,
   data,
   onAdd,
@@ -31,11 +33,19 @@ export default function DynamicTable<T extends Record<string, any>>({
 }: DynamicTableProps<T>) {
   return (
     <div className="overflow-x-auto">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-          {title}
-        </h3>
+      <div className="mb-4 grid grid-cols-12 gap-4 items-start">
+        <div className="col-span-8">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            {title}
+          </h3>
+          {description && (
+            <p className="mt-1 text-sm font-normal text-gray-600 dark:text-gray-400">
+              {description}
+            </p>
+          )}
+        </div>
         {data.length < maxRows && (
+          <div className="col-span-4 flex justify-end">
           <Button
             type="button"
             variant="outline"
@@ -46,6 +56,7 @@ export default function DynamicTable<T extends Record<string, any>>({
             <PiPlus className="h-4 w-4" />
             Ajouter une ligne
           </Button>
+          </div>
         )}
       </div>
       <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">

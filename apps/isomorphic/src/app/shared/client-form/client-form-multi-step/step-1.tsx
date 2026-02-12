@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import FormSummary from '@/app/shared/client-form/client-form-multi-step/form-summary';
 import { formDataAtom, useStepper } from '@/app/shared/client-form/client-form-multi-step';
+import { questionnaireLocaleAtom } from '@/app/shared/questionnaire-locale';
 import { Input, Select, RadioGroup, AdvancedRadio } from 'rizzui';
 import {
   clientFormStep1Schema,
@@ -16,18 +17,119 @@ import CountrySelect from '@/app/shared/client-form/country-select';
 import DateField from '@/app/shared/client-form/date-field';
 import { PiX } from 'react-icons/pi';
 
-const languageOptions = [
+/** Traductions pour l’étape 1 du questionnaire (zone question / intro + titres) */
+const STEP1_T = {
+  fr: {
+    intro: "Nous vous demandons de remplir ce questionnaire. Gardez votre passeport et/ou votre document national d'identité à portée de main pendant que vous remplissez ce questionnaire. Si vous avez des personnes à charge (accompagnant ou non), ces informations leur seront également demandées.",
+    summaryTitle: "Détails de la demande et Informations personnelles",
+    detailsTitle: "Détails de la demande",
+    familyMembersLabel: "Combien de membres de votre famille, dont vous-même, seront inclus dans cette demande?",
+    languagePreferenceLabel: "Langue de préférence pour:",
+    correspondenceLabel: "La correspondance:",
+    interviewLabel: "L'entrevue:",
+    csqQuestion: "Avez-vous reçu votre Certificat de sélection du Québec (CSQ)?",
+    yes: "Oui",
+    no: "Non",
+    csqNumberLabel: "Si oui, entrez le numéro. Numéro CSQ:",
+    csqApplicationDateLabelWhenYes: "Date de la demande du CSQ (AAAA/MM/JJ):",
+    csqDateLabel: "Si non, quand avez-vous demandé votre CSQ? Date (AAAA/MM/JJ):",
+    personalInfoTitle: "Renseignements personnels",
+    personalInfoIntro: "Entrez votre nom de famille complet, tel qu'il figure dans votre passeport ou titre de voyage. Si votre document ne comporte qu'un seul nom, inscrivez-le dans le champ du nom de famille et laissez le champ du prénom vide.",
+    lastNameLabel: "Nom(s) de famille:",
+    firstNameLabel: "Prénom(s):",
+    uciLabel: "IUC (si vous avez un identificateur unique de client):",
+    physicalTitle: "Caractéristiques physiques",
+    sexLabel: "Sexe:",
+    eyeColorLabel: "Couleur des yeux:",
+    heightLabel: "Taille (cm):",
+    birthTitle: "Renseignements sur la naissance",
+    dobLabel: "Date de naissance (AAAAMM/JJ):",
+    placeOfBirthLabel: "Lieu de naissance:",
+    countryLabel: "Pays:",
+    selectPlaceholder: "Sélectionner",
+    step: "Étape",
+    of: "sur",
+    member: "membre",
+    members: "membres",
+    languageFr: "Français",
+    languageEn: "Anglais",
+    sexMale: "Masculin",
+    sexFemale: "Féminin",
+    sexOther: "Autre",
+    eyeBlue: "Bleu",
+    eyeGreen: "Vert",
+    eyeBrown: "Marron",
+    eyeBlack: "Noir",
+    eyeGray: "Gris",
+    eyeHazel: "Noisette",
+  },
+  en: {
+    intro: "We ask you to complete this questionnaire. Keep your passport and/or national identity document on hand while you complete it. If you have dependants (accompanying or not), this information will also be requested for them.",
+    summaryTitle: "Application details and Personal information",
+    detailsTitle: "Application details",
+    familyMembersLabel: "How many family members, including yourself, will be included in this application?",
+    languagePreferenceLabel: "Preferred language for:",
+    correspondenceLabel: "Correspondence:",
+    interviewLabel: "Interview:",
+    csqQuestion: "Have you received your Québec Certificate of Selection (CSQ)?",
+    yes: "Yes",
+    no: "No",
+    csqNumberLabel: "If yes, enter the number. CSQ number:",
+    csqApplicationDateLabelWhenYes: "CSQ application date (YYYY/MM/DD):",
+    csqDateLabel: "If no, when did you apply for your CSQ? Date (YYYY/MM/DD):",
+    personalInfoTitle: "Personal information",
+    personalInfoIntro: "Enter your full surname as shown on your passport or travel document. If your document has only one name, enter it in the surname field and leave the given name field blank.",
+    lastNameLabel: "Surname(s):",
+    firstNameLabel: "Given name(s):",
+    uciLabel: "UCI (if you have a unique client identifier):",
+    physicalTitle: "Physical characteristics",
+    sexLabel: "Sex:",
+    eyeColorLabel: "Eye colour:",
+    heightLabel: "Height (cm):",
+    birthTitle: "Birth information",
+    dobLabel: "Date of birth (YYYY/MM/DD):",
+    placeOfBirthLabel: "Place of birth:",
+    countryLabel: "Country:",
+    selectPlaceholder: "Select",
+    step: "Step",
+    of: "of",
+    member: "member",
+    members: "members",
+    languageFr: "French",
+    languageEn: "English",
+    sexMale: "Male",
+    sexFemale: "Female",
+    sexOther: "Other",
+    eyeBlue: "Blue",
+    eyeGreen: "Green",
+    eyeBrown: "Brown",
+    eyeBlack: "Black",
+    eyeGray: "Gray",
+    eyeHazel: "Hazel",
+  },
+} as const;
+
+const languageOptionsFr = [
   { label: 'Français', value: 'Français' },
   { label: 'Anglais', value: 'Anglais' },
 ];
+const languageOptionsEn = [
+  { label: 'French', value: 'Français' },
+  { label: 'English', value: 'Anglais' },
+];
 
-const sexOptions = [
+const sexOptionsFr = [
   { label: 'Masculin', value: 'male' },
   { label: 'Féminin', value: 'female' },
   { label: 'Autre', value: 'other' },
 ];
+const sexOptionsEn = [
+  { label: 'Male', value: 'male' },
+  { label: 'Female', value: 'female' },
+  { label: 'Other', value: 'other' },
+];
 
-const eyeColorOptions = [
+const eyeColorOptionsFr = [
   { label: 'Bleu', value: 'blue' },
   { label: 'Vert', value: 'green' },
   { label: 'Marron', value: 'brown' },
@@ -35,11 +137,24 @@ const eyeColorOptions = [
   { label: 'Gris', value: 'gray' },
   { label: 'Noisette', value: 'hazel' },
 ];
+const eyeColorOptionsEn = [
+  { label: 'Blue', value: 'blue' },
+  { label: 'Green', value: 'green' },
+  { label: 'Brown', value: 'brown' },
+  { label: 'Black', value: 'black' },
+  { label: 'Gray', value: 'gray' },
+  { label: 'Hazel', value: 'hazel' },
+];
 
 export default function StepOne() {
   const { step, gotoNextStep } = useStepper();
   const [formData, setFormData] = useAtom(formDataAtom);
+  const [locale] = useAtom(questionnaireLocaleAtom);
   const [isAlertVisible, setIsAlertVisible] = useState(true);
+  const t = STEP1_T[locale] || STEP1_T.fr;
+  const languageOptions = locale === 'en' ? languageOptionsEn : languageOptionsFr;
+  const sexOptions = locale === 'en' ? sexOptionsEn : sexOptionsFr;
+  const eyeColorOptions = locale === 'en' ? eyeColorOptionsEn : eyeColorOptionsFr;
 
   const {
     register,
@@ -175,10 +290,7 @@ export default function StepOne() {
                 </div>
                 <div className="ml-3 flex-1">
                   <p className="text-sm font-bold text-blue-800 dark:text-blue-200">
-                    Nous vous demandons de remplir ce questionnaire y compris les informations figurant sur votre passeport
-                    et/ou votre document national d'identité, si vous en possédez un. Gardez-les à portée de main pendant que
-                    vous remplissez ce formulaire. Si vous avez des personnes à charge (accompagnant ou non), ces informations
-                    leur seront également demandées.
+                    {t.intro}
                   </p>
                 </div>
               </div>
@@ -188,8 +300,8 @@ export default function StepOne() {
 
         <FormSummary
           descriptionClassName="@7xl:me-10"
-          title="Détails de la demande et Informations personnelles"
-          description="Veuillez remplir les détails de votre demande et vos informations personnelles de base"
+          title={t.summaryTitle}
+          description=""
         />
       </div>
 
@@ -202,21 +314,21 @@ export default function StepOne() {
           {/* Détails de la demande */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              Détails de la demande
+              {t.detailsTitle}
             </h3>
             <div className="grid gap-4">
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Combien de membres de votre famille, dont vous-même, seront inclus dans cette demande?
+                  {t.familyMembersLabel}
                 </label>
                 <Controller
                   name="numberOfFamilyMembers"
                   control={control}
                   render={({ field: { value, onChange } }) => (
                     <Select
-                      placeholder="Sélectionner"
+                      placeholder={t.selectPlaceholder}
                       options={Array.from({ length: 10 }, (_, i) => ({
-                        label: `${i + 1} membre${i > 0 ? 's' : ''}`,
+                        label: `${i + 1} ${i > 0 ? t.members : t.member}`,
                         value: `${i + 1}`,
                       }))}
                       value={value}
@@ -224,7 +336,7 @@ export default function StepOne() {
                       getOptionValue={(option) => option.value}
                       displayValue={(selected) => {
                         const option = Array.from({ length: 10 }, (_, i) => ({
-                          label: `${i + 1} membre${i > 0 ? 's' : ''}`,
+                          label: `${i + 1} ${i > 0 ? t.members : t.member}`,
                           value: `${i + 1}`,
                         })).find((opt) => opt.value === selected);
                         return option?.label || '';
@@ -237,17 +349,17 @@ export default function StepOne() {
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Langue de préférence pour:
+                  {t.languagePreferenceLabel}
                 </label>
                 <div className="grid gap-4 @3xl:grid-cols-2">
                   <div>
-                    <label className="mb-1 block text-xs text-gray-600">La correspondance:</label>
+                    <label className="mb-1 block text-xs text-gray-600">{t.correspondenceLabel}</label>
                     <Controller
                       name="preferredLanguageCorrespondence"
                       control={control}
                       render={({ field: { value, onChange } }) => (
                         <Select
-                          placeholder="Sélectionner"
+                          placeholder={t.selectPlaceholder}
                           options={languageOptions}
                           value={value}
                           onChange={(selected: string | { value: string } | null) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
@@ -262,13 +374,13 @@ export default function StepOne() {
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs text-gray-600">L'entrevue:</label>
+                    <label className="mb-1 block text-xs text-gray-600">{t.interviewLabel}</label>
                     <Controller
                       name="preferredLanguageInterview"
                       control={control}
                       render={({ field: { value, onChange } }) => (
                         <Select
-                          placeholder="Sélectionner"
+                          placeholder={t.selectPlaceholder}
                           options={languageOptions}
                           value={value}
                           onChange={(selected: string | { value: string } | null) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
@@ -287,7 +399,7 @@ export default function StepOne() {
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Avez-vous reçu votre Certificat de sélection du Québec (CSQ)?
+                  {t.csqQuestion}
                 </label>
                 <Controller
                   name="hasCSQ"
@@ -299,30 +411,38 @@ export default function StepOne() {
                         className="[&_.rizzui-advanced-radio]:px-4 [&_.rizzui-advanced-radio]:py-2"
                         inputClassName="[&~span]:border-0 [&~span]:ring-1 [&~span]:ring-gray-200 [&~span:hover]:ring-primary [&:checked~span:hover]:ring-primary [&:checked~span]:border-1 [&:checked~.rizzui-advanced-radio]:ring-2"
                       >
-                        Oui
+                        {t.yes}
                       </AdvancedRadio>
                       <AdvancedRadio
                         value="no"
                         className="[&_.rizzui-advanced-radio]:px-4 [&_.rizzui-advanced-radio]:py-2"
                         inputClassName="[&~span]:border-0 [&~span]:ring-1 [&~span]:ring-gray-200 [&~span:hover]:ring-primary [&:checked~span:hover]:ring-primary [&:checked~span]:border-1 [&:checked~.rizzui-advanced-radio]:ring-2"
                       >
-                        Non
+                        {t.no}
                       </AdvancedRadio>
                     </RadioGroup>
                   )}
                 />
                 {hasCSQ === 'yes' && (
-                  <Input
-                    label="Si oui, entrez le numéro. Numéro CSQ:"
-                    {...register('csqNumber')}
-                    className="mt-4"
-                  />
+                  <>
+                    <Input
+                      label={t.csqNumberLabel}
+                      {...register('csqNumber')}
+                      className="mt-4"
+                    />
+                    <DateField
+                      name="csqApplicationDate"
+                      control={control}
+                      label={t.csqApplicationDateLabelWhenYes}
+                      className="mt-4"
+                    />
+                  </>
                 )}
                 {hasCSQ === 'no' && (
                   <DateField
                     name="csqApplicationDate"
                     control={control}
-                    label="Si non, quand avez-vous demandé votre CSQ? Date (AAAA/MM/JJ):"
+                    label={t.csqDateLabel}
                     className="mt-4"
                   />
                 )}
@@ -333,25 +453,25 @@ export default function StepOne() {
           {/* Renseignements personnels */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              Renseignements personnels
+              {t.personalInfoTitle}
             </h3>
             <p className="mb-4 text-sm text-gray-600">
-              Entrez votre nom de famille complet, tel qu'il figure dans votre passeport ou titre de voyage. Si votre document ne comporte qu'un seul nom, inscrivez-le dans le champ du nom de famille et laissez le champ du prénom vide.
+              {t.personalInfoIntro}
             </p>
             <div className="grid gap-4 @3xl:grid-cols-2">
               <Input
-                label="Nom(s) de famille:"
+                label={t.lastNameLabel}
                 {...register('lastName')}
                 error={errors.lastName?.message}
                 className="w-full"
               />
               <Input
-                label="Prénom(s):"
+                label={t.firstNameLabel}
                 {...register('firstName')}
                 className="w-full"
               />
               <Input
-                label="IUC (si vous avez un identificateur unique de client):"
+                label={t.uciLabel}
                 {...register('uci')}
                 className="w-full"
               />
@@ -361,7 +481,7 @@ export default function StepOne() {
           {/* Caractéristiques physiques */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              Caractéristiques physiques
+              {t.physicalTitle}
             </h3>
             <div className="grid gap-4 @3xl:grid-cols-3">
               <Controller
@@ -369,8 +489,8 @@ export default function StepOne() {
                 control={control}
                 render={({ field: { value, onChange } }) => (
                   <Select
-                    label="Sexe:"
-                    placeholder="Sélectionner"
+                    label={t.sexLabel}
+                    placeholder={t.selectPlaceholder}
                     options={sexOptions}
                     value={value}
                     onChange={(selected: string | { value: string } | null) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
@@ -388,8 +508,8 @@ export default function StepOne() {
                 control={control}
                 render={({ field: { value, onChange } }) => (
                   <Select
-                    label="Couleur des yeux:"
-                    placeholder="Sélectionner"
+                    label={t.eyeColorLabel}
+                    placeholder={t.selectPlaceholder}
                     options={eyeColorOptions}
                     value={value}
                     onChange={(selected: string | { value: string } | null) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
@@ -424,7 +544,7 @@ export default function StepOne() {
                 error={errors.dateOfBirth}
               />
               <Input
-                label="Lieu de naissance:"
+                label="Ville de naissance:"
                 {...register('placeOfBirth')}
                 error={errors.placeOfBirth?.message}
               />
