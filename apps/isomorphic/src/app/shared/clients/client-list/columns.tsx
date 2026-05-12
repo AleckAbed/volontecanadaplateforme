@@ -4,10 +4,21 @@ import TableRowActionGroup from '@core/components/table-utils/table-row-action-g
 import { routes } from '@/config/routes';
 import { createColumnHelper } from '@tanstack/react-table';
 import Link from 'next/link';
-import { Badge, Checkbox } from 'rizzui';
+import { Avatar, Badge, Checkbox } from 'rizzui';
 import type { ClientListRow } from './table';
 
 const columnHelper = createColumnHelper<ClientListRow>();
+
+/**
+ * Pick a default avatar (out of 15 available) deterministically from the
+ * client id, so each client keeps the same picture between renders / reloads.
+ */
+function getDefaultAvatarUrl(id: number | string): string {
+  const n = typeof id === 'number' ? id : parseInt(String(id), 10) || 0;
+  const idx = ((n - 1) % 15 + 15) % 15 + 1; // 1..15
+  const formatted = idx.toString().padStart(2, '0');
+  return `https://isomorphic-furyroad.s3.amazonaws.com/public/avatars/avatar-${formatted}.png`;
+}
 
 export const clientListColumns = [
   columnHelper.display({
@@ -40,16 +51,24 @@ export const clientListColumns = [
     (row) => `${row.first_name} ${row.last_name}`.trim(),
     {
       id: 'name',
-      size: 220,
+      size: 260,
       header: 'Nom',
-      cell: ({ row }) => (
-        <Link
-          href={routes.clients.details(String(row.original.id))}
-          className="duration-200 hover:text-gray-900 hover:underline"
-        >
-          {row.original.first_name} {row.original.last_name}
-        </Link>
-      ),
+      cell: ({ row }) => {
+        const fullName = `${row.original.first_name} ${row.original.last_name}`.trim() || 'Client';
+        const avatarUrl = (row.original as any).avatar
+          || getDefaultAvatarUrl(row.original.id);
+        return (
+          <Link
+            href={routes.clients.details(String(row.original.id))}
+            className="flex items-center gap-3 duration-200 hover:text-gray-900"
+          >
+            <Avatar name={fullName} src={avatarUrl} size="sm" />
+            <span className="hover:underline">
+              {row.original.first_name} {row.original.last_name}
+            </span>
+          </Link>
+        );
+      },
     }
   ),
   columnHelper.accessor('email', {

@@ -82,20 +82,20 @@ export default function MusicPlayer({ className }: { className?: string }) {
         </Box>
         <Box className="relative mt-4 text-center">
           <Title as="h5" className="font-inter font-bold">
-            {currentItem?.name ?? 'Living My Best Life'}
+            {currentItem?.name ?? 'Article du jour'}
           </Title>
           <Flex gap="0" className="inline-flex justify-center text-gray-400">
             <Text
               as="span"
               className="mt-1 text-xs after:mx-1 after:content-['.'] last:after:hidden"
             >
-              {currentItem?.authorName ?? 'Ben Hector'}
+              {currentItem?.authorName ?? 'Volonté Canada'}
             </Text>
             <Text
               as="span"
               className="mt-1 text-xs after:mx-1 after:content-['.'] last:after:hidden"
             >
-              Episode 1
+              Lecture audio
             </Text>
           </Flex>
         </Box>

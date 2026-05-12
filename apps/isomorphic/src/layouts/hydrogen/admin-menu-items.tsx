@@ -14,6 +14,7 @@ import {
   PiUserPlusDuotone,
   PiBellDuotone,
   PiFileTextDuotone,
+  PiNewspaperDuotone,
 } from 'react-icons/pi';
 
 // Menu pour les Administrateurs du Cabinet d'Immigration
@@ -43,16 +44,6 @@ export const adminMenuItems = [
     name: 'Clients',
     href: '/admin/clients',
     icon: <PiUsersDuotone />,
-    dropdownItems: [
-      {
-        name: 'Liste des clients',
-        href: '/admin/clients',
-      },
-      {
-        name: 'Ajouter un client',
-        href: '/admin/clients/create',
-      },
-    ],
   },
   {
     name: 'Dossiers',
@@ -122,13 +113,32 @@ export const adminMenuItems = [
 
   // label start
   {
-    name: 'Formulaires',
+    name: 'Formulaires & Documents',
   },
   // label end
   {
-    name: 'Questionnaires',
-    href: routes.questionnaires.list,
+    name: 'Envois',
+    href: routes.invitations.list,
     icon: <PiFileTextDuotone />,
+  },
+  {
+    name: 'Modèles documents',
+    href: routes.configuration.documents,
+    icon: <PiFileTextDuotone />,
+  },
+  {
+    name: 'Configuration',
+    href: '#',
+    icon: <PiBriefcaseDuotone />,
+    dropdownItems: [
+      { name: 'Catégories', href: routes.configuration.categories },
+      { name: 'Types de formulaires', href: routes.configuration.formTypes },
+    ],
+  },
+  {
+    name: 'Questionnaires (legacy)',
+    href: routes.questionnaires.list,
+    icon: <PiClipboardTextDuotone />,
   },
 
   // label start
@@ -146,6 +156,15 @@ export const adminMenuItems = [
     name: 'Notifications',
     href: '/admin/notifications',
     icon: <PiBellDuotone />,
+  },
+  {
+    name: 'Nouvelles',
+    href: '/podcast',
+    icon: <PiNewspaperDuotone />,
+    dropdownItems: [
+      { name: 'Tableau de bord', href: '/podcast' },
+      { name: 'Articles', href: '/admin/news/articles' },
+    ],
   },
 
   // label start

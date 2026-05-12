@@ -60,7 +60,7 @@ export default function StepSix() {
       >
         <p className="mb-4 text-sm text-gray-600">
         Veuillez préciser vos antécédents personnels au cours des 10 dernières années ou depuis votre 18e anniversaire de naissance si cela remonte à moins de 10 ans. Commencez
-        par l’information la plus récente. À la rubrique « Activité, » inscrivez votre profession ou votre emploi, si vous travaillez. Si vous ne travaillez pas, donnez des renseignements sur ce que vous faisiez (p.ex., sans emploi, études, voyage, retraite, en détention, etc.). Si vous étiez à l'extérieur de votre pays ou territoire de nationalité, indiquez votre statut dans le pays ou le territoire où vous étiez. Remarque: Veuillez ne laisser aucune période inexpliquée.
+        par l’information la plus récente. À la rubrique « Activité, » inscrivez votre profession ou votre emploi, si vous travaillez. Si vous ne travaillez pas, donnez des renseignements sur ce que vous faisiez (p.ex., sans emploi, études, voyage, retraite, en détention, etc.). Si vous étiez à l&apos;extérieur de votre pays ou territoire de nationalité, indiquez votre statut dans le pays ou le territoire où vous étiez. Remarque: Veuillez ne laisser aucune période inexpliquée.
         </p>
         <DynamicTable<PersonalBackgroundEntry>
           title="Antécédents personnels"

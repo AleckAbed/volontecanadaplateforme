@@ -98,7 +98,7 @@ export default function StepFour() {
                 <span className="font-semibold text-gray-900 dark:text-white">{score.blocB.hors_montreal} points</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">Offre d'emploi</span>
+                <span className="text-gray-600 dark:text-gray-400">Offre d&apos;emploi</span>
                 <span className="font-semibold text-gray-900 dark:text-white">{score.blocB.offre_emploi} points</span>
               </div>
               <div className="flex justify-between">
@@ -115,7 +115,7 @@ export default function StepFour() {
           {/* Bloc C */}
           <div className="rounded-lg border border-gray-200 p-6 dark:border-gray-700">
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              Bloc C - Facteurs d'adaptation (180 points max)
+              Bloc C - Facteurs d&apos;adaptation (180 points max)
             </h3>
             <div className="space-y-2">
               <div className="flex justify-between">

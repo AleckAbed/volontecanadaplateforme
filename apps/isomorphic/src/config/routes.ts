@@ -98,6 +98,16 @@ export const routes = {
     list: '/questionnaires',
     details: (id: string) => `/questionnaires/${id}`,
   },
+  invitations: {
+    list: '/envois',
+    create: '/envois/nouveau',
+    details: (id: string) => `/envois/${id}`,
+  },
+  configuration: {
+    categories: '/configuration/categories',
+    formTypes: '/configuration/form-types',
+    documents: '/documents',
+  },
   clients: {
     list: '/admin/clients',
     create: '/admin/clients/create',

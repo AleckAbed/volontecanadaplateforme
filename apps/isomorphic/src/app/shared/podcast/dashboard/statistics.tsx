@@ -91,8 +91,8 @@ export default function PodcastsStatistics({
 
   return (
     <WidgetCard
-      title="Visitors Statistics"
-      description="Revealing risk and growth in investments."
+      title="Statistiques des lectures"
+      description="Évolution des consultations d'articles et annonces."
       headerClassName="mb-6 items-baseline flex-wrap gap-4 @3xl:flex-nowrap [&>div]:ps-0"
       className={cn('@container', className)}
       action={

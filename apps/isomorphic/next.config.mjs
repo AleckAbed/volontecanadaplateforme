@@ -1,12 +1,17 @@
 import './src/env.mjs';
+
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
-  // Optimisations pour le mode développement
+  webpack: (config) => {
+    // pdfjs-dist@3.11.174 référence canvas (module natif Node.js) dans son build.
+    // On l'ignore côté browser — pdfjs utilise le canvas du DOM à la place.
+    config.resolve.alias.canvas = false;
+    return config;
+  },
   experimental: {
     optimizePackageImports: ['@headlessui/react', 'react-icons', 'recharts', 'motion'],
   },
-  // Réduire les logs en développement
   logging: {
     fetches: {
       fullUrl: false,

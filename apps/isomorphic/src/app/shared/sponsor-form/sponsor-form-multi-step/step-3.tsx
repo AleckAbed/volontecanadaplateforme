@@ -314,7 +314,7 @@ export default function StepThree() {
           {/* Question 11: Autres parrainages */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              11. Avez-vous parrainé, dans le passé, ou parrainez-vous actuellement d'autres membres de votre famille dans une demande différente ?
+              11. Avez-vous parrainé, dans le passé, ou parrainez-vous actuellement d&apos;autres membres de votre famille dans une demande différente ?
             </label>
             <Controller
               name="hasOtherSponsorships"
@@ -354,7 +354,7 @@ export default function StepThree() {
           {/* Question 12: Autres personnes à charge */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              12. Donnez des détails sur toute autre personne qui dépend financièrement de vous (qu'elle vive ou non avec vous) et qui ne figure pas déjà dans les tableaux ci-dessus. Incluez les anciens époux ou conjoints et tous les enfants issus des relations antérieures
+              12. Donnez des détails sur toute autre personne qui dépend financièrement de vous (qu&apos;elle vive ou non avec vous) et qui ne figure pas déjà dans les tableaux ci-dessus. Incluez les anciens époux ou conjoints et tous les enfants issus des relations antérieures
             </label>
             <DynamicTable
               title="Autres personnes à charge"
@@ -386,7 +386,7 @@ export default function StepThree() {
           {/* Question 14: Historique des adresses */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              14. Indiquez toutes les adresses où vous avez résidé au cours des cinq dernières années. N'utilisez pas d'adresse comportant une case postale
+              14. Indiquez toutes les adresses où vous avez résidé au cours des cinq dernières années. N&apos;utilisez pas d&apos;adresse comportant une case postale
             </label>
             <DynamicTable
               title="Historique des adresses"
@@ -410,10 +410,10 @@ export default function StepThree() {
           {/* Question 15: Relations antérieures */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              15. Avez-vous déjà été marié ou vécu dans une relation d'union de fait/concubinage auparavant?
+              15. Avez-vous déjà été marié ou vécu dans une relation d&apos;union de fait/concubinage auparavant?
             </label>
             <p className="mb-4 text-xs text-gray-500 dark:text-gray-400">
-              (Vous avez vécu en union de fait si vous avez déjà vécu avec un partenaire dans une relation engagée et conjugale – assimilable à un mariage – pendant une période d'un an ou plus)
+              (Vous avez vécu en union de fait si vous avez déjà vécu avec un partenaire dans une relation engagée et conjugale – assimilable à un mariage – pendant une période d&apos;un an ou plus)
             </p>
             <Controller
               name="hasPreviousRelationships"

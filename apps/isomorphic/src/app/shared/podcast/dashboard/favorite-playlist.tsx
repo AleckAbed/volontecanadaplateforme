@@ -1,4 +1,4 @@
-import { favouritePlaylist } from '@/data/podcasts-data';
+import { favouriteGuides as favouritePlaylist } from '@/data/news-data';
 import WidgetCard from '@core/components/cards/widget-card';
 import cn from '@core/utils/class-names';
 import Image from 'next/image';
@@ -22,7 +22,7 @@ export default function FavoritePlaylist({
         (cn(className),
         'flex max-h-[420px] flex-col @5xl/pod:max-h-[390px] @6xl/pod:max-h-[420px] 3xl:max-h-[500px] 4xl:!max-h-[600px] [@media(min-width:2300px)]:max-h-[550px]')
       }
-      title="Favorite Playlist"
+      title="Guides favoris"
       headerClassName="mb-6"
     >
       <Grid className="custom-scrollbar h-full grid-cols-1 gap-7 overflow-y-auto">

@@ -13,6 +13,7 @@ import {
   PiUserGear,
   PiUserPlus,
   PiBell,
+  PiNewspaper,
   PiFileText,
 } from 'react-icons/pi';
 
@@ -43,16 +44,6 @@ export const adminMenuItems = [
     name: 'Clients',
     href: '/admin/clients',
     icon: <PiUsers />,
-    dropdownItems: [
-      {
-        name: 'Liste des clients',
-        href: '/admin/clients',
-      },
-      {
-        name: 'Ajouter un client',
-        href: '/admin/clients/create',
-      },
-    ],
   },
   {
     name: 'Dossiers',
@@ -122,13 +113,32 @@ export const adminMenuItems = [
 
   // label start
   {
-    name: 'Formulaires',
+    name: 'Formulaires & Documents',
   },
   // label end
   {
-    name: 'Questionnaires',
-    href: routes.questionnaires.list,
+    name: 'Envois',
+    href: routes.invitations.list,
     icon: <PiFileText />,
+  },
+  {
+    name: 'Modèles documents',
+    href: routes.configuration.documents,
+    icon: <PiFileText />,
+  },
+  {
+    name: 'Configuration',
+    href: '#',
+    icon: <PiClipboardText />,
+    dropdownItems: [
+      { name: 'Catégories', href: routes.configuration.categories },
+      { name: 'Types de formulaires', href: routes.configuration.formTypes },
+    ],
+  },
+  {
+    name: 'Questionnaires (legacy)',
+    href: routes.questionnaires.list,
+    icon: <PiClipboardText />,
   },
 
   // label start
@@ -146,6 +156,15 @@ export const adminMenuItems = [
     name: 'Notifications',
     href: '/admin/notifications',
     icon: <PiBell />,
+  },
+  {
+    name: 'Nouvelles',
+    href: '/podcast',
+    icon: <PiNewspaper />,
+    dropdownItems: [
+      { name: 'Tableau de bord', href: '/podcast' },
+      { name: 'Articles', href: '/admin/news/articles' },
+    ],
   },
 
   // label start

@@ -306,10 +306,10 @@ export default function StepTwo() {
             </div>
           </div>
 
-          {/* B5. Offre d'emploi validée */}
+          {/* B5. Offre d&apos;emploi validée */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              B5. Offre d'emploi validée
+              B5. Offre d&apos;emploi validée
             </h3>
             <div className="mb-4">
               <Controller
@@ -347,10 +347,10 @@ export default function StepTwo() {
             )}
           </div>
 
-          {/* B6. Autorisation d'exercer */}
+          {/* B6. Autorisation d&apos;exercer */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              B6. Autorisation d'exercer
+              B6. Autorisation d&apos;exercer
             </h3>
             <Controller
               name="autorisation_exercer"

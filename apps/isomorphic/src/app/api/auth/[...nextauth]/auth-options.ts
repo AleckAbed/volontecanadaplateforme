@@ -67,10 +67,14 @@ export const authOptions: NextAuthOptions = {
         return null;
       },
     }),
-    GoogleProvider({
-      clientId: env.GOOGLE_CLIENT_ID || '',
-      clientSecret: env.GOOGLE_CLIENT_SECRET || '',
-      allowDangerousEmailAccountLinking: true,
-    }),
+    ...(env.GOOGLE_CLIENT_ID?.trim() && env.GOOGLE_CLIENT_SECRET?.trim()
+      ? [
+          GoogleProvider({
+            clientId: env.GOOGLE_CLIENT_ID.trim(),
+            clientSecret: env.GOOGLE_CLIENT_SECRET.trim(),
+            allowDangerousEmailAccountLinking: true,
+          }),
+        ]
+      : []),
   ],
 };

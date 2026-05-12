@@ -1,6 +1,6 @@
 'use client';
 
-import { podcastScheduleData } from '@/data/podcasts-data';
+import { newsScheduleData as podcastScheduleData } from '@/data/news-data';
 import WidgetCard from '@core/components/cards/widget-card';
 import { DatePicker } from '@core/ui/datepicker';
 import { formatDate } from '@core/utils/format-date';
@@ -27,15 +27,15 @@ export default function PodcastSchedule({ className }: { className?: string }) {
   return (
     <>
       <WidgetCard
-        title="Today's Podcast"
+        title="Agenda du jour"
         headerClassName="mb-6"
         className={cn('@container', className)}
         action={
           <Link
-            href={'/'}
+            href={'/podcast'}
             className="text-sm font-medium text-gray-900 hover:underline"
           >
-            See All
+            Voir tout
           </Link>
         }
       >
@@ -48,7 +48,7 @@ export default function PodcastSchedule({ className }: { className?: string }) {
               <PiPlusBold className="size-4" />
             </Box>
             <Title as="h6" className="font-inter font-semibold">
-              Schedule Podcast
+              Planifier une annonce
             </Title>
           </button>
           {podcastScheduleData.map((schedule) => (
@@ -100,7 +100,7 @@ function CreatePodcastForm({ closeModal }: { closeModal: () => void }) {
     <div className="px-7 pb-8 pt-6">
       <div className="mb-7 flex items-center justify-between">
         <Title as="h3" className="font-inter font-semibold">
-          Schedule Podcast
+          Planifier une annonce
         </Title>
         <ActionIcon size="sm" variant="text" onClick={closeModal}>
           <PiXBold className="size-6" />
@@ -109,9 +109,9 @@ function CreatePodcastForm({ closeModal }: { closeModal: () => void }) {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid className="grid-cols-5 gap-x-5 gap-y-6 [&_label>span]:font-medium">
           <Input
-            label="Title"
+            label="Titre"
             inputClassName="border-2"
-            placeholder="Enter podcast title..."
+            placeholder="Titre de l'annonce..."
             className="col-span-full w-full"
             {...register('title')}
           />
@@ -123,9 +123,9 @@ function CreatePodcastForm({ closeModal }: { closeModal: () => void }) {
                 selected={value}
                 onChange={onChange}
                 dateFormat="d MMMM yyyy"
-                placeholderText="Select Date"
+                placeholderText="Choisir une date"
                 inputProps={{
-                  label: 'Start Date',
+                  label: 'Date de publication',
                   inputClassName: 'border-2',
                 }}
                 className="col-span-full sm:col-span-3"
@@ -142,9 +142,9 @@ function CreatePodcastForm({ closeModal }: { closeModal: () => void }) {
                 dateFormat="h:mm aa"
                 showTimeSelect
                 showTimeSelectOnly
-                placeholderText="Select Time"
+                placeholderText="Choisir une heure"
                 inputProps={{
-                  label: 'Start Time',
+                  label: 'Heure',
                   inputClassName: 'border-2',
                 }}
                 className="col-span-full sm:col-span-2"
@@ -152,22 +152,21 @@ function CreatePodcastForm({ closeModal }: { closeModal: () => void }) {
             )}
           />
           <Input
-            label="Host"
+            label="Source / Auteur"
             inputClassName="border-2"
             className="col-span-full w-full"
-            placeholder="Enter host name"
+            placeholder="ex: IRCC, MIFI Québec, Bureau d'immigration..."
             {...register('host')}
           />
           <Textarea
             label="Description"
             textareaClassName="border-2"
             className="col-span-full w-full"
-            placeholder="Enter description"
+            placeholder="Détails de l'annonce..."
             {...register('description')}
           />
-          {/* onClick={closeModal} */}
           <Button type="submit" className="col-span-full mt-2">
-            Schedule
+            Planifier
           </Button>
         </Grid>
       </form>

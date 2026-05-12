@@ -16,7 +16,7 @@ import {
   authErrorAtom,
 } from '@/store/auth';
 import api from '@/services/api';
-import { setAuthToken } from '@/lib/auth-storage';
+import { getAuthToken, setAuthToken } from '@/lib/auth-storage';
 import type { LoginCredentials, RegisterData, UserType } from '@/types/auth';
 
 export function useAuth() {
@@ -30,6 +30,19 @@ export function useAuth() {
   const [isLoading, setIsLoading] = useAtom(authLoadingAtom);
   const [error, setError] = useAtom(authErrorAtom);
   const currentUser = useAtomValue(currentUserAtom);
+
+  // Après un refresh : le token est en localStorage mais authStateAtom repart à false → évite redirection erronée et charge le profil.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const token = getAuthToken()?.trim();
+    if (!token) return;
+    const ut = localStorage.getItem('user_type') as UserType | null;
+    if (ut !== 'admin' && ut !== 'client') return;
+    setAuthState((prev) => {
+      if (prev.isAuthenticated) return prev;
+      return { ...prev, isAuthenticated: true, userType: ut };
+    });
+  }, [setAuthState]);
 
   /**
    * Connexion administrateur
@@ -303,11 +316,9 @@ export function useAuth() {
     }
   }, [userType, setAdmin, setClient, setAuthState, setIsLoading, setUserType]);
 
-  // Charger le profil au montage du composant
   useEffect(() => {
-    loadUserProfile();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    void loadUserProfile();
+  }, [loadUserProfile]);
 
   return {
     // État

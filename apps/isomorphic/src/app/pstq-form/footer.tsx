@@ -61,6 +61,12 @@ export default function PSTQFooter({ isLoading, className }: FooterProps) {
       if (response.success) {
         toast.success('Formulaire soumis avec succès !');
         gotoNextStep(); // Aller à la page de félicitations
+        let invitationCode: string | null = null;
+        try { invitationCode = sessionStorage.getItem('return_to_invitation'); } catch {}
+        if (invitationCode) {
+          try { sessionStorage.removeItem('return_to_invitation'); } catch {}
+          setTimeout(() => { window.location.href = `/invitation/${invitationCode}`; }, 1500);
+        }
       } else {
         toast.error(response.message || 'Erreur lors de la soumission');
       }

@@ -61,7 +61,7 @@ export default function StepEight() {
       >
         <div className="grid gap-6">
           <p className="text-sm text-gray-600">
-            Veuillez énumérer tous les voyages que vous et les membres de votre famille âgés de 18 ans ou plus (s'il y a lieu) avez effectués depuis les 10 dernières années hors de votre pays d'origine ou de résidence (mais seulement depuis l'âge de 18 ans). Inclure les voyages à but touristique, les voyages d'affaires, les stages de formation, etc.
+            Veuillez énumérer tous les voyages que vous et les membres de votre famille âgés de 18 ans ou plus (s&apos;il y a lieu) avez effectués depuis les 10 dernières années hors de votre pays d&apos;origine ou de résidence (mais seulement depuis l&apos;âge de 18 ans). Inclure les voyages à but touristique, les voyages d&apos;affaires, les stages de formation, etc.
           </p>
 
           <Controller

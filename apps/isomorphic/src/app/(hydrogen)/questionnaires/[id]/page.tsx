@@ -321,7 +321,7 @@ export default function QuestionnaireDetailsPage() {
               <div className="mt-1">{getStatusBadge(questionnaire.status)}</div>
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Date d'envoi</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Date d&apos;envoi</p>
               <p className="mt-1 text-sm text-gray-900 dark:text-white">
                 {formatDate(questionnaire.sent_at)}
               </p>

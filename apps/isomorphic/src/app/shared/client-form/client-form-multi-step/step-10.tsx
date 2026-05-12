@@ -185,7 +185,7 @@ export default function StepTen() {
           {hasYesAnswers && (
             <div>
               <p className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                Pour toute question à laquelle vous avez répondu " OUI ", veuillez donner des précisions ci-dessous:
+                Pour toute question à laquelle vous avez répondu &quot; OUI &quot;, veuillez donner des précisions ci-dessous:
               </p>
               <Textarea
                 {...register('securityDetails')}
@@ -204,7 +204,7 @@ export default function StepTen() {
                 <Checkbox
                   label={
                     <span>
-                      J'accepte les{' '}
+                      J&apos;accepte les{' '}
                       <a href="#" className="text-primary underline">
                         termes et conditions
                       </a>{' '}

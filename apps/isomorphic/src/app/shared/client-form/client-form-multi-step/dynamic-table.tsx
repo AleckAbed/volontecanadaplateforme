@@ -83,7 +83,7 @@ export default function DynamicTable<T extends Record<string, any>>({
                   colSpan={columns.length + 1}
                   className="px-4 py-8 text-center text-sm text-gray-500"
                 >
-                  Aucune donnée. Cliquez sur "Ajouter une ligne" pour commencer.
+                  Aucune donnée. Cliquez sur &quot;Ajouter une ligne&quot; pour commencer.
                 </td>
               </tr>
             ) : (

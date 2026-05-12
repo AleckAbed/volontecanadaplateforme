@@ -334,7 +334,7 @@ export default function QuestionnairesPage() {
                       onClick={() => handleSort('sent_at')}
                     >
                       <div className="flex items-center gap-2">
-                        Date d'envoi
+                        Date d&apos;envoi
                         {sortConfig.key === 'sent_at' && (
                           sortConfig.direction === 'asc' ? (
                             <PiCaretUp className="h-4 w-4" />

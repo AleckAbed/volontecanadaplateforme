@@ -364,7 +364,7 @@ export default function StepTwo() {
               ANTECEDANT PROFESSIONNELS
             </h3>
             <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-              10. En commençant par l'emploi actuel, remplir le tableau sur les 5 dernières années
+              10. En commençant par l&apos;emploi actuel, remplir le tableau sur les 5 dernières années
             </p>
             <DynamicTable
               title="Historique professionnel"

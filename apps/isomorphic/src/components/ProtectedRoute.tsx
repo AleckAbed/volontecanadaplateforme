@@ -26,6 +26,8 @@ const publicRoutes = [
   '/client-form',
   '/sponsor-form',
   '/pstq-form',
+  '/invitation',
+  '/document',
 ];
 
 const authRoutes = [

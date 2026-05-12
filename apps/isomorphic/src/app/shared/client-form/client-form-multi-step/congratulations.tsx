@@ -35,6 +35,14 @@ export default function Congratulations() {
           localStorage.removeItem('questionnaire_code');
           localStorage.removeItem('questionnaire_days_remaining');
           localStorage.removeItem('clientFormData');
+
+          // If we were called from an invitation, return to it
+          let invitationCode: string | null = null;
+          try { invitationCode = sessionStorage.getItem('return_to_invitation'); } catch {}
+          if (invitationCode) {
+            try { sessionStorage.removeItem('return_to_invitation'); } catch {}
+            setTimeout(() => router.push(`/invitation/${invitationCode}`), 1500);
+          }
         } else {
           toast.error(response.message || 'Erreur lors de la soumission');
         }

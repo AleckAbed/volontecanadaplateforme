@@ -301,7 +301,7 @@ export default function StepOne() {
           {/* Question 17: Présentation */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              17. Quelqu'un vous a-t-il présentés l'un à l'autre ?
+              17. Quelqu&apos;un vous a-t-il présentés l&apos;un à l&apos;autre ?
             </label>
             <Input
               placeholder="Si oui, précisez qui"

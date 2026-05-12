@@ -158,7 +158,7 @@ export default function StepThree() {
                 </div>
                 <div className="ml-3 flex-1">
                   <p className="text-sm font-bold text-blue-800 dark:text-blue-200">
-                    Bloc C - Facteurs d'adaptation (180 points maximum)
+                    Bloc C - Facteurs d&apos;adaptation (180 points maximum)
                   </p>
                 </div>
               </div>
