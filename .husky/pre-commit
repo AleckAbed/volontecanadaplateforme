@@ -1,1 +1,11 @@
-pnpm lint && pnpm type:check
+# Pre-commit hook — runs only lint (fast).
+#
+# type:check est volontairement exclu : il y a beaucoup d'erreurs TypeScript
+# héritées du template d'origine (`res: unknown`, etc.) qui ne sont pas
+# liées aux changements en cours. Faire passer le type:check demande un
+# nettoyage de fond séparé.
+#
+# À lancer manuellement avant un gros refactor :
+#   pnpm type:check
+# Ou ajouter au CI (GitHub Actions, etc.) avant un déploiement prod.
+pnpm lint

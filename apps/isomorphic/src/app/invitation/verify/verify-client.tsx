@@ -103,7 +103,7 @@ export default function VerifyInvitationClient() {
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Code d'accès</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Code d&apos;accès</label>
               <input
                 type="text"
                 value={code}
@@ -118,7 +118,7 @@ export default function VerifyInvitationClient() {
               />
               {errors.code && <p className="mt-1 text-xs text-red-600">{errors.code}</p>}
               <p className="mt-1 text-[11px] text-gray-500">
-                Le code se trouve dans l'email que vous avez reçu, sous le bouton "Accéder à mon invitation".
+                Le code se trouve dans l&apos;email que vous avez reçu, sous le bouton &quot;Accéder à mon invitation&quot;.
               </p>
             </div>
 

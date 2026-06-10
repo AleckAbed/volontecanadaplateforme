@@ -444,6 +444,8 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
         </div>
       </form>
 
+      {/* styled-jsx — legacy mais fonctionnel sous Next 15 avec le package styled-jsx */}
+      {/* eslint-disable-next-line react/no-unknown-property */}
       <style jsx>{`
         :global(.input) {
           width: 100%;

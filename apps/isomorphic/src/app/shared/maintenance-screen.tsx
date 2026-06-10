@@ -61,7 +61,7 @@ export default function MaintenanceScreen({
             <Link href="/">
               <Button as="span" size="xl" color="primary" className="gap-2">
                 <PiHouseLineBold className="text-lg" />
-                Retour à l'accueil
+                Retour à l&apos;accueil
               </Button>
             </Link>
             <Button
@@ -76,7 +76,7 @@ export default function MaintenanceScreen({
           </div>
 
           <Text className="mt-8 text-xs text-gray-400">
-            Volonté Canada — Cabinet d'immigration · Une erreur persistante ?{' '}
+            Volonté Canada — Cabinet d&apos;immigration · Une erreur persistante ?{' '}
             <a
               href="mailto:formulaire.volontecanada@querga.ca"
               className="text-red-700 hover:underline"

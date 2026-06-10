@@ -26,7 +26,7 @@ export default function GlobalError({ error }: { error: Error & { digest?: strin
           fontFamily: 'system-ui, sans-serif',
           color: '#6b7280',
         }}>
-          Redirection vers la page d'erreur…
+          Redirection vers la page d&apos;erreur…
         </div>
       </body>
     </html>

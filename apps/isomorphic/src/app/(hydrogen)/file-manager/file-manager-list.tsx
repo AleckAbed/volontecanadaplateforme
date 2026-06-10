@@ -1249,7 +1249,7 @@ function FilePreviewModal({
         <FileTypeIcon type={type} className="h-24 w-24" />
         <div className="text-lg font-medium text-gray-900">{item.name}</div>
         <div className="text-sm text-gray-500">
-          La prévisualisation n'est pas disponible pour ce type de fichier.
+          La prévisualisation n&apos;est pas disponible pour ce type de fichier.
         </div>
         <a
           href={url}

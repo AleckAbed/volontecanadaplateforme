@@ -39,6 +39,10 @@ function ErrorPage({ statusCode }: ErrorPageProps) {
             ? 'Page introuvable / Page not found'
             : 'Une erreur est survenue / An error occurred'}
         </p>
+        {/* Intentionally a raw <a> to keep this fallback page hook/context-free.
+            Importing next/link would re-introduce React context risks that this
+            file exists specifically to avoid. */}
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a
           href="/"
           style={{
