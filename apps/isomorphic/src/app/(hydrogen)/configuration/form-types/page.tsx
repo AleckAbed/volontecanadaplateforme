@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { invitationsService, FormType, Category } from '@/services/invitations';
 
 interface FormState {
@@ -23,6 +24,7 @@ const emptyForm: FormState = {
 };
 
 export default function FormTypesPage() {
+  const { t } = useTranslation();
   const [formTypes, setFormTypes] = useState<FormType[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,16 +51,16 @@ export default function FormTypesPage() {
   useEffect(() => { load(); }, []);
 
   const handleSave = async () => {
-    if (!form.name.trim()) { toast.error('Nom requis'); return; }
+    if (!form.name.trim()) { toast.error(t('configuration.name_required')); return; }
     try {
       const payload: any = { ...form };
       if (!payload.code.trim()) delete payload.code;
       if (editing) {
         await invitationsService.updateFormType(editing.id, payload);
-        toast.success('Type mis à jour');
+        toast.success(t('configuration.ft_updated'));
       } else {
         await invitationsService.createFormType(payload);
-        toast.success('Type créé');
+        toast.success(t('configuration.ft_created'));
       }
       setShowForm(false);
       setEditing(null);
@@ -70,10 +72,10 @@ export default function FormTypesPage() {
   };
 
   const handleDelete = async (ft: FormType) => {
-    if (!confirm(`Supprimer le type "${ft.name}" ?`)) return;
+    if (!confirm(t('configuration.ft_delete_confirm', { name: ft.name }))) return;
     try {
       await invitationsService.deleteFormType(ft.id);
-      toast.success('Type supprimé');
+      toast.success(t('configuration.ft_deleted'));
       load();
     } catch (e: any) {
       toast.error(e.message);
@@ -103,25 +105,25 @@ export default function FormTypesPage() {
     <div className="p-6">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Types de formulaires</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Définissez les types de formulaires que les admins peuvent envoyer aux clients.
-          </p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('configuration.form_types_title')}</h1>
+          <p className="mt-1 text-sm text-gray-500">{t('configuration.form_types_subtitle')}</p>
         </div>
         <button
           onClick={handleNew}
           className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
         >
-          + Nouveau type
+          {t('configuration.new_form_type')}
         </button>
       </div>
 
       {showForm && (
         <div className="mb-6 rounded-xl border border-gray-200 bg-white p-5">
-          <h3 className="mb-4 text-lg font-semibold">{editing ? 'Modifier' : 'Nouveau'} type de formulaire</h3>
+          <h3 className="mb-4 text-lg font-semibold">
+            {editing ? t('configuration.form_type_edit_title') : t('configuration.form_type_new_title')}
+          </h3>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Nom *</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">{t('configuration.name_label')} *</label>
               <input
                 type="text"
                 value={form.name}
@@ -130,30 +132,30 @@ export default function FormTypesPage() {
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Code (slug)</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">{t('configuration.code_label')}</label>
               <input
                 type="text"
                 value={form.code}
                 onChange={(e) => setForm({ ...form, code: e.target.value })}
-                placeholder="auto-généré si vide"
+                placeholder={t('configuration.code_placeholder')}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-mono"
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Catégorie</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">{t('configuration.category_label')}</label>
               <select
                 value={form.category_id ?? ''}
                 onChange={(e) => setForm({ ...form, category_id: e.target.value ? Number(e.target.value) : null })}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
               >
-                <option value="">— Aucune —</option>
+                <option value="">{t('configuration.none_option')}</option>
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Ordre d&apos;affichage</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">{t('configuration.sort_order_label')}</label>
               <input
                 type="number"
                 value={form.sort_order}
@@ -162,7 +164,7 @@ export default function FormTypesPage() {
               />
             </div>
             <div className="md:col-span-2">
-              <label className="mb-1 block text-sm font-medium text-gray-700">Description</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">{t('configuration.description_label')}</label>
               <textarea
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
@@ -176,7 +178,7 @@ export default function FormTypesPage() {
                 checked={form.is_active}
                 onChange={(e) => setForm({ ...form, is_active: e.target.checked })}
               />
-              <span className="text-sm text-gray-700">Actif</span>
+              <span className="text-sm text-gray-700">{t('common.active')}</span>
             </label>
           </div>
           <div className="mt-5 flex gap-3">
@@ -184,34 +186,34 @@ export default function FormTypesPage() {
               onClick={() => { setShowForm(false); setEditing(null); }}
               className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
-              Annuler
+              {t('common.cancel')}
             </button>
             <button
               onClick={handleSave}
               className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
             >
-              {editing ? 'Mettre à jour' : 'Créer'}
+              {editing ? t('configuration.update_button') : t('common.create')}
             </button>
           </div>
         </div>
       )}
 
       {loading ? (
-        <div className="py-10 text-center text-gray-400">Chargement…</div>
+        <div className="py-10 text-center text-gray-400">{t('common.loading')}</div>
       ) : formTypes.length === 0 ? (
         <div className="rounded-xl border-2 border-dashed border-gray-200 py-12 text-center">
-          <p className="text-gray-500">Aucun type de formulaire défini.</p>
+          <p className="text-gray-500">{t('configuration.no_form_types')}</p>
         </div>
       ) : (
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Nom</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Code</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Catégorie</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Statut</th>
-                <th className="px-4 py-3 text-right text-xs font-medium uppercase text-gray-500">Actions</th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">{t('configuration.cols_name')}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">{t('configuration.cols_code')}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">{t('configuration.cols_category')}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">{t('configuration.cols_status')}</th>
+                <th className="px-4 py-3 text-right text-xs font-medium uppercase text-gray-500">{t('dossiers.columns.actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -225,14 +227,14 @@ export default function FormTypesPage() {
                   <td className="px-4 py-3 text-sm text-gray-700">{ft.category?.name ?? '—'}</td>
                   <td className="px-4 py-3">
                     {ft.is_active ? (
-                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Actif</span>
+                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">{t('common.active')}</span>
                     ) : (
-                      <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">Inactif</span>
+                      <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">{t('common.inactive')}</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <button onClick={() => handleEdit(ft)} className="mr-2 text-sm text-blue-600 hover:underline">Modifier</button>
-                    <button onClick={() => handleDelete(ft)} className="text-sm text-red-600 hover:underline">Supprimer</button>
+                    <button onClick={() => handleEdit(ft)} className="mr-2 text-sm text-blue-600 hover:underline">{t('common.edit')}</button>
+                    <button onClick={() => handleDelete(ft)} className="text-sm text-red-600 hover:underline">{t('common.delete')}</button>
                   </td>
                 </tr>
               ))}

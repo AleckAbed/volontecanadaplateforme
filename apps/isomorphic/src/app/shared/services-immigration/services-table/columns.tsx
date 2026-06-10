@@ -62,14 +62,6 @@ export const servicesColumns = [
       </Badge>
     ),
   }),
-  columnHelper.accessor('price', {
-    id: 'price',
-    size: 120,
-    header: 'Prix',
-    cell: ({ row }) => (
-      <span className="font-semibold text-gray-900">{row.original.price}</span>
-    ),
-  }),
   columnHelper.accessor('duration', {
     id: 'duration',
     size: 150,

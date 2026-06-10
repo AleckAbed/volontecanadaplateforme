@@ -17,9 +17,123 @@ import {
 import DynamicTable from '@/app/shared/client-form/client-form-multi-step/dynamic-table';
 import DateField from '@/app/shared/client-form/date-field';
 
+const STEP2_LABELS = {
+  fr: {
+    alert: 'Renseignements concernant la relation - À remplir par le répondant et le demandeur principal',
+    personalSection: 'DONNÉES PERSONNELLES',
+    q1Name: '1. Nom',
+    q1Placeholder: 'Entrez votre nom de famille',
+    q2FirstName: '2. Prénoms',
+    q2Placeholder: 'Entrez vos prénoms',
+    q3Phone: '3. Numéro de téléphone',
+    q3Placeholder: 'Ex: +1 514 123 4567',
+    q4DateOfBirth: '4. Date et lieu de naissance',
+    q4Placeholder: 'Ex: 15 janvier 1985, Montréal, Canada',
+    q5Nationality: '5. Nationalité',
+    q5Placeholder: 'Ex: Canadienne',
+    q6WhereLived: '6. Où avez-vous vécu les 5 dernières années ?',
+    q6Placeholder: 'Listez tous les endroits où vous avez résidé',
+    q7MaritalStatus: '7. État matrimonial',
+    q7Placeholder: 'Ex: Marié(e), Célibataire, etc.',
+    q8MarriageDate: "8. Date du mariage (s'il y a lieu, nom et prénom de l'époux)",
+    q8Placeholder: 'Ex: 10 juin 2010, Jean Dupont',
+    q9HasBeenMarried: '9. Avez-vous déjà été marié dans le passé ?',
+    yes: 'Oui',
+    no: 'Non',
+    exSpouseName: 'Nom et prénoms',
+    exSpousePlaceholder: "Nom et prénoms de l'ex-époux",
+    exSpouseDob: 'Date de naissance (JJ/MM/AAAA)',
+    relStart: 'Début de relation (JJ/MM/AAAA)',
+    relEnd: 'Fin de relation (JJ/MM/AAAA)',
+    profSection: 'ANTÉCÉDENTS PROFESSIONNELS',
+    profIntro: "10. En commençant par l'emploi actuel, remplir le tableau sur les 5 dernières années",
+    profHistory: 'Historique professionnel',
+    eFromDate: 'De (AAAA-MM)',
+    eToDate: 'À (AAAA-MM)',
+    eEmployer: "Inscrivez le nom, l'adresse complète et le numéro de téléphone de chaque employeur",
+    eProfession: 'Profession/Poste',
+    eSalary: 'Salaire/Revenu mensuel brut',
+  },
+  en: {
+    alert: 'Relationship information - To be completed by the sponsor and principal applicant',
+    personalSection: 'PERSONAL DATA',
+    q1Name: '1. Surname',
+    q1Placeholder: 'Enter your surname',
+    q2FirstName: '2. Given names',
+    q2Placeholder: 'Enter your given names',
+    q3Phone: '3. Phone number',
+    q3Placeholder: 'E.g. +1 514 123 4567',
+    q4DateOfBirth: '4. Date and place of birth',
+    q4Placeholder: 'E.g. January 15, 1985, Montreal, Canada',
+    q5Nationality: '5. Nationality',
+    q5Placeholder: 'E.g. Canadian',
+    q6WhereLived: '6. Where have you lived in the last 5 years?',
+    q6Placeholder: 'List all places where you have lived',
+    q7MaritalStatus: '7. Marital status',
+    q7Placeholder: 'E.g. Married, Single, etc.',
+    q8MarriageDate: '8. Date of marriage (if applicable, name of spouse)',
+    q8Placeholder: 'E.g. June 10, 2010, John Doe',
+    q9HasBeenMarried: '9. Have you ever been married in the past?',
+    yes: 'Yes',
+    no: 'No',
+    exSpouseName: 'Name and given names',
+    exSpousePlaceholder: 'Name and given names of ex-spouse',
+    exSpouseDob: 'Date of birth (DD/MM/YYYY)',
+    relStart: 'Relationship start (DD/MM/YYYY)',
+    relEnd: 'Relationship end (DD/MM/YYYY)',
+    profSection: 'PROFESSIONAL BACKGROUND',
+    profIntro: '10. Starting with current employment, fill in the table for the last 5 years',
+    profHistory: 'Employment history',
+    eFromDate: 'From (YYYY-MM)',
+    eToDate: 'To (YYYY-MM)',
+    eEmployer: 'Enter the name, full address and phone number of each employer',
+    eProfession: 'Profession/Position',
+    eSalary: 'Gross monthly salary/income',
+  },
+  es: {
+    alert: 'Información sobre la relación - Para completar por el patrocinador y el solicitante principal',
+    personalSection: 'DATOS PERSONALES',
+    q1Name: '1. Apellido',
+    q1Placeholder: 'Ingrese su apellido',
+    q2FirstName: '2. Nombres',
+    q2Placeholder: 'Ingrese sus nombres',
+    q3Phone: '3. Número de teléfono',
+    q3Placeholder: 'Ej: +1 514 123 4567',
+    q4DateOfBirth: '4. Fecha y lugar de nacimiento',
+    q4Placeholder: 'Ej: 15 de enero de 1985, Montreal, Canadá',
+    q5Nationality: '5. Nacionalidad',
+    q5Placeholder: 'Ej: Canadiense',
+    q6WhereLived: '6. ¿Dónde ha vivido los últimos 5 años?',
+    q6Placeholder: 'Enumere todos los lugares donde ha residido',
+    q7MaritalStatus: '7. Estado civil',
+    q7Placeholder: 'Ej: Casado(a), Soltero(a), etc.',
+    q8MarriageDate: '8. Fecha del matrimonio (si aplica, nombre y apellido del cónyuge)',
+    q8Placeholder: 'Ej: 10 de junio de 2010, Juan Pérez',
+    q9HasBeenMarried: '9. ¿Ha estado casado anteriormente?',
+    yes: 'Sí',
+    no: 'No',
+    exSpouseName: 'Nombre y apellidos',
+    exSpousePlaceholder: 'Nombre y apellidos del ex cónyuge',
+    exSpouseDob: 'Fecha de nacimiento (DD/MM/AAAA)',
+    relStart: 'Inicio de la relación (DD/MM/AAAA)',
+    relEnd: 'Fin de la relación (DD/MM/AAAA)',
+    profSection: 'ANTECEDENTES PROFESIONALES',
+    profIntro: '10. Empezando por el empleo actual, complete la tabla de los últimos 5 años',
+    profHistory: 'Historial profesional',
+    eFromDate: 'Desde (AAAA-MM)',
+    eToDate: 'Hasta (AAAA-MM)',
+    eEmployer: 'Indique el nombre, dirección completa y número de teléfono de cada empleador',
+    eProfession: 'Profesión/Puesto',
+    eSalary: 'Salario/Ingreso mensual bruto',
+  },
+} as const;
+
 export default function StepTwo() {
   const { step, gotoNextStep } = useSponsorStepper();
   const [formData, setFormData] = useAtom(sponsorFormDataAtom);
+  const [locale] = useAtom(questionnaireLocaleAtom);
+  const t = SPONSOR_STEP2_T[locale] || SPONSOR_STEP2_T.fr;
+  const l = STEP2_LABELS[locale] || STEP2_LABELS.fr;
   const { dataLoadedKey } = useSponsorFormLoad();
   const [isAlertVisible, setIsAlertVisible] = useState(true);
 
@@ -209,7 +323,7 @@ export default function StepTwo() {
                 </div>
                 <div className="ml-3 flex-1">
                   <p className="text-sm font-bold text-blue-800 dark:text-blue-200">
-                    Renseignements concernant la relation - À remplir par le répondant et le demandeur principal
+                    {l.alert}
                   </p>
                 </div>
               </div>
@@ -242,65 +356,64 @@ export default function StepTwo() {
           {/* Section: DONNÉES PERSONNELLES */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              DONNÉES PERSONNELLES
+              {l.personalSection}
             </h3>
             <div className="grid gap-4">
               <Input
-                label="1. Nom"
-                placeholder="Entrez votre nom de famille"
+                label={l.q1Name}
+                placeholder={l.q1Placeholder}
                 {...register('lastName')}
                 error={errors.lastName?.message}
               />
               <Input
-                label="2. Prénoms"
-                placeholder="Entrez vos prénoms"
+                label={l.q2FirstName}
+                placeholder={l.q2Placeholder}
                 {...register('firstName')}
                 error={errors.firstName?.message}
               />
               <Input
-                label="3. Numéro de téléphone"
-                placeholder="Ex: +1 514 123 4567"
+                label={l.q3Phone}
+                placeholder={l.q3Placeholder}
                 {...register('phoneNumber')}
                 error={errors.phoneNumber?.message}
               />
               <Textarea
-                label="4. Date et lieu de naissance"
-                placeholder="Ex: 15 janvier 1985, Montréal, Canada"
+                label={l.q4DateOfBirth}
+                placeholder={l.q4Placeholder}
                 rows={2}
                 {...register('dateAndPlaceOfBirth')}
                 error={errors.dateAndPlaceOfBirth?.message}
               />
               <Input
-                label="5. Nationalité"
-                placeholder="Ex: Canadienne"
+                label={l.q5Nationality}
+                placeholder={l.q5Placeholder}
                 {...register('nationality')}
                 error={errors.nationality?.message}
               />
               <Textarea
-                label="6. Où avez-vous vécu les 5 dernières années ?"
-                placeholder="Listez tous les endroits où vous avez résidé"
+                label={l.q6WhereLived}
+                placeholder={l.q6Placeholder}
                 rows={3}
                 {...register('whereLivedLast5Years')}
                 error={errors.whereLivedLast5Years?.message}
               />
               <Input
-                label="7. État matrimonial"
-                placeholder="Ex: Marié(e), Célibataire, etc."
+                label={l.q7MaritalStatus}
+                placeholder={l.q7Placeholder}
                 {...register('maritalStatus')}
                 error={errors.maritalStatus?.message}
               />
               <Textarea
-                label="8. Date du mariage (s'il y a lieu, nom et prénom de l'époux)"
-                placeholder="Ex: 10 juin 2010, Jean Dupont"
+                label={l.q8MarriageDate}
+                placeholder={l.q8Placeholder}
                 rows={2}
                 {...register('spouseName')}
                 error={errors.spouseName?.message}
               />
-              
-              {/* Question 9: Avez-vous déjà été marié */}
+
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  9. Avez-vous déjà été marié dans le passé ?
+                  {l.q9HasBeenMarried}
                 </label>
                 <Controller
                   name="hasBeenMarried"
@@ -315,13 +428,13 @@ export default function StepTwo() {
                         value="yes"
                         className="flex-1 cursor-pointer rounded-md border border-gray-200 px-5 py-3 text-center hover:bg-gray-100 peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:text-primary"
                       >
-                        Oui
+                        {l.yes}
                       </AdvancedRadio>
                       <AdvancedRadio
                         value="no"
                         className="flex-1 cursor-pointer rounded-md border border-gray-200 px-5 py-3 text-center hover:bg-gray-100 peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:text-primary"
                       >
-                        Non
+                        {l.no}
                       </AdvancedRadio>
                     </RadioGroup>
                   )}
@@ -329,27 +442,27 @@ export default function StepTwo() {
                 {hasBeenMarried === 'yes' && (
                   <div className="mt-4 grid gap-4 @3xl:grid-cols-2">
                     <Input
-                      label="Nom et prénoms"
-                      placeholder="Nom et prénoms de l'ex-époux"
+                      label={l.exSpouseName}
+                      placeholder={l.exSpousePlaceholder}
                       {...register('exSpouseName')}
                       error={errors.exSpouseName?.message}
                     />
                     <DateField
                       name="exSpouseDateOfBirth"
                       control={control}
-                      label="Date de naissance (JJ/MM/AAAA)"
+                      label={l.exSpouseDob}
                       error={errors.exSpouseDateOfBirth}
                     />
                     <DateField
                       name="relationshipStartDate"
                       control={control}
-                      label="Début de relation (JJ/MM/AAAA)"
+                      label={l.relStart}
                       error={errors.relationshipStartDate}
                     />
                     <DateField
                       name="relationshipEndDate"
                       control={control}
-                      label="Fin de relation (JJ/MM/AAAA)"
+                      label={l.relEnd}
                       error={errors.relationshipEndDate}
                     />
                   </div>
@@ -358,22 +471,21 @@ export default function StepTwo() {
             </div>
           </div>
 
-          {/* Section: ANTECEDANT PROFESSIONNELS */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              ANTECEDANT PROFESSIONNELS
+              {l.profSection}
             </h3>
             <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-              10. En commençant par l&apos;emploi actuel, remplir le tableau sur les 5 dernières années
+              {l.profIntro}
             </p>
             <DynamicTable
-              title="Historique professionnel"
+              title={l.profHistory}
               columns={[
-                { key: 'fromDate', label: 'De (AAAA-MM)', type: 'text', placeholder: 'YYYY-MM' },
-                { key: 'toDate', label: 'À (AAAA-MM)', type: 'text', placeholder: 'YYYY-MM' },
-                { key: 'employerName', label: 'Inscrivez le nom, l\'adresse complète et le numéro de téléphone de chaque employeur', type: 'text' },
-                { key: 'profession', label: 'Profession/Poste', type: 'text' },
-                { key: 'monthlySalary', label: 'Salaire/Revenu Mensuel brut', type: 'text' },
+                { key: 'fromDate', label: l.eFromDate, type: 'text', placeholder: 'YYYY-MM' },
+                { key: 'toDate', label: l.eToDate, type: 'text', placeholder: 'YYYY-MM' },
+                { key: 'employerName', label: l.eEmployer, type: 'text' },
+                { key: 'profession', label: l.eProfession, type: 'text' },
+                { key: 'monthlySalary', label: l.eSalary, type: 'text' },
               ]}
               data={watch('employmentHistory') || []}
               onAdd={handleAddEmployment}

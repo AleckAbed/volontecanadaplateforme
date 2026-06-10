@@ -1,6 +1,21 @@
 /**
- * Stockage du token d'auth : localStorage, sessionStorage et cookie (persistance au refresh).
- * Une seule clé partagée pour que ProtectedRoute et l'API lisent la même valeur.
+ * Stockage du token d'auth.
+ *
+ * ARCHITECTURE ACTUELLE (transition cookie HttpOnly) :
+ *  - Source de vérité côté serveur : cookie HttpOnly `auth_token` posé par Laravel à la
+ *    connexion. Non lisible par JavaScript — immunisé contre XSS.
+ *  - Tous les `fetch()` du frontend ont `credentials: 'include'` → le navigateur envoie
+ *    automatiquement le cookie HttpOnly à chaque requête API.
+ *  - Le backend a un middleware (AuthCookieToBearer) qui convertit le cookie en
+ *    Authorization: Bearer pour Sanctum.
+ *
+ * LEGACY (à retirer une fois la transition validée) :
+ *  - Le token est aussi stocké dans localStorage / sessionStorage / cookie JS-lisible
+ *    pour rétro-compat avec les surfaces qui lisent `getAuthToken()` (ProtectedRoute,
+ *    ancien code). Ces surfaces seront migrées pour appeler /api/admin/me au mount
+ *    et faire confiance au cookie HttpOnly.
+ *  - En attendant : si un XSS vole le localStorage, le token volé reste utilisable
+ *    jusqu'au prochain logout. Le cookie HttpOnly, lui, reste invisible à l'attaquant.
  */
 
 const AUTH_TOKEN_KEY = 'auth_token';
@@ -108,6 +123,17 @@ export function removeAuthToken(): void {
     localStorage.removeItem(AUTH_TOKEN_KEY);
     sessionStorage.removeItem(AUTH_TOKEN_KEY);
     removeCookie(AUTH_TOKEN_COOKIE);
+
+    // Clear file-manager folder unlock codes — locked folders must re-prompt
+    // their PIN after logout/login.
+    try {
+      const keys: string[] = [];
+      for (let i = 0; i < sessionStorage.length; i++) {
+        const k = sessionStorage.key(i);
+        if (k && k.startsWith('fm_unlock_')) keys.push(k);
+      }
+      keys.forEach((k) => sessionStorage.removeItem(k));
+    } catch {}
   } catch {
     // ignore
   }

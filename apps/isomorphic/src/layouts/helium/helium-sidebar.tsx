@@ -26,21 +26,23 @@ export default function HeliumSidebar({ className }: { className?: string }) {
           {isQuestionnaires ? (
             <a href={logoHref} aria-label="Volonté Canada">
               <Image
-                src="/logo-short-light.svg"
-                alt={siteConfig.title}
-                width={58}
-                height={35}
+                src="/logo2.png"
+                alt="Volonté Canada"
+                width={140}
+                height={48}
                 priority
+                style={{ height: 'auto', maxHeight: 48, width: 'auto', maxWidth: 140 }}
               />
             </a>
           ) : (
-            <Link href={logoHref} aria-label="Site Logo">
+            <Link href={logoHref} aria-label="Volonté Canada">
               <Image
-                src="/logo-short-light.svg"
-                alt={siteConfig.title}
-                width={58}
-                height={35}
+                src="/logo2.png"
+                alt="Volonté Canada"
+                width={140}
+                height={48}
                 priority
+                style={{ height: 'auto', maxHeight: 48, width: 'auto', maxWidth: 140 }}
               />
             </Link>
           )}

@@ -1,25 +1,25 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
 import { invitationsService } from '@/services/invitations';
 
+/**
+ * Page d'accès à une invitation. L'utilisateur doit saisir :
+ *  - son adresse email (celle qui a reçu le lien)
+ *  - le code d'accès unique reçu dans l'email
+ *
+ * Le code et l'email ne sont volontairement PAS pré-remplis depuis l'URL —
+ * sécurité : un email forwardé / lien intercepté ne donne pas l'accès direct.
+ */
 export default function VerifyInvitationClient() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; code?: string }>({});
-
-  useEffect(() => {
-    const e = searchParams.get('email') ?? '';
-    const c = searchParams.get('code') ?? '';
-    if (e) setEmail(e);
-    if (c) setCode(c);
-  }, [searchParams]);
 
   const validate = (): boolean => {
     const errs: typeof errors = {};
@@ -39,7 +39,6 @@ export default function VerifyInvitationClient() {
       setLoading(true);
       const data = await invitationsService.verifyAccess(email.trim(), code.trim());
 
-      // Persist for the invitation page (used to verify access)
       try {
         sessionStorage.setItem('invitation_code', data.unique_code);
         sessionStorage.setItem('invitation_email', email.trim());
@@ -64,12 +63,12 @@ export default function VerifyInvitationClient() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center p-4">
-      {/* Background */}
+      {/* Background image + voile rouge cohérent avec le branding Volonté Canada */}
       <div
         className="fixed inset-0 -z-20 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: 'url(/bg0.jpg)' }}
       />
-      <div className="fixed inset-0 -z-10 bg-gradient-to-r from-blue-700/80 to-blue-900/80" />
+      <div className="fixed inset-0 -z-10 bg-gradient-to-br from-red-800/80 via-red-700/75 to-red-900/85" />
 
       <div className="relative w-full max-w-md">
         <div className="rounded-xl bg-white p-8 shadow-2xl">
@@ -95,7 +94,8 @@ export default function VerifyInvitationClient() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="votre@email.com"
-                className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                autoComplete="email"
+                className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 ${
                   errors.email ? 'border-red-400' : 'border-gray-300'
                 }`}
               />
@@ -103,31 +103,36 @@ export default function VerifyInvitationClient() {
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Code unique</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Code d'accès</label>
               <input
                 type="text"
                 value={code}
-                onChange={(e) => setCode(e.target.value)}
-                placeholder="32 caractères"
+                onChange={(e) => setCode(e.target.value.trim())}
+                placeholder="Collez ici le code reçu (32 caractères)"
                 maxLength={32}
-                className={`w-full rounded-lg border px-3 py-2 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                autoComplete="off"
+                spellCheck={false}
+                className={`w-full rounded-lg border px-3 py-2 font-mono text-sm tracking-wide focus:outline-none focus:ring-2 focus:ring-red-500 ${
                   errors.code ? 'border-red-400' : 'border-gray-300'
                 }`}
               />
               {errors.code && <p className="mt-1 text-xs text-red-600">{errors.code}</p>}
+              <p className="mt-1 text-[11px] text-gray-500">
+                Le code se trouve dans l'email que vous avez reçu, sous le bouton "Accéder à mon invitation".
+              </p>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+              className="w-full rounded-lg bg-gradient-to-r from-red-600 to-red-800 px-4 py-3 text-sm font-semibold text-white shadow-lg transition hover:from-red-700 hover:to-red-900 disabled:opacity-50"
             >
               {loading ? 'Vérification…' : 'Accéder à mon invitation'}
             </button>
           </form>
         </div>
 
-        <p className="mt-4 text-center text-xs text-white/80">
+        <p className="mt-4 text-center text-xs text-white/90">
           Volonté Canada — Cabinet d&apos;immigration
         </p>
       </div>

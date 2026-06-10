@@ -2,6 +2,7 @@ import { Toaster } from 'react-hot-toast';
 import GlobalDrawer from '@/app/shared/drawer-views/container';
 import GlobalModal from '@/app/shared/modal-views/container';
 import { JotaiProvider, ThemeProvider } from '@/app/shared/theme-provider';
+import I18nProvider from '@/i18n/provider';
 import { siteConfig } from '@/config/site.config';
 import { inter, lexendDeca } from '@/app/fonts';
 import cn from '@core/utils/class-names';
@@ -38,12 +39,14 @@ export default function RootLayout({
         <ThemeProvider>
           <NextProgress />
           <JotaiProvider>
-            <ProtectedRoute>
-              {children}
-              <Toaster />
-              <GlobalDrawer />
-              <GlobalModal />
-            </ProtectedRoute>
+            <I18nProvider>
+              <ProtectedRoute>
+                {children}
+                <Toaster />
+                <GlobalDrawer />
+                <GlobalModal />
+              </ProtectedRoute>
+            </I18nProvider>
           </JotaiProvider>
         </ThemeProvider>
       </body>

@@ -32,24 +32,30 @@ class ApiService {
   }
 
   /**
-   * Obtenir le token (localStorage, sessionStorage, ou cookie en secours)
+   * Le token n'est plus stocké côté JS — le cookie HttpOnly posé par Laravel
+   * est envoyé automatiquement par le navigateur (via credentials: 'include').
+   * Cette méthode retourne null par défaut. Conservée pour rétro-compat avec
+   * le code qui pourrait encore l'appeler.
    */
   private getToken(): string | null {
-    return getAuthToken();
+    return getAuthToken(); // legacy fallback — retourne null en flux 100% cookie
   }
 
-  /**
-   * Sauvegarder le token (localStorage + sessionStorage + cookie pour persistance au refresh)
-   */
   private setToken(token: string): void {
-    setAuthTokenStorage(token);
+    // No-op : on ne stocke plus le token côté JS — le cookie HttpOnly suffit.
+    // Conservé pour rétro-compat avec d'éventuels appels existants.
+    void token;
   }
 
   /**
-   * Supprimer le token d'authentification
+   * Efface les marqueurs d'auth côté client (user_type). Le cookie HttpOnly
+   * est effacé par Laravel à la déconnexion.
    */
   private removeToken(): void {
     removeAuthToken();
+    if (typeof window !== 'undefined') {
+      try { localStorage.removeItem('user_type'); } catch {}
+    }
   }
 
   /**
@@ -60,9 +66,13 @@ class ApiService {
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     const token = this.getToken();
+    const lang = typeof window !== 'undefined'
+      ? (() => { try { return localStorage.getItem('app_language') || 'fr'; } catch { return 'fr'; } })()
+      : 'fr';
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       Accept: 'application/json',
+      'Accept-Language': lang,
       ...(options.headers as Record<string, string>),
     };
     if (token) {
@@ -71,8 +81,12 @@ class ApiService {
 
     try {
       const baseUrl = getApiBaseUrl();
+      // `credentials: 'include'` est requis pour que le navigateur envoie le
+      // cookie HttpOnly `auth_token` posé par Laravel à la connexion.
+      // Combiné avec CORS `supports_credentials=true` côté backend.
       const response = await fetch(`${baseUrl}${endpoint}`, {
         ...options,
+        credentials: 'include',
         headers,
       });
 
@@ -156,10 +170,11 @@ class ApiService {
       token: string;
     }>('/admin/login', { email, password });
 
-    const token = (response.data as { token?: string; access_token?: string })?.token
-      ?? (response.data as { token?: string; access_token?: string })?.access_token;
-    if (response.success && typeof token === 'string' && token.trim().length > 0) {
-      this.setToken(token.trim());
+    // Le cookie HttpOnly est posé par Laravel. Le token JSON renvoyé est
+    // legacy — on ne le stocke plus. On garde juste un marqueur user_type
+    // pour savoir quel /me appeler au mount.
+    if (response.success && typeof window !== 'undefined') {
+      try { localStorage.setItem('user_type', 'admin'); } catch {}
     }
     return response;
   }
@@ -180,6 +195,14 @@ class ApiService {
     return this.get<any>('/admin/me');
   }
 
+  /**
+   * Vérifie le mot de passe de l'admin connecté SANS rotation de token.
+   * Utilisé par le lock screen — préserve la session existante.
+   */
+  async verifyAdminPassword(password: string) {
+    return this.post<{ message: string }>('/admin/verify-password', { password });
+  }
+
   // ============ AUTHENTIFICATION CLIENT ============
 
   /**
@@ -198,10 +221,8 @@ class ApiService {
       token: string;
     }>('/client/register', data);
 
-    const regToken = (response.data as { token?: string; access_token?: string })?.token
-      ?? (response.data as { token?: string; access_token?: string })?.access_token;
-    if (response.success && typeof regToken === 'string' && regToken.trim().length > 0) {
-      this.setToken(regToken.trim());
+    if (response.success && typeof window !== 'undefined') {
+      try { localStorage.setItem('user_type', 'client'); } catch {}
     }
     return response;
   }
@@ -215,10 +236,8 @@ class ApiService {
       token: string;
     }>('/client/login', { email, password });
 
-    const token = (response.data as { token?: string; access_token?: string })?.token
-      ?? (response.data as { token?: string; access_token?: string })?.access_token;
-    if (response.success && typeof token === 'string' && token.trim().length > 0) {
-      this.setToken(token.trim());
+    if (response.success && typeof window !== 'undefined') {
+      try { localStorage.setItem('user_type', 'client'); } catch {}
     }
     return response;
   }
@@ -242,10 +261,21 @@ class ApiService {
   // ============ UTILITAIRES ============
 
   /**
-   * Vérifier si l'utilisateur est authentifié
+   * Vérifier si l'utilisateur est probablement authentifié (heuristique).
+   *
+   * Avec le cookie HttpOnly, JS ne peut pas vérifier directement le token —
+   * il faut appeler /admin/me ou /client/me pour avoir la vérité du serveur.
+   * On utilise ici un marqueur user_type (non sensible) comme indication
+   * "il y avait une session récemment", pour éviter un round-trip réseau
+   * inutile. useAuth fait l'appel /me au mount pour confirmer.
    */
   isAuthenticated(): boolean {
-    return !!this.getToken();
+    if (typeof window === 'undefined') return false;
+    try {
+      return localStorage.getItem('user_type') === 'admin'
+          || localStorage.getItem('user_type') === 'client'
+          || !!this.getToken(); // fallback legacy
+    } catch { return false; }
   }
 
   /**
@@ -312,6 +342,95 @@ class ApiService {
     if (params?.client_type) sp.set('client_type', params.client_type);
     const qs = sp.toString();
     return this.request<ApiResponse>(`/admin/module-clients${qs ? `?${qs}` : ''}`, { method: 'GET' });
+  }
+
+  /** Récupérer un client par ID (avec familyMembers + dossiers) */
+  async getModuleClient(id: number | string): Promise<ApiResponse> {
+    return this.request<ApiResponse>(`/admin/module-clients/${id}`, { method: 'GET' });
+  }
+
+  /** Mettre à jour un client */
+  async updateModuleClient(id: number | string, payload: any): Promise<ApiResponse> {
+    return this.request<ApiResponse>(`/admin/module-clients/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  /** Supprimer un client */
+  async deleteModuleClient(id: number | string): Promise<ApiResponse> {
+    return this.request<ApiResponse>(`/admin/module-clients/${id}`, { method: 'DELETE' });
+  }
+
+  /** Ajouter un membre de famille */
+  async addFamilyMember(clientId: number | string, payload: any): Promise<ApiResponse> {
+    return this.request<ApiResponse>(`/admin/module-clients/${clientId}/family-members`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  /** Modifier un membre de famille */
+  async updateFamilyMember(clientId: number | string, memberId: number | string, payload: any): Promise<ApiResponse> {
+    return this.request<ApiResponse>(`/admin/module-clients/${clientId}/family-members/${memberId}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  /** Supprimer un membre de famille */
+  async deleteFamilyMember(clientId: number | string, memberId: number | string): Promise<ApiResponse> {
+    return this.request<ApiResponse>(`/admin/module-clients/${clientId}/family-members/${memberId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // ─── Dossiers ─────────────────────────────────────────────────────────────
+
+  async getDossiers(params?: { page?: number; per_page?: number; status?: string; client_id?: number }): Promise<ApiResponse> {
+    const sp = new URLSearchParams();
+    if (params?.page != null) sp.set('page', String(params.page));
+    if (params?.per_page != null) sp.set('per_page', String(params.per_page));
+    if (params?.status) sp.set('status', params.status);
+    if (params?.client_id) sp.set('client_id', String(params.client_id));
+    const qs = sp.toString();
+    return this.request<ApiResponse>(`/admin/dossiers${qs ? `?${qs}` : ''}`, { method: 'GET' });
+  }
+
+  async getDossier(id: number | string): Promise<ApiResponse> {
+    return this.request<ApiResponse>(`/admin/dossiers/${id}`, { method: 'GET' });
+  }
+
+  async createDossier(payload: {
+    client_id: number;
+    scope: 'client' | 'member' | 'family';
+    family_member_id?: number;
+    name: string;
+    service_name?: string;
+    status?: string;
+    opened_at?: string;
+    deadline_at?: string;
+    notes?: string;
+  }): Promise<ApiResponse> {
+    return this.request<ApiResponse>('/admin/dossiers', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async updateDossier(id: number | string, payload: any): Promise<ApiResponse> {
+    return this.request<ApiResponse>(`/admin/dossiers/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async deleteDossier(id: number | string): Promise<ApiResponse> {
+    return this.request<ApiResponse>(`/admin/dossiers/${id}`, { method: 'DELETE' });
+  }
+
+  async getDossierOptions(): Promise<ApiResponse> {
+    return this.request<ApiResponse>('/admin/dossiers/options', { method: 'GET' });
   }
 
   /**

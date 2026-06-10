@@ -11,11 +11,57 @@ import { Input } from 'rizzui';
 import DynamicTable from './dynamic-table';
 import type { EducationEntry } from '@/validators/client-form.schema';
 
+const STEP4_LABELS = {
+  fr: {
+    elementary: "Élémentaire/École primaire (nombre d'années):",
+    secondary: "Secondaire (nombre d'années):",
+    university: "Université/Collège (nombre d'années):",
+    vocational: "École de formation professionnelle ou autre école postsecondaire (nombre d'années):",
+    historyTitle: 'Historique des études',
+    fromDate: 'Du (AAAA-MM)',
+    toDate: 'Au (AAAA-MM)',
+    fieldOfStudy: "Domaine d'étude",
+    certificateType: 'Type de certificat ou de diplôme décerné',
+    city: 'Ville ou village',
+    country: 'Pays ou territoire',
+    institutionName: "Nom de l'établissement",
+  },
+  en: {
+    elementary: 'Elementary/Primary school (number of years):',
+    secondary: 'Secondary (number of years):',
+    university: 'University/College (number of years):',
+    vocational: 'Vocational training school or other post-secondary school (number of years):',
+    historyTitle: 'Education history',
+    fromDate: 'From (YYYY-MM)',
+    toDate: 'To (YYYY-MM)',
+    fieldOfStudy: 'Field of study',
+    certificateType: 'Type of certificate or degree awarded',
+    city: 'City or town',
+    country: 'Country or territory',
+    institutionName: 'Institution name',
+  },
+  es: {
+    elementary: 'Primaria/Escuela primaria (número de años):',
+    secondary: 'Secundaria (número de años):',
+    university: 'Universidad/Colegio (número de años):',
+    vocational: 'Escuela de formación profesional u otra escuela postsecundaria (número de años):',
+    historyTitle: 'Historial académico',
+    fromDate: 'Desde (AAAA-MM)',
+    toDate: 'Hasta (AAAA-MM)',
+    fieldOfStudy: 'Campo de estudio',
+    certificateType: 'Tipo de certificado o diploma otorgado',
+    city: 'Ciudad o pueblo',
+    country: 'País o territorio',
+    institutionName: 'Nombre de la institución',
+  },
+} as const;
+
 export default function StepFour() {
   const { step, gotoNextStep } = useStepper();
   const [formData, setFormData] = useAtom(formDataAtom);
   const [locale] = useAtom(questionnaireLocaleAtom);
   const t = STEP4_T[locale] || STEP4_T.fr;
+  const l = STEP4_LABELS[locale] || STEP4_LABELS.fr;
   const [educationHistory, setEducationHistory] = useState<EducationEntry[]>(
     formData?.educationHistory || []
   );
@@ -72,38 +118,22 @@ export default function StepFour() {
       >
         <div className="grid gap-6">
           <div className="grid gap-4 @3xl:grid-cols-2">
-            <Input
-              label="Élémentaire/École primaire (nombre d'années):"
-              type="number"
-              {...register('elementaryYears')}
-            />
-            <Input
-              label="Secondaire (nombre d'années):"
-              type="number"
-              {...register('secondaryYears')}
-            />
-            <Input
-              label="Université/Collège (nombre d'années):"
-              type="number"
-              {...register('universityYears')}
-            />
-            <Input
-              label="École de formation professionnelle ou autre école postsecondaire (nombre d'années):"
-              type="number"
-              {...register('vocationalYears')}
-            />
+            <Input label={l.elementary} type="number" {...register('elementaryYears')} />
+            <Input label={l.secondary} type="number" {...register('secondaryYears')} />
+            <Input label={l.university} type="number" {...register('universityYears')} />
+            <Input label={l.vocational} type="number" {...register('vocationalYears')} />
           </div>
 
           <DynamicTable<EducationEntry>
-            title="Historique des études"
+            title={l.historyTitle}
             columns={[
-              { key: 'fromDate', label: 'Du (AAAA-MM)', type: 'date', placeholder: 'YYYY-MM' },
-              { key: 'toDate', label: 'Au (AAAA-MM)', type: 'date', placeholder: 'YYYY-MM' },
-              { key: 'fieldOfStudy', label: 'Domaine d\'étude', type: 'text' },
-              { key: 'certificateType', label: 'Type de certificat ou de diplôme décerné', type: 'text' },
-              { key: 'city', label: 'Ville ou village', type: 'text' },
-              { key: 'country', label: 'Pays ou territoire', type: 'text' },
-              { key: 'institutionName', label: 'Nom de l\'établissement', type: 'text' },
+              { key: 'fromDate', label: l.fromDate, type: 'date', placeholder: 'YYYY-MM' },
+              { key: 'toDate', label: l.toDate, type: 'date', placeholder: 'YYYY-MM' },
+              { key: 'fieldOfStudy', label: l.fieldOfStudy, type: 'text' },
+              { key: 'certificateType', label: l.certificateType, type: 'text' },
+              { key: 'city', label: l.city, type: 'text' },
+              { key: 'country', label: l.country, type: 'text' },
+              { key: 'institutionName', label: l.institutionName, type: 'text' },
             ]}
             data={educationHistory}
             onAdd={addEducationEntry}

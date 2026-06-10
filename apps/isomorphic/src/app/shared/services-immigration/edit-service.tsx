@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { PiXBold } from 'react-icons/pi';
 import { Controller, SubmitHandler } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { Form } from '@core/ui/form';
 import { Input, Button, ActionIcon, Title, Select } from 'rizzui';
 import {
@@ -12,38 +13,28 @@ import {
 import { useModal } from '@/app/shared/modal-views/use-modal';
 import { servicesList } from '@/data/services-immigration';
 
-const categories = [
-  { label: 'Visa', value: 'Visa' },
-  { label: 'Travail', value: 'Travail' },
-  { label: 'Immigration', value: 'Immigration' },
-  { label: 'Citoyenneté', value: 'Citoyenneté' },
-  { label: 'Famille', value: 'Famille' },
-  { label: 'Éducation', value: 'Éducation' },
-];
-
-const statusOptions = [
-  { label: 'Actif', value: 'active' },
-  { label: 'Inactif', value: 'inactive' },
-  { label: 'En attente', value: 'pending' },
-];
+const CATEGORY_KEYS = ['Visa', 'Travail', 'Immigration', 'Citoyenneté', 'Famille', 'Éducation'];
+const STATUS_KEYS = ['active', 'inactive', 'pending'] as const;
 
 interface EditServiceProps {
   serviceId: number;
 }
 
 export default function EditService({ serviceId }: EditServiceProps) {
+  const { t } = useTranslation();
   const { closeModal } = useModal();
   const [isLoading, setLoading] = useState(false);
 
-  // Trouver le service à éditer
   const service = servicesList.find((s) => s.id === serviceId);
+
+  const categories = CATEGORY_KEYS.map((k) => ({ label: t(`services_immigration.categories_list.${k}`, { defaultValue: k }), value: k }));
+  const statusOptions = STATUS_KEYS.map((k) => ({ label: t(`services_immigration.status_label.${k}`), value: k }));
 
   const defaultValues: CreateServiceInput = service
     ? {
         serviceName: service.name,
         description: service.description,
         category: service.category,
-        price: service.price,
         duration: service.duration,
         status: service.status,
       }
@@ -51,7 +42,6 @@ export default function EditService({ serviceId }: EditServiceProps) {
         serviceName: '',
         description: '',
         category: '',
-        price: '',
         duration: '',
         status: 'active',
       };
@@ -76,21 +66,21 @@ export default function EditService({ serviceId }: EditServiceProps) {
         <>
           <div className="flex items-center justify-between">
             <Title as="h4" className="font-semibold">
-              Modifier le Service
+              {t('services_immigration.edit_title')}
             </Title>
             <ActionIcon size="sm" variant="text" onClick={closeModal}>
               <PiXBold className="h-auto w-5" />
             </ActionIcon>
           </div>
           <Input
-            label="Nom du Service"
-            placeholder="Ex: Visa de Visiteur"
+            label={t('services_immigration.service_name')}
+            placeholder={t('services_immigration.service_name_placeholder')}
             {...register('serviceName')}
             error={errors.serviceName?.message}
           />
           <Input
-            label="Description"
-            placeholder="Description du service"
+            label={t('services_immigration.description')}
+            placeholder={t('services_immigration.description_placeholder')}
             {...register('description')}
             error={errors.description?.message}
           />
@@ -99,8 +89,8 @@ export default function EditService({ serviceId }: EditServiceProps) {
             name="category"
             render={({ field: { onChange, value } }) => (
               <Select
-                label="Catégorie"
-                placeholder="Sélectionner une catégorie"
+                label={t('services_immigration.category')}
+                placeholder={t('services_immigration.category_placeholder')}
                 options={categories}
                 value={value}
                 onChange={onChange}
@@ -108,27 +98,19 @@ export default function EditService({ serviceId }: EditServiceProps) {
               />
             )}
           />
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label="Prix"
-              placeholder="Ex: 150 CAD"
-              {...register('price')}
-              error={errors.price?.message}
-            />
-            <Input
-              label="Durée"
-              placeholder="Ex: 2-4 semaines"
-              {...register('duration')}
-              error={errors.duration?.message}
-            />
-          </div>
+          <Input
+            label={t('services_immigration.duration')}
+            placeholder={t('services_immigration.duration_placeholder')}
+            {...register('duration')}
+            error={errors.duration?.message}
+          />
           <Controller
             control={control}
             name="status"
             render={({ field: { onChange, value } }) => (
               <Select
-                label="Statut"
-                placeholder="Sélectionner un statut"
+                label={t('services_immigration.status')}
+                placeholder={t('services_immigration.status_placeholder')}
                 options={statusOptions}
                 value={value}
                 onChange={onChange}
@@ -143,14 +125,14 @@ export default function EditService({ serviceId }: EditServiceProps) {
               onClick={closeModal}
               className="w-full @xl:w-auto"
             >
-              Annuler
+              {t('common.cancel')}
             </Button>
             <Button
               type="submit"
               isLoading={isLoading}
               className="w-full @xl:w-auto"
             >
-              Enregistrer
+              {t('common.save')}
             </Button>
           </div>
         </>
@@ -158,7 +140,3 @@ export default function EditService({ serviceId }: EditServiceProps) {
     </Form>
   );
 }
-
-
-
-

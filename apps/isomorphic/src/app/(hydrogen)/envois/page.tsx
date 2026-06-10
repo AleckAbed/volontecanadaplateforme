@@ -3,20 +3,22 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { Title, Text, Badge, ActionIcon, Tooltip, Avatar } from 'rizzui';
 import { PiTrashDuotone, PiEyeDuotone, PiPlusBold } from 'react-icons/pi';
 import BasicTableWidget from '@core/components/controlled-table/basic-table-widget';
 import cn from '@core/utils/class-names';
 import { invitationsService, Invitation } from '@/services/invitations';
 
-const STATUS_INFO: Record<string, { label: string; color: 'warning' | 'info' | 'success' | 'secondary' }> = {
-  pending: { label: 'En attente', color: 'warning' },
-  in_progress: { label: 'En cours', color: 'info' },
-  completed: { label: 'Complété', color: 'success' },
-  expired: { label: 'Expiré', color: 'secondary' },
+const STATUS_COLOR: Record<string, 'warning' | 'info' | 'success' | 'secondary'> = {
+  pending: 'warning',
+  in_progress: 'info',
+  completed: 'success',
+  expired: 'secondary',
 };
 
 export default function EnvoisListPage() {
+  const { t, i18n } = useTranslation();
   const [items, setItems] = useState<Invitation[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -41,19 +43,30 @@ export default function EnvoisListPage() {
 
   const handleDelete = async (inv: Invitation) => {
     const recipient = inv.client?.name || inv.custom_name || inv.email;
-    if (!confirm(`Supprimer l'envoi à ${recipient} ?`)) return;
+    if (!confirm(t('envois.delete_confirm', { recipient }))) return;
     try {
       await invitationsService.deleteInvitation(inv.id);
-      toast.success('Envoi supprimé');
+      toast.success(t('envois.deleted'));
       load();
     } catch (e: any) {
       toast.error(e.message);
     }
   };
 
+  const formatDateLoc = (value?: string | null): string => {
+    if (!value) return '—';
+    const m = String(value).match(/^(\d{4}-\d{2}-\d{2})[ T](\d{2}):(\d{2})/);
+    const sep = t('envois.date_separator');
+    if (m) return `${m[1]} ${sep} ${m[2]}H${m[3]}`;
+    const d = new Date(value);
+    if (isNaN(d.getTime())) return value;
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${sep} ${pad(d.getHours())}H${pad(d.getMinutes())}`;
+  };
+
   const getColumns = () => [
     {
-      title: <span className="block whitespace-nowrap">Destinataire</span>,
+      title: <span className="block whitespace-nowrap">{t('envois.columns.recipient')}</span>,
       dataIndex: 'recipient',
       key: 'recipient',
       width: 320,
@@ -69,7 +82,7 @@ export default function EnvoisListPage() {
               {inv.family_member && (
                 <Text className="truncate text-[12px] font-medium text-blue-700">
                   → {inv.family_member.name}{' '}
-                  <span className="text-gray-500">({inv.family_member.relationship})</span>
+                  <span className="text-gray-500">({t(`clients.relationship.${inv.family_member.relationship}`, { defaultValue: inv.family_member.relationship })})</span>
                 </Text>
               )}
               <Text className="truncate text-[12px] text-gray-500">{inv.email}</Text>
@@ -84,7 +97,7 @@ export default function EnvoisListPage() {
       },
     },
     {
-      title: <span className="block whitespace-nowrap">Items</span>,
+      title: <span className="block whitespace-nowrap">{t('envois.columns.items')}</span>,
       dataIndex: 'items',
       key: 'items',
       width: 120,
@@ -95,12 +108,12 @@ export default function EnvoisListPage() {
           <div className="flex gap-2">
             {f > 0 && (
               <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-medium text-blue-800">
-                {f} formulaire{f > 1 ? 's' : ''}
+                {t(f > 1 ? 'envois.forms_count_other' : 'envois.forms_count_one', { count: f })}
               </span>
             )}
             {d > 0 && (
               <span className="rounded-full bg-purple-100 px-2 py-0.5 text-[11px] font-medium text-purple-800">
-                {d} document{d > 1 ? 's' : ''}
+                {t(d > 1 ? 'envois.documents_count_other' : 'envois.documents_count_one', { count: d })}
               </span>
             )}
           </div>
@@ -108,7 +121,7 @@ export default function EnvoisListPage() {
       },
     },
     {
-      title: <span className="block whitespace-nowrap">Avancement</span>,
+      title: <span className="block whitespace-nowrap">{t('envois.columns.progress')}</span>,
       dataIndex: 'progress',
       key: 'progress',
       width: 180,
@@ -129,20 +142,20 @@ export default function EnvoisListPage() {
       },
     },
     {
-      title: <span className="block whitespace-nowrap">Statut</span>,
+      title: <span className="block whitespace-nowrap">{t('envois.columns.status')}</span>,
       dataIndex: 'status',
       key: 'status',
       width: 130,
       render: (status: string, inv: Invitation) => {
-        const info = STATUS_INFO[status] || STATUS_INFO.pending;
+        const color = STATUS_COLOR[status] || 'warning';
         return (
           <div className="flex flex-col gap-1">
-            <Badge color={info.color} variant="flat" rounded="lg">
-              {info.label}
+            <Badge color={color} variant="flat" rounded="lg">
+              {t(`envois.status.${status}`, { defaultValue: status })}
             </Badge>
             {!inv.email_sent && (
               <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-medium text-red-700">
-                ✉ Email KO
+                {t('envois.email_ko')}
               </span>
             )}
           </div>
@@ -150,42 +163,42 @@ export default function EnvoisListPage() {
       },
     },
     {
-      title: <span className="block whitespace-nowrap">Envoyé le</span>,
+      title: <span className="block whitespace-nowrap">{t('envois.columns.sent_at')}</span>,
       dataIndex: 'sent_at',
       key: 'sent_at',
       width: 160,
       render: (value?: string) => (
-        <Text className="text-[13px] text-gray-700">{formatDateFr(value)}</Text>
+        <Text className="text-[13px] text-gray-700">{formatDateLoc(value)}</Text>
       ),
     },
     {
-      title: <span className="block whitespace-nowrap">Expire le</span>,
+      title: <span className="block whitespace-nowrap">{t('envois.columns.expires_at')}</span>,
       dataIndex: 'expires_at',
       key: 'expires_at',
       width: 160,
       render: (value?: string) => (
-        <Text className="text-[13px] text-gray-700">{formatDateFr(value)}</Text>
+        <Text className="text-[13px] text-gray-700">{formatDateLoc(value)}</Text>
       ),
     },
     {
-      title: <span className="block whitespace-nowrap text-right">Actions</span>,
+      title: <span className="block whitespace-nowrap text-right">{t('envois.columns.actions')}</span>,
       dataIndex: 'actions',
       key: 'actions',
       width: 130,
       render: (_: any, inv: Invitation) => (
         <div className="flex items-center justify-end gap-1.5">
-          <Tooltip size="sm" content="Voir les détails" placement="top" color="invert">
+          <Tooltip size="sm" content={t('envois.view_details')} placement="top" color="invert">
             <Link href={`/envois/${inv.id}`}>
-              <ActionIcon as="span" size="sm" variant="outline" aria-label="Voir">
+              <ActionIcon as="span" size="sm" variant="outline" aria-label={t('common.view')}>
                 <PiEyeDuotone className="h-4 w-4" />
               </ActionIcon>
             </Link>
           </Tooltip>
-          <Tooltip size="sm" content="Supprimer" placement="top" color="invert">
+          <Tooltip size="sm" content={t('common.delete')} placement="top" color="invert">
             <ActionIcon
               size="sm"
               variant="outline"
-              aria-label="Supprimer"
+              aria-label={t('common.delete')}
               onClick={() => handleDelete(inv)}
             >
               <PiTrashDuotone className="h-4 w-4" />
@@ -200,63 +213,61 @@ export default function EnvoisListPage() {
     <div className="p-6">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Envois</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Gérez les invitations envoyées aux clients (formulaires + documents).
-          </p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('envois.title')}</h1>
+          <p className="mt-1 text-sm text-gray-500">{t('envois.subtitle')}</p>
         </div>
         <Link
           href="/envois/nouveau"
           className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
         >
           <PiPlusBold className="h-4 w-4" />
-          Nouvel envoi
+          {t('envois.add')}
         </Link>
       </div>
 
       {loading ? (
-        <div className="py-10 text-center text-gray-400">Chargement…</div>
+        <div className="py-10 text-center text-gray-400">{t('common.loading')}</div>
       ) : items.length === 0 ? (
         <div className="rounded-xl border-2 border-dashed border-gray-200 py-16 text-center">
-          <p className="text-lg font-medium text-gray-500">Aucun envoi</p>
-          <p className="mt-1 text-sm text-gray-400">Créez votre premier envoi.</p>
+          <p className="text-lg font-medium text-gray-500">{t('envois.no_envois')}</p>
+          <p className="mt-1 text-sm text-gray-400">{t('envois.create_first')}</p>
           <Link
             href="/envois/nouveau"
             className="mt-4 inline-block rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700"
           >
-            Nouvel envoi
+            {t('envois.add')}
           </Link>
         </div>
       ) : (
         <>
           <BasicTableWidget
-            title={`Liste des envois (${total})`}
+            title={t('envois.list_count', { count: total })}
             data={items}
             getColumns={getColumns}
             noGutter
-            searchPlaceholder="Rechercher par destinataire, email, dossier..."
+            searchPlaceholder={t('envois.search_placeholder')}
             scroll={{ x: 1100 }}
             className={cn('pb-0 lg:pb-0 [&_.rc-table-row:last-child_td]:border-b-0')}
           />
 
           {totalPages > 1 && (
             <div className="mt-4 flex items-center justify-between">
-              <div className="text-sm text-gray-600">{total} envoi{total > 1 ? 's' : ''} au total</div>
+              <div className="text-sm text-gray-600">{t('envois.total_count', { count: total })}</div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
                   className="rounded-lg border border-gray-300 px-3 py-1 text-sm disabled:opacity-50"
                 >
-                  Précédent
+                  {t('envois.prev')}
                 </button>
-                <span className="text-sm">Page {page} / {totalPages}</span>
+                <span className="text-sm">{t('envois.page_of', { page, total: totalPages })}</span>
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
                   className="rounded-lg border border-gray-300 px-3 py-1 text-sm disabled:opacity-50"
                 >
-                  Suivant
+                  {t('envois.next')}
                 </button>
               </div>
             </div>
@@ -265,15 +276,4 @@ export default function EnvoisListPage() {
       )}
     </div>
   );
-}
-
-/** Format "2026-05-10 17:30" → "2026-05-10 à 17H30". */
-function formatDateFr(value?: string | null): string {
-  if (!value) return '—';
-  const m = String(value).match(/^(\d{4}-\d{2}-\d{2})[ T](\d{2}):(\d{2})/);
-  if (m) return `${m[1]} à ${m[2]}H${m[3]}`;
-  const d = new Date(value);
-  if (isNaN(d.getTime())) return value;
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} à ${pad(d.getHours())}H${pad(d.getMinutes())}`;
 }

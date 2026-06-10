@@ -2,6 +2,7 @@
 
 import { useAtom } from 'jotai';
 import { Button } from 'rizzui';
+import { useTranslation } from 'react-i18next';
 import cn from '@core/utils/class-names';
 import {
   clientFormDataAtom,
@@ -19,11 +20,14 @@ interface FooterProps {
 
 export default function CreateClientFormFooter({
   className,
-  nextLabel = 'Suivant',
-  submitLabel = 'Créer le client',
+  nextLabel,
+  submitLabel,
   showSubmit = false,
   isLoading = false,
 }: FooterProps) {
+  const { t } = useTranslation();
+  const _nextLabel = nextLabel ?? t('clients.create_modal.next');
+  const _submitLabel = submitLabel ?? t('clients.create_modal.submit_create');
   const { step, gotoPrevStep } = useStepperClient();
   const [formData] = useAtom(clientFormDataAtom);
   const isFamily = formData.client_type === 'family';
@@ -59,7 +63,7 @@ export default function CreateClientFormFooter({
             className="!w-auto"
             rounded="lg"
           >
-            Retour
+            {t('clients.create_modal.back')}
           </Button>
         )}
         <Button
@@ -68,7 +72,7 @@ export default function CreateClientFormFooter({
           rounded="lg"
           isLoading={isLoading}
         >
-          {showSubmit || isLastStep ? submitLabel : nextLabel}
+          {showSubmit || isLastStep ? _submitLabel : _nextLabel}
         </Button>
       </div>
     </footer>

@@ -2,14 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { invitationsService, Category } from '@/services/invitations';
 
 const COLORS = ['blue', 'purple', 'green', 'red', 'amber', 'pink', 'gray', 'indigo'];
-
-const TYPE_LABELS: Record<string, string> = {
-  form: 'Formulaire',
-  document: 'Document',
-};
 
 interface FormState {
   name: string;
@@ -30,12 +26,19 @@ const emptyForm: FormState = {
 };
 
 export default function CategoriesPage() {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Category | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [showForm, setShowForm] = useState(false);
   const [filterType, setFilterType] = useState<string>('');
+
+  const typeLabel = (type: string) => {
+    if (type === 'form') return t('configuration.type_form');
+    if (type === 'document') return t('configuration.type_document');
+    return type;
+  };
 
   const load = async () => {
     try {
@@ -52,15 +55,15 @@ export default function CategoriesPage() {
   useEffect(() => { load(); }, []);
 
   const handleSave = async () => {
-    if (!form.name.trim()) { toast.error('Nom requis'); return; }
-    if (!form.type.trim()) { toast.error('Type requis'); return; }
+    if (!form.name.trim()) { toast.error(t('configuration.name_required')); return; }
+    if (!form.type.trim()) { toast.error(t('configuration.type_required')); return; }
     try {
       if (editing) {
         await invitationsService.updateCategory(editing.id, form);
-        toast.success('Catégorie mise à jour');
+        toast.success(t('configuration.updated'));
       } else {
         await invitationsService.createCategory(form);
-        toast.success('Catégorie créée');
+        toast.success(t('configuration.created'));
       }
       setShowForm(false);
       setEditing(null);
@@ -72,10 +75,10 @@ export default function CategoriesPage() {
   };
 
   const handleDelete = async (cat: Category) => {
-    if (!confirm(`Supprimer la catégorie "${cat.name}" ? Les formulaires et documents associés perdront leur catégorie.`)) return;
+    if (!confirm(t('configuration.delete_confirm', { name: cat.name }))) return;
     try {
       await invitationsService.deleteCategory(cat.id);
-      toast.success('Catégorie supprimée');
+      toast.success(t('configuration.deleted'));
       load();
     } catch (e: any) {
       toast.error(e.message);
@@ -105,27 +108,23 @@ export default function CategoriesPage() {
     ? categories.filter((c) => c.type === filterType)
     : categories;
 
-  // Discover existing types so admin can see which ones are in use
   const existingTypes = Array.from(new Set(categories.map((c) => c.type)));
 
   return (
     <div className="p-6">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Catégories</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Organisez formulaires et documents par catégorie. Vous pouvez créer de nouveaux types si besoin.
-          </p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('configuration.categories_title')}</h1>
+          <p className="mt-1 text-sm text-gray-500">{t('configuration.categories_subtitle')}</p>
         </div>
         <button
           onClick={handleNew}
           className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
         >
-          + Nouvelle catégorie
+          {t('configuration.new_category')}
         </button>
       </div>
 
-      {/* Filtre par type */}
       <div className="mb-4 flex flex-wrap gap-2">
         <button
           onClick={() => setFilterType('')}
@@ -133,28 +132,29 @@ export default function CategoriesPage() {
             !filterType ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
           }`}
         >
-          Toutes ({categories.length})
+          {t('configuration.all_count', { count: categories.length })}
         </button>
-        {existingTypes.map((t) => (
+        {existingTypes.map((type) => (
           <button
-            key={t}
-            onClick={() => setFilterType(t)}
+            key={type}
+            onClick={() => setFilterType(type)}
             className={`rounded-full px-3 py-1 text-xs font-medium ${
-              filterType === t ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
+              filterType === type ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
             }`}
           >
-            {TYPE_LABELS[t] || t} ({categories.filter((c) => c.type === t).length})
+            {typeLabel(type)} ({categories.filter((c) => c.type === type).length})
           </button>
         ))}
       </div>
 
-      {/* Formulaire */}
       {showForm && (
         <div className="mb-6 rounded-xl border border-gray-200 bg-white p-5">
-          <h3 className="mb-4 text-lg font-semibold">{editing ? 'Modifier' : 'Nouvelle'} catégorie</h3>
+          <h3 className="mb-4 text-lg font-semibold">
+            {editing ? t('configuration.category_edit_title') : t('configuration.category_new_title')}
+          </h3>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Nom *</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">{t('configuration.name_label')} *</label>
               <input
                 type="text"
                 value={form.name}
@@ -163,20 +163,18 @@ export default function CategoriesPage() {
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Type *</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">{t('configuration.type_label')} *</label>
               <input
                 type="text"
                 value={form.type}
                 onChange={(e) => setForm({ ...form, type: e.target.value })}
-                placeholder="form, document, ou un type custom"
+                placeholder={t('configuration.type_placeholder')}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
               />
-              <p className="mt-1 text-xs text-gray-500">
-                Standards : <code>form</code>, <code>document</code>. Tu peux créer des types personnalisés.
-              </p>
+              <p className="mt-1 text-xs text-gray-500">{t('configuration.type_hint')}</p>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Couleur</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">{t('configuration.color_label')}</label>
               <div className="flex gap-2">
                 {COLORS.map((c) => (
                   <button
@@ -192,7 +190,7 @@ export default function CategoriesPage() {
               </div>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Ordre d&apos;affichage</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">{t('configuration.sort_order_label')}</label>
               <input
                 type="number"
                 value={form.sort_order}
@@ -201,7 +199,7 @@ export default function CategoriesPage() {
               />
             </div>
             <div className="md:col-span-2">
-              <label className="mb-1 block text-sm font-medium text-gray-700">Description</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">{t('configuration.description_label')}</label>
               <textarea
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
@@ -216,7 +214,7 @@ export default function CategoriesPage() {
                 onChange={(e) => setForm({ ...form, is_active: e.target.checked })}
                 className="rounded"
               />
-              <span className="text-sm text-gray-700">Active</span>
+              <span className="text-sm text-gray-700">{t('configuration.is_active_label')}</span>
             </label>
           </div>
           <div className="mt-5 flex gap-3">
@@ -224,36 +222,35 @@ export default function CategoriesPage() {
               onClick={() => { setShowForm(false); setEditing(null); }}
               className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
-              Annuler
+              {t('common.cancel')}
             </button>
             <button
               onClick={handleSave}
               className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
             >
-              {editing ? 'Mettre à jour' : 'Créer'}
+              {editing ? t('configuration.update_button') : t('common.create')}
             </button>
           </div>
         </div>
       )}
 
-      {/* Liste */}
       {loading ? (
-        <div className="py-10 text-center text-gray-400">Chargement…</div>
+        <div className="py-10 text-center text-gray-400">{t('common.loading')}</div>
       ) : filtered.length === 0 ? (
         <div className="rounded-xl border-2 border-dashed border-gray-200 py-12 text-center">
-          <p className="text-gray-500">Aucune catégorie.</p>
+          <p className="text-gray-500">{t('configuration.no_categories')}</p>
         </div>
       ) : (
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Nom</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Type</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Couleur</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Ordre</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Statut</th>
-                <th className="px-4 py-3 text-right text-xs font-medium uppercase text-gray-500">Actions</th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">{t('configuration.cols_name')}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">{t('configuration.cols_type')}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">{t('configuration.cols_color')}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">{t('configuration.cols_order')}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">{t('configuration.cols_status')}</th>
+                <th className="px-4 py-3 text-right text-xs font-medium uppercase text-gray-500">{t('dossiers.columns.actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -263,24 +260,24 @@ export default function CategoriesPage() {
                     <div className="font-medium text-gray-900">{c.name}</div>
                     {c.description && <div className="text-xs text-gray-500">{c.description}</div>}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-700">{TYPE_LABELS[c.type] || c.type}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{typeLabel(c.type)}</td>
                   <td className="px-4 py-3">
                     {c.color && <span className={`inline-block h-5 w-5 rounded-full bg-${c.color}-500`} />}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700">{c.sort_order}</td>
                   <td className="px-4 py-3">
                     {c.is_active ? (
-                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Active</span>
+                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">{t('common.active')}</span>
                     ) : (
-                      <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">Inactive</span>
+                      <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">{t('common.inactive')}</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <button onClick={() => handleEdit(c)} className="mr-2 text-sm text-blue-600 hover:underline">
-                      Modifier
+                      {t('common.edit')}
                     </button>
                     <button onClick={() => handleDelete(c)} className="text-sm text-red-600 hover:underline">
-                      Supprimer
+                      {t('common.delete')}
                     </button>
                   </td>
                 </tr>

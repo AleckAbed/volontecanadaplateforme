@@ -8,7 +8,7 @@ import { Collapse } from 'rizzui/collapse';
 import cn from '@core/utils/class-names';
 import { PiCaretDownBold } from 'react-icons/pi';
 import { menuItems } from '@/layouts/helium/helium-menu-items';
-import { adminMenuItems } from '@/layouts/helium/admin-menu-items';
+import { useAdminMenuItems } from '@/layouts/helium/admin-menu-items';
 import { clientMenuItems } from '@/layouts/helium/client-menu-items';
 import { useAuth } from '@/hooks/useAuth';
 import StatusBadge from '@core/components/get-status-badge';
@@ -16,8 +16,8 @@ import StatusBadge from '@core/components/get-status-badge';
 export function HeliumSidebarMenu() {
   const pathname = usePathname();
   const { userType } = useAuth();
+  const adminMenuItems = useAdminMenuItems();
 
-  // Sélectionner les items de menu selon le type d'utilisateur
   const currentMenuItems = useMemo(() => {
     if (userType === 'admin') {
       return adminMenuItems;
@@ -25,7 +25,7 @@ export function HeliumSidebarMenu() {
       return clientMenuItems;
     }
     return adminMenuItems;
-  }, [userType]);
+  }, [userType, adminMenuItems]);
 
   return (
     <div className="mt-4 pb-3 3xl:mt-6">

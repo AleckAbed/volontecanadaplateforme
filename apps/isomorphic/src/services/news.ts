@@ -15,7 +15,7 @@ async function authFetch(endpoint: string, options: RequestInit = {}) {
   const token = getAuthToken();
   const headers: HeadersInit = { Accept: 'application/json', ...options.headers };
   if (token) (headers as any).Authorization = `Bearer ${token}`;
-  const res = await fetch(`${getApiUrl()}${endpoint}`, { ...options, headers });
+  const res = await fetch(`${getApiUrl()}${endpoint}`, { ...options, credentials: 'include', headers });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || 'Une erreur est survenue');
   return data;
@@ -27,7 +27,7 @@ async function publicFetch(endpoint: string, options: RequestInit = {}) {
   const token = getAuthToken();
   const headers: HeadersInit = { Accept: 'application/json', ...options.headers };
   if (token) (headers as any).Authorization = `Bearer ${token}`;
-  const res = await fetch(`${getApiUrl()}${endpoint}`, { ...options, headers });
+  const res = await fetch(`${getApiUrl()}${endpoint}`, { ...options, credentials: 'include', headers });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || 'Une erreur est survenue');
   return data;

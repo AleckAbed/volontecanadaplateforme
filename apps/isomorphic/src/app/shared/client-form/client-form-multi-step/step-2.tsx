@@ -109,10 +109,57 @@ const STEP2_T = {
     separated: 'Separated',
     marriage: 'Marriage',
   },
+  es: {
+    summaryTitle: 'Ciudadanía, residencia y estado civil',
+    summaryDesc: 'Por favor proporcione su información sobre ciudadanía, residencia y estado civil',
+    citizenships: 'Ciudadanía(s)',
+    howManyCitizenships: '¿Cuántas ciudadanías tiene?',
+    select: 'Seleccionar',
+    oneCitizenship: '1 ciudadanía',
+    citizenshipsCount: (n: number) => (n === 1 ? '1 ciudadanía' : `${n} ciudadanías`),
+    citizenshipNum: (n: number) => `Ciudadanía ${n}:`,
+    lastEntryTitle: 'Fecha y lugar de su última entrada a Canadá',
+    date: 'Fecha (AAAA/MM/DD):',
+    place: 'Lugar:',
+    previousResidenceTitle: 'País(es) de residencia anterior(es)',
+    previousResidenceIntro: 'En los últimos cinco años, ¿ha vivido en un país diferente al de su ciudadanía o residencia actual (indicado arriba) durante más de seis meses?',
+    yes: 'Sí',
+    no: 'No',
+    previousResidenceDetails: 'Si respondió "sí", proporcione los detalles:',
+    maritalTitle: 'Estado civil y relación',
+    maritalLabel: 'Su estado civil actual:',
+    marriedIntro: '(Si está casado o en unión de hecho) Indique la fecha en que se casó o empezó a vivir en unión de hecho.',
+    spouseIntro: 'Proporcione el nombre de su cónyuge o pareja de hecho actual.',
+    surname: 'Apellido(s):',
+    givenName: 'Nombre(s):',
+    previousSpouseTitle: '¿Ha estado casado o en unión de hecho anteriormente?',
+    previousSpouseIntro: 'Proporcione la siguiente información sobre su ex cónyuge o pareja de hecho:',
+    dob: 'Fecha de nacimiento (AAAA/MM/DD):',
+    relationshipType: 'Tipo de relación:',
+    relationshipStart: 'Fecha de inicio de la relación (AAAA/MM/DD):',
+    relationshipEnd: 'Fecha de fin de la relación (AAAA/MM/DD):',
+    contactTitle: 'Datos de contacto',
+    contactIntro: 'Dirección postal actual de su domicilio',
+    aptUnit: 'N° apto/unidad:',
+    streetNumber: 'Número de calle:',
+    streetName: 'Nombre de calle:',
+    city: 'Ciudad/pueblo:',
+    province: 'Provincia o estado:',
+    country: 'País:',
+    postalCode: 'Código postal:',
+    single: 'Soltero(a)',
+    married: 'Casado(a)',
+    divorced: 'Divorciado(a)',
+    widowed: 'Viudo(a)',
+    commonLaw: 'Unión de hecho',
+    separated: 'Separado(a)',
+    marriage: 'Matrimonio',
+  },
 } as const;
 
-function getMaritalOptions(locale: 'fr' | 'en') {
-  const t = STEP2_T[locale];
+type Step2Locale = 'fr' | 'en' | 'es';
+function getMaritalOptions(locale: Step2Locale) {
+  const t = STEP2_T[locale] || STEP2_T.fr;
   return [
     { label: t.single, value: 'single' },
     { label: t.married, value: 'married' },
@@ -123,8 +170,8 @@ function getMaritalOptions(locale: 'fr' | 'en') {
   ];
 }
 
-function getRelationshipOptions(locale: 'fr' | 'en') {
-  const t = STEP2_T[locale];
+function getRelationshipOptions(locale: Step2Locale) {
+  const t = STEP2_T[locale] || STEP2_T.fr;
   return [
     { label: t.marriage, value: 'marriage' },
     { label: t.commonLaw, value: 'common-law' },

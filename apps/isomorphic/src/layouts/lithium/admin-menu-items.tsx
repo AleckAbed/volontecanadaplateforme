@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslation } from 'react-i18next';
 import { routes } from '@/config/routes';
 
 export type SubMenuItemType = {
@@ -21,162 +24,69 @@ export type LithiumMenuItem = {
   };
 };
 
-// Menu pour les Administrateurs du Cabinet d'Immigration
-export const lithiumAdminMenuItems: LithiumMenuItem = {
-  dashboard: {
-    name: 'Tableau de bord',
-    type: 'link',
-    dropdownItems: [
-      {
-        name: 'Dashboard',
-        href: '/',
-        icon: 'AnalyticsCircularIcon',
-      },
-      {
-        name: 'Statistiques',
-        href: routes.analytics,
-        icon: 'BarChartIcon',
-      },
-    ],
-  },
-  clients: {
-    name: 'Gestion des Clients',
-    type: 'enhance',
-    dropdownItems: [
-      {
-        name: 'Clients',
-        icon: 'UserSettingsIcon',
-        description: 'Gérer les clients du cabinet',
-        subMenuItems: [
-          {
-            name: 'Liste des clients',
-            href: '/admin/clients',
-          },
-          {
-            name: 'Ajouter un client',
-            href: '/admin/clients/create',
-          },
-        ],
-      },
-      {
-        name: 'Dossiers',
-        icon: 'FolderIcon',
-        description: 'Dossiers d\'immigration',
-        subMenuItems: [
-          {
-            name: 'Tous les dossiers',
-            href: '/admin/dossiers',
-          },
-          {
-            name: 'En cours',
-            href: '/admin/dossiers/en-cours',
-          },
-          {
-            name: 'Terminés',
-            href: '/admin/dossiers/termines',
-          },
-          {
-            name: 'Créer un dossier',
-            href: '/admin/dossiers/create',
-          },
-        ],
-      },
-      {
-        name: 'Documents',
-        icon: 'DocumentIcon',
-        description: 'Gestion des documents',
-        href: '/admin/documents',
-      },
-    ],
-  },
-  agenda: {
-    name: 'Agenda & Rendez-vous',
-    type: 'link',
-    dropdownItems: [
-      {
-        name: 'Calendrier',
-        href: '/admin/appointments',
-        icon: 'ScheduleIcon',
-      },
-      {
-        name: 'Nouveau rendez-vous',
-        href: '/admin/appointments/create',
-        icon: 'CalendarPlusIcon',
-      },
-    ],
-  },
-  services: {
-    name: 'Services',
-    type: 'link',
-    dropdownItems: [
-      {
-        name: 'Services d\'immigration',
-        icon: 'SuitcaseIcon',
-        href: '/services-immigration',
-      },
-      {
-        name: 'Types de visa',
-        icon: 'DocumentIcon',
-        href: '/admin/visa-types',
-      },
-    ],
-  },
-  communication: {
-    name: 'Communication',
-    type: 'link',
-    dropdownItems: [
-      {
-        name: 'Messages',
-        href: '/admin/messages',
-        icon: 'WalkmanIcon',
-      },
-      {
-        name: 'Notifications',
-        href: '/admin/notifications',
-        icon: 'NotificationIcon',
-      },
-    ],
-  },
-  administration: {
-    name: 'Administration',
-    type: 'enhance',
-    dropdownItems: [
-      {
-        name: 'Utilisateurs',
-        icon: 'UserSettingsIcon',
-        description: 'Gérer les administrateurs',
-        subMenuItems: [
-          {
-            name: 'Administrateurs',
-            href: '/admin/users/admins',
-          },
-          {
-            name: 'Ajouter un admin',
-            href: '/admin/users/admins/create',
-          },
-        ],
-      },
-      {
-        name: 'Paramètres',
-        icon: 'SettingsIcon',
-        description: 'Configuration du système',
-        subMenuItems: [
-          {
-            name: 'Général',
-            href: '/admin/settings/general',
-          },
-          {
-            name: 'Mon profil',
-            href: routes.forms.profileSettings,
-          },
-          {
-            name: 'Sécurité',
-            href: '/admin/settings/security',
-          },
-        ],
-      },
-    ],
-  },
-};
+/**
+ * Menu admin (Lithium layout — top nav).
+ * Voir helium/admin-menu-items.tsx pour la liste des sections retirées
+ * (agenda, communication, gestion admins, settings général/sécurité).
+ */
+export function useLithiumAdminMenuItems(): LithiumMenuItem {
+  const { t } = useTranslation();
 
+  return {
+    dashboard: {
+      name: t('menu.section_dashboard'),
+      type: 'link',
+      dropdownItems: [
+        { name: t('menu.dashboard'), href: '/', icon: 'AnalyticsCircularIcon' },
+        { name: t('menu.analytics'), href: routes.analytics, icon: 'BarChartIcon' },
+      ],
+    },
+    clients: {
+      name: t('menu.section_clients'),
+      type: 'enhance',
+      dropdownItems: [
+        {
+          name: t('menu.clients'),
+          icon: 'UserSettingsIcon',
+          description: t('menu.clients'),
+          href: '/admin/clients',
+        },
+        {
+          name: t('menu.dossiers'),
+          icon: 'FolderIcon',
+          description: t('menu.dossiers'),
+          subMenuItems: [
+            { name: t('menu.dossiers'), href: '/admin/dossiers' },
+            { name: t('common.create'), href: '/admin/dossiers/create' },
+          ],
+        },
+        {
+          name: t('menu.documents'),
+          icon: 'DocumentIcon',
+          description: t('menu.documents'),
+          href: '/file-manager',
+        },
+      ],
+    },
+    services: {
+      name: t('menu.section_services'),
+      type: 'link',
+      dropdownItems: [
+        { name: t('menu.immigration_services'), icon: 'SuitcaseIcon', href: '/services-immigration' },
+      ],
+    },
+    administration: {
+      name: t('menu.section_admin'),
+      type: 'link',
+      dropdownItems: [
+        {
+          name: t('menu.settings_profile'),
+          icon: 'SettingsIcon',
+          href: routes.forms.profileSettings,
+        },
+      ],
+    },
+  };
+}
 
+export const lithiumAdminMenuItems: LithiumMenuItem = {} as LithiumMenuItem;

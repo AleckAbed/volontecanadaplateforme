@@ -8,6 +8,7 @@ import BerylLiumLayout from '@/layouts/beryllium/beryllium-layout';
 import BoronLayout from '@/layouts/boron/boron-layout';
 import CarbonLayout from '@/layouts/carbon/carbon-layout';
 import { useLayout } from '@/layouts/use-layout';
+import LockScreen from '@/layouts/lock-screen';
 import { useAuth } from '@/hooks/useAuth';
 import { LAYOUT_OPTIONS } from '@/config/enums';
 import { useEffect } from 'react';
@@ -24,7 +25,12 @@ type LayoutProps = {
  * - Client → Lithium Layout
  */
 export default function DefaultLayout({ children }: LayoutProps) {
-  return <LayoutProvider>{children}</LayoutProvider>;
+  return (
+    <>
+      <LayoutProvider>{children}</LayoutProvider>
+      <LockScreen />
+    </>
+  );
 }
 
 function LayoutProvider({ children }: LayoutProps) {

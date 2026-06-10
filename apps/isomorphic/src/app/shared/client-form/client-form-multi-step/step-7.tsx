@@ -14,19 +14,93 @@ import type { FamilyMember } from '@/validators/client-form.schema';
 import CountrySelect from '@/app/shared/client-form/country-select';
 import DateField from '@/app/shared/client-form/date-field';
 
-const maritalStatusOptions = [
-  { label: 'Célibataire', value: 'single' },
-  { label: 'Marié(e)', value: 'married' },
-  { label: 'Divorcé(e)', value: 'divorced' },
-  { label: 'Veuf(ve)', value: 'widowed' },
-  { label: 'Union de fait', value: 'common-law' },
-];
+const STEP7_LABELS = {
+  fr: {
+    sectionA: 'Section A - Lien de parenté - Demandeur',
+    sectionSpouse: 'Lien de parenté – Époux, conjoint de fait ou partenaire conjugal',
+    sectionMother: 'Lien de parenté - Mère',
+    sectionFather: 'Lien de parenté - Père',
+    sectionChildren: 'Section B: Enfants',
+    sectionSiblings: 'Section C: Frères et sœurs',
+    lastName: 'Nom de famille',
+    firstName: 'Prénom',
+    dob: 'Date de naissance (AAAA/MM/JJ)',
+    placeOfBirth: 'Lieu de naissance (ville)',
+    countryOfBirth: 'Pays ou territoire de naissance',
+    maritalStatus: 'État civil',
+    email: 'Adresse électronique',
+    currentAddress: 'Adresse actuelle',
+    currentAddressDeceased: 'Adresse actuelle (si décédé, dites la ville, pays et date du décès)',
+    single: 'Célibataire',
+    married: 'Marié(e)',
+    divorced: 'Divorcé(e)',
+    widowed: 'Veuf(ve)',
+    commonLaw: 'Union de fait',
+  },
+  en: {
+    sectionA: 'Section A - Family relationship - Applicant',
+    sectionSpouse: 'Family relationship – Spouse, common-law partner or conjugal partner',
+    sectionMother: 'Family relationship - Mother',
+    sectionFather: 'Family relationship - Father',
+    sectionChildren: 'Section B: Children',
+    sectionSiblings: 'Section C: Siblings',
+    lastName: 'Surname',
+    firstName: 'Given name',
+    dob: 'Date of birth (YYYY/MM/DD)',
+    placeOfBirth: 'Place of birth (city)',
+    countryOfBirth: 'Country or territory of birth',
+    maritalStatus: 'Marital status',
+    email: 'Email address',
+    currentAddress: 'Current address',
+    currentAddressDeceased: 'Current address (if deceased, indicate city, country and date of death)',
+    single: 'Single',
+    married: 'Married',
+    divorced: 'Divorced',
+    widowed: 'Widowed',
+    commonLaw: 'Common-law',
+  },
+  es: {
+    sectionA: 'Sección A - Vínculo de parentesco - Solicitante',
+    sectionSpouse: 'Vínculo de parentesco – Cónyuge, pareja de hecho o pareja conyugal',
+    sectionMother: 'Vínculo de parentesco - Madre',
+    sectionFather: 'Vínculo de parentesco - Padre',
+    sectionChildren: 'Sección B: Hijos',
+    sectionSiblings: 'Sección C: Hermanos y hermanas',
+    lastName: 'Apellido',
+    firstName: 'Nombre',
+    dob: 'Fecha de nacimiento (AAAA/MM/DD)',
+    placeOfBirth: 'Lugar de nacimiento (ciudad)',
+    countryOfBirth: 'País o territorio de nacimiento',
+    maritalStatus: 'Estado civil',
+    email: 'Correo electrónico',
+    currentAddress: 'Dirección actual',
+    currentAddressDeceased: 'Dirección actual (si fallecido, indique ciudad, país y fecha del fallecimiento)',
+    single: 'Soltero(a)',
+    married: 'Casado(a)',
+    divorced: 'Divorciado(a)',
+    widowed: 'Viudo(a)',
+    commonLaw: 'Unión de hecho',
+  },
+} as const;
+
+function buildMaritalOptions(loc: 'fr' | 'en' | 'es') {
+  const l = STEP7_LABELS[loc] || STEP7_LABELS.fr;
+  return [
+    { label: l.single, value: 'single' },
+    { label: l.married, value: 'married' },
+    { label: l.divorced, value: 'divorced' },
+    { label: l.widowed, value: 'widowed' },
+    { label: l.commonLaw, value: 'common-law' },
+  ];
+}
 
 export default function StepSeven() {
   const { step, gotoNextStep } = useStepper();
   const [formData, setFormData] = useAtom(formDataAtom);
   const [locale] = useAtom(questionnaireLocaleAtom);
   const t = STEP7_T[locale] || STEP7_T.fr;
+  const l = STEP7_LABELS[locale] || STEP7_LABELS.fr;
+  const maritalStatusOptions = buildMaritalOptions(locale);
   const [children, setChildren] = useState<FamilyMember[]>(formData?.children || []);
   const [siblings, setSiblings] = useState<FamilyMember[]>(formData?.siblings || []);
 
@@ -144,15 +218,70 @@ export default function StepSeven() {
   };
 
   const familyMemberColumns = [
-    { key: 'lastName', label: 'Nom de famille', type: 'text' as const },
-    { key: 'firstName', label: 'Prénom', type: 'text' as const },
-    { key: 'dateOfBirth', label: 'Date de naissance (AAAA/MM/JJ)', type: 'date' as const },
-    { key: 'placeOfBirth', label: 'Lieu de naissance (ville)', type: 'text' as const },
-    { key: 'countryOfBirth', label: 'Pays ou territoire de naissance', type: 'text' as const },
-    { key: 'maritalStatus', label: 'État civil', type: 'select' as const, options: maritalStatusOptions },
-    { key: 'email', label: 'Adresse électronique', type: 'text' as const },
-    { key: 'currentAddress', label: 'Adresse actuelle (si décédé, dites la ville, pays et date du décès)', type: 'text' as const },
+    { key: 'lastName', label: l.lastName, type: 'text' as const },
+    { key: 'firstName', label: l.firstName, type: 'text' as const },
+    { key: 'dateOfBirth', label: l.dob, type: 'date' as const },
+    { key: 'placeOfBirth', label: l.placeOfBirth, type: 'text' as const },
+    { key: 'countryOfBirth', label: l.countryOfBirth, type: 'text' as const },
+    { key: 'maritalStatus', label: l.maritalStatus, type: 'select' as const, options: maritalStatusOptions },
+    { key: 'email', label: l.email, type: 'text' as const },
+    { key: 'currentAddress', label: l.currentAddressDeceased, type: 'text' as const },
   ];
+
+  const renderRelativeBlock = (
+    title: string,
+    prefix: 'applicant' | 'spouse' | 'mother' | 'father',
+    addressLabel: string,
+  ) => (
+    <div>
+      <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
+      <div className="grid gap-4">
+        <div className="grid gap-4 @3xl:grid-cols-2">
+          <Input label={l.lastName} {...register(`${prefix}LastName` as any)} />
+          <Input label={l.firstName} {...register(`${prefix}FirstName` as any)} />
+        </div>
+        <div className="grid gap-4 @3xl:grid-cols-3">
+          <DateField
+            name={`${prefix}DateOfBirth`}
+            control={control}
+            label={l.dob}
+          />
+          <Controller
+            name={`${prefix}CountryOfBirth` as any}
+            control={control}
+            render={({ field: { value, onChange } }) => (
+              <CountrySelect
+                label={l.countryOfBirth}
+                value={value}
+                onChange={onChange}
+              />
+            )}
+          />
+          <Controller
+            name={`${prefix}MaritalStatus` as any}
+            control={control}
+            render={({ field: { value, onChange } }) => (
+              <Select
+                label={l.maritalStatus}
+                options={maritalStatusOptions}
+                value={value || ''}
+                onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
+                getOptionValue={(option) => option.value}
+                displayValue={(selected) => {
+                  const option = maritalStatusOptions.find((opt) => opt.value === selected);
+                  return option?.label || '';
+                }}
+              />
+            )}
+          />
+        </div>
+        <div className="grid gap-4 @3xl:grid-cols-2">
+          <Input label={l.email} type="email" {...register(`${prefix}Email` as any)} />
+          <Input label={addressLabel} {...register(`${prefix}CurrentAddress` as any)} />
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <>
@@ -170,217 +299,13 @@ export default function StepSeven() {
         className="col-span-full rounded-lg bg-white p-5 @4xl:col-span-7 @4xl:p-7 dark:bg-gray-0"
       >
         <div className="grid gap-6">
-          {/* Section A - Demandeur */}
-          <div>
-            <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              Section A - Lien de parenté - Demandeur
-            </h3>
-            <div className="grid gap-4">
-              <div className="grid gap-4 @3xl:grid-cols-2">
-                <Input label="Nom de famille" {...register('applicantLastName')} />
-                <Input label="Prénom" {...register('applicantFirstName')} />
-              </div>
-              <div className="grid gap-4 @3xl:grid-cols-3">
-                <DateField
-                  name="applicantDateOfBirth"
-                  control={control}
-                  label="Date de naissance (AAAA/MM/JJ)"
-                />
-                <Controller
-                  name="applicantCountryOfBirth"
-                  control={control}
-                  render={({ field: { value, onChange } }) => (
-                    <CountrySelect
-                      label="Pays ou territoire de naissance"
-                      value={value}
-                      onChange={onChange}
-                    />
-                  )}
-                />
-                <Controller
-                  name="applicantMaritalStatus"
-                  control={control}
-                  render={({ field: { value, onChange } }) => (
-                    <Select
-                      label="État civil"
-                      options={maritalStatusOptions}
-                      value={value || ''}
-                      onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
-                      getOptionValue={(option) => option.value}
-                      displayValue={(selected) => {
-                        const option = maritalStatusOptions.find((opt) => opt.value === selected);
-                        return option?.label || '';
-                      }}
-                    />
-                  )}
-                />
-              </div>
-              <div className="grid gap-4 @3xl:grid-cols-2">
-                <Input label="Adresse électronique" type="email" {...register('applicantEmail')} />
-                <Input label="Adresse actuelle" {...register('applicantCurrentAddress')} />
-              </div>
-            </div>
-          </div>
+          {renderRelativeBlock(l.sectionA, 'applicant', l.currentAddress)}
+          {renderRelativeBlock(l.sectionSpouse, 'spouse', l.currentAddressDeceased)}
+          {renderRelativeBlock(l.sectionMother, 'mother', l.currentAddressDeceased)}
+          {renderRelativeBlock(l.sectionFather, 'father', l.currentAddressDeceased)}
 
-          {/* Époux/Conjoint */}
-          <div>
-            <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              Lien de parenté – Époux, conjoint de fait ou partenaire conjugal
-            </h3>
-            <div className="grid gap-4">
-              <div className="grid gap-4 @3xl:grid-cols-2">
-                <Input label="Nom de famille" {...register('spouseLastName')} />
-                <Input label="Prénom" {...register('spouseFirstName')} />
-              </div>
-              <div className="grid gap-4 @3xl:grid-cols-3">
-                <DateField
-                  name="spouseDateOfBirth"
-                  control={control}
-                  label="Date de naissance (AAAA/MM/JJ)"
-                />
-                <Controller
-                  name="spouseCountryOfBirth"
-                  control={control}
-                  render={({ field: { value, onChange } }) => (
-                    <CountrySelect
-                      label="Pays ou territoire de naissance"
-                      value={value}
-                      onChange={onChange}
-                    />
-                  )}
-                />
-                <Controller
-                  name="spouseMaritalStatus"
-                  control={control}
-                  render={({ field: { value, onChange } }) => (
-                    <Select
-                      label="État civil"
-                      options={maritalStatusOptions}
-                      value={value || ''}
-                      onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
-                      getOptionValue={(option) => option.value}
-                      displayValue={(selected) => {
-                        const option = maritalStatusOptions.find((opt) => opt.value === selected);
-                        return option?.label || '';
-                      }}
-                    />
-                  )}
-                />
-              </div>
-              <div className="grid gap-4 @3xl:grid-cols-2">
-                <Input label="Adresse électronique" type="email" {...register('spouseEmail')} />
-                <Input label="Adresse actuelle (si décédé, dites la ville, pays et date du décès)" {...register('spouseCurrentAddress')} />
-              </div>
-            </div>
-          </div>
-
-          {/* Mère */}
-          <div>
-            <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              Lien de parenté - Mère
-            </h3>
-            <div className="grid gap-4">
-              <div className="grid gap-4 @3xl:grid-cols-2">
-                <Input label="Nom de famille" {...register('motherLastName')} />
-                <Input label="Prénom" {...register('motherFirstName')} />
-              </div>
-              <div className="grid gap-4 @3xl:grid-cols-3">
-                <DateField
-                  name="motherDateOfBirth"
-                  control={control}
-                  label="Date de naissance (AAAA/MM/JJ)"
-                />
-                <Controller
-                  name="motherCountryOfBirth"
-                  control={control}
-                  render={({ field: { value, onChange } }) => (
-                    <CountrySelect
-                      label="Pays ou territoire de naissance"
-                      value={value}
-                      onChange={onChange}
-                    />
-                  )}
-                />
-                <Controller
-                  name="motherMaritalStatus"
-                  control={control}
-                  render={({ field: { value, onChange } }) => (
-                    <Select
-                      label="État civil"
-                      options={maritalStatusOptions}
-                      value={value || ''}
-                      onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
-                      getOptionValue={(option) => option.value}
-                      displayValue={(selected) => {
-                        const option = maritalStatusOptions.find((opt) => opt.value === selected);
-                        return option?.label || '';
-                      }}
-                    />
-                  )}
-                />
-              </div>
-              <div className="grid gap-4 @3xl:grid-cols-2">
-                <Input label="Adresse électronique" type="email" {...register('motherEmail')} />
-                <Input label="Adresse actuelle (si décédé, dites la ville, pays et date du décès)" {...register('motherCurrentAddress')} />
-              </div>
-            </div>
-          </div>
-
-          {/* Père */}
-          <div>
-            <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              Lien de parenté - Père
-            </h3>
-            <div className="grid gap-4">
-              <div className="grid gap-4 @3xl:grid-cols-2">
-                <Input label="Nom de famille" {...register('fatherLastName')} />
-                <Input label="Prénom" {...register('fatherFirstName')} />
-              </div>
-              <div className="grid gap-4 @3xl:grid-cols-3">
-                <DateField
-                  name="fatherDateOfBirth"
-                  control={control}
-                  label="Date de naissance (AAAA/MM/JJ)"
-                />
-                <Controller
-                  name="fatherCountryOfBirth"
-                  control={control}
-                  render={({ field: { value, onChange } }) => (
-                    <CountrySelect
-                      label="Pays ou territoire de naissance"
-                      value={value}
-                      onChange={onChange}
-                    />
-                  )}
-                />
-                <Controller
-                  name="fatherMaritalStatus"
-                  control={control}
-                  render={({ field: { value, onChange } }) => (
-                    <Select
-                      label="État civil"
-                      options={maritalStatusOptions}
-                      value={value || ''}
-                      onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
-                      getOptionValue={(option) => option.value}
-                      displayValue={(selected) => {
-                        const option = maritalStatusOptions.find((opt) => opt.value === selected);
-                        return option?.label || '';
-                      }}
-                    />
-                  )}
-                />
-              </div>
-              <div className="grid gap-4 @3xl:grid-cols-2">
-                <Input label="Adresse électronique" type="email" {...register('fatherEmail')} />
-                <Input label="Adresse actuelle (si décédé, dites la ville, pays et date du décès)" {...register('fatherCurrentAddress')} />
-              </div>
-            </div>
-          </div>
-
-          {/* Section B - Enfants */}
           <DynamicTable<FamilyMember>
-            title="Section B: Enfants"
+            title={l.sectionChildren}
             columns={familyMemberColumns}
             data={children}
             onAdd={addChild}
@@ -389,9 +314,8 @@ export default function StepSeven() {
             maxRows={8}
           />
 
-          {/* Section C - Frères et sœurs */}
           <DynamicTable<FamilyMember>
-            title="Section C: Frères et sœurs"
+            title={l.sectionSiblings}
             columns={familyMemberColumns}
             data={siblings}
             onAdd={addSibling}
@@ -404,4 +328,3 @@ export default function StepSeven() {
     </>
   );
 }
-

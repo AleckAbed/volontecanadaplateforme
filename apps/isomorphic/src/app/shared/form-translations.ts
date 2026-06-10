@@ -3,7 +3,7 @@
  * Utilisé par client-form, sponsor-form, pstq-form.
  */
 
-export type FormLocale = 'fr' | 'en';
+export type FormLocale = 'fr' | 'en' | 'es';
 
 export const commonT = {
   fr: {
@@ -43,6 +43,25 @@ export const commonT = {
     givenName: 'Given name(s):',
     country: 'Country:',
     place: 'Place:',
+  },
+  es: {
+    select: 'Seleccionar',
+    yes: 'Sí',
+    no: 'No',
+    step: 'Paso',
+    of: 'de',
+    save: 'Guardar',
+    quit: 'Salir',
+    questions: '¿Preguntas?',
+    language: 'Idioma',
+    french: 'Francés',
+    english: 'Inglés',
+    dateFormat: 'Fecha (AAAA/MM/DD):',
+    dateFormatEn: 'Date (YYYY/MM/DD):',
+    surname: 'Apellido(s):',
+    givenName: 'Nombre(s):',
+    country: 'País:',
+    place: 'Lugar:',
   },
 } as const;
 

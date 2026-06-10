@@ -7,6 +7,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import FormSummary from '@/app/shared/pstq-form/pstq-form-multi-step/form-summary';
 import { pstqFormDataAtom, usePSTQStepper } from '@/app/shared/pstq-form/pstq-form-multi-step';
+import { questionnaireLocaleAtom } from '@/app/shared/questionnaire-locale';
+import { PSTQ_STEP1_T } from '@/app/shared/pstq-form/pstq-form-translations';
 import { Input, Select, RadioGroup, AdvancedRadio, Button } from 'rizzui';
 import {
   pstqFormBlocASchema,
@@ -15,25 +17,125 @@ import {
 import DateField from '@/app/shared/client-form/date-field';
 import { calculatePSTQScore } from '@/services/pstq-scoring';
 
-const niveauFrancaisOptions = Array.from({ length: 12 }, (_, i) => ({
-  label: `Niveau ${i + 1}`,
-  value: (i + 1).toString(),
-}));
+const PSTQ_STEP1_LABELS = {
+  fr: {
+    scoreLabel: 'Score actuel (Bloc A):',
+    scorePoints: '/ 520 points',
+    scoreFr: 'Français',
+    scoreAge: 'Âge',
+    scoreExp: 'Expérience',
+    scoreEdu: 'Scolarité',
+    a1Title: 'A1. Connaissance du français',
+    hasSpouse: 'Avez-vous un conjoint ?',
+    yes: 'Oui',
+    no: 'Non',
+    listening: 'Compréhension orale (1-12)',
+    speaking: 'Production orale (1-12)',
+    reading: 'Compréhension écrite (1-12)',
+    writing: 'Production écrite (1-12)',
+    select: 'Sélectionner',
+    a2Title: 'A2. Date de naissance',
+    dobLabel: 'Date de naissance (JJ/MM/AAAA)',
+    a3Title: 'A3. Expérience de travail (5 dernières années)',
+    durationMonths: 'Durée en mois',
+    durationPlaceholder: 'Ex: 36',
+    a4Title: 'A4. Niveau de scolarité (plus élevé retenu)',
+    level: 'Niveau',
+    eduSecondaire: 'Secondaire',
+    eduPostsec: 'Postsecondaire général (2 ans)',
+    eduTechnique: 'Technique (3 ans)',
+    eduUniv1: 'Université 1er cycle (3-4 ans)',
+    eduUniv2: 'Université 2e cycle',
+    eduUniv3: 'Université 3e cycle',
+  },
+  en: {
+    scoreLabel: 'Current score (Block A):',
+    scorePoints: '/ 520 points',
+    scoreFr: 'French',
+    scoreAge: 'Age',
+    scoreExp: 'Experience',
+    scoreEdu: 'Education',
+    a1Title: 'A1. French language proficiency',
+    hasSpouse: 'Do you have a spouse?',
+    yes: 'Yes',
+    no: 'No',
+    listening: 'Listening comprehension (1-12)',
+    speaking: 'Oral production (1-12)',
+    reading: 'Reading comprehension (1-12)',
+    writing: 'Written production (1-12)',
+    select: 'Select',
+    a2Title: 'A2. Date of birth',
+    dobLabel: 'Date of birth (DD/MM/YYYY)',
+    a3Title: 'A3. Work experience (last 5 years)',
+    durationMonths: 'Duration in months',
+    durationPlaceholder: 'E.g. 36',
+    a4Title: 'A4. Level of education (highest retained)',
+    level: 'Level',
+    eduSecondaire: 'Secondary',
+    eduPostsec: 'General post-secondary (2 years)',
+    eduTechnique: 'Technical (3 years)',
+    eduUniv1: 'University 1st cycle (3-4 years)',
+    eduUniv2: 'University 2nd cycle',
+    eduUniv3: 'University 3rd cycle',
+  },
+  es: {
+    scoreLabel: 'Puntaje actual (Bloque A):',
+    scorePoints: '/ 520 puntos',
+    scoreFr: 'Francés',
+    scoreAge: 'Edad',
+    scoreExp: 'Experiencia',
+    scoreEdu: 'Estudios',
+    a1Title: 'A1. Conocimiento del francés',
+    hasSpouse: '¿Tiene cónyuge?',
+    yes: 'Sí',
+    no: 'No',
+    listening: 'Comprensión oral (1-12)',
+    speaking: 'Producción oral (1-12)',
+    reading: 'Comprensión escrita (1-12)',
+    writing: 'Producción escrita (1-12)',
+    select: 'Seleccionar',
+    a2Title: 'A2. Fecha de nacimiento',
+    dobLabel: 'Fecha de nacimiento (DD/MM/AAAA)',
+    a3Title: 'A3. Experiencia laboral (últimos 5 años)',
+    durationMonths: 'Duración en meses',
+    durationPlaceholder: 'Ej: 36',
+    a4Title: 'A4. Nivel de estudios (más alto retenido)',
+    level: 'Nivel',
+    eduSecondaire: 'Secundaria',
+    eduPostsec: 'Postsecundaria general (2 años)',
+    eduTechnique: 'Técnica (3 años)',
+    eduUniv1: 'Universidad 1er ciclo (3-4 años)',
+    eduUniv2: 'Universidad 2do ciclo',
+    eduUniv3: 'Universidad 3er ciclo',
+  },
+} as const;
 
-const scolariteOptions = [
-  { label: 'Secondaire', value: 'secondaire' },
-  { label: 'Postsecondaire général (2 ans)', value: 'postsec_general_2ans' },
-  { label: 'Technique (3 ans)', value: 'technique_3ans' },
-  { label: 'Université 1er cycle (3-4 ans)', value: 'univ_1er_cycle' },
-  { label: 'Université 2e cycle', value: 'univ_2e_cycle' },
-  { label: 'Université 3e cycle', value: 'univ_3e_cycle' },
-];
+function buildNiveauOptions(levelLabel: string) {
+  return Array.from({ length: 12 }, (_, i) => ({
+    label: `${levelLabel} ${i + 1}`,
+    value: (i + 1).toString(),
+  }));
+}
+
+function buildScolariteOptions(l: typeof PSTQ_STEP1_LABELS.fr) {
+  return [
+    { label: l.eduSecondaire, value: 'secondaire' },
+    { label: l.eduPostsec, value: 'postsec_general_2ans' },
+    { label: l.eduTechnique, value: 'technique_3ans' },
+    { label: l.eduUniv1, value: 'univ_1er_cycle' },
+    { label: l.eduUniv2, value: 'univ_2e_cycle' },
+    { label: l.eduUniv3, value: 'univ_3e_cycle' },
+  ];
+}
 
 export default function StepOne() {
   const { step, gotoNextStep } = usePSTQStepper();
   const [formData, setFormData] = useAtom(pstqFormDataAtom);
   const [locale] = useAtom(questionnaireLocaleAtom);
   const t = PSTQ_STEP1_T[locale] || PSTQ_STEP1_T.fr;
+  const l = PSTQ_STEP1_LABELS[locale] || PSTQ_STEP1_LABELS.fr;
+  const niveauFrancaisOptions = buildNiveauOptions(l.level);
+  const scolariteOptions = buildScolariteOptions(l);
   const [isAlertVisible, setIsAlertVisible] = useState(true);
   const [score, setScore] = useState<any>(null);
 
@@ -165,10 +267,10 @@ export default function StepOne() {
         {/* Affichage du score en temps réel */}
         {score && (
           <div className="mt-6 rounded-lg bg-white/10 p-4 backdrop-blur-sm">
-            <p className="text-sm font-semibold text-white">Score actuel (Bloc A):</p>
-            <p className="text-2xl font-bold text-white">{score.blocA.total} / 520 points</p>
+            <p className="text-sm font-semibold text-white">{l.scoreLabel}</p>
+            <p className="text-2xl font-bold text-white">{score.blocA.total} {l.scorePoints}</p>
             <div className="mt-2 text-xs text-white/80">
-              Français: {score.blocA.francais} | Âge: {score.blocA.age} | Expérience: {score.blocA.experience} | Scolarité: {score.blocA.scolarite}
+              {l.scoreFr}: {score.blocA.francais} | {l.scoreAge}: {score.blocA.age} | {l.scoreExp}: {score.blocA.experience} | {l.scoreEdu}: {score.blocA.scolarite}
             </div>
           </div>
         )}
@@ -183,11 +285,11 @@ export default function StepOne() {
           {/* A1. Connaissance du français */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              A1. Connaissance du français
+              {l.a1Title}
             </h3>
             <div className="mb-4">
               <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Avez-vous un conjoint ?
+                {l.hasSpouse}
               </label>
               <Controller
                 name="avec_conjoint"
@@ -202,13 +304,13 @@ export default function StepOne() {
                       value="yes"
                       className="flex-1 cursor-pointer rounded-md border border-gray-200 px-5 py-3 text-center hover:bg-gray-100 peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:text-primary"
                     >
-                      Oui
+                      {l.yes}
                     </AdvancedRadio>
                     <AdvancedRadio
                       value="no"
                       className="flex-1 cursor-pointer rounded-md border border-gray-200 px-5 py-3 text-center hover:bg-gray-100 peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:text-primary"
                     >
-                      Non
+                      {l.no}
                     </AdvancedRadio>
                   </RadioGroup>
                 )}
@@ -217,14 +319,14 @@ export default function StepOne() {
             <div className="grid gap-4 @3xl:grid-cols-2">
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Compréhension orale (1-12)
+                  {l.listening}
                 </label>
                 <Controller
                   name="comprehension_orale"
                   control={control}
                   render={({ field: { value, onChange } }) => (
                     <Select
-                      placeholder="Sélectionner"
+                      placeholder={l.select}
                       options={niveauFrancaisOptions}
                       value={value?.toString()}
                       onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : selected?.value || '1'))}
@@ -240,14 +342,14 @@ export default function StepOne() {
               </div>
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Production orale (1-12)
+                  {l.speaking}
                 </label>
                 <Controller
                   name="production_orale"
                   control={control}
                   render={({ field: { value, onChange } }) => (
                     <Select
-                      placeholder="Sélectionner"
+                      placeholder={l.select}
                       options={niveauFrancaisOptions}
                       value={value?.toString()}
                       onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : selected?.value || '1'))}
@@ -263,14 +365,14 @@ export default function StepOne() {
               </div>
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Compréhension écrite (1-12)
+                  {l.reading}
                 </label>
                 <Controller
                   name="comprehension_ecrite"
                   control={control}
                   render={({ field: { value, onChange } }) => (
                     <Select
-                      placeholder="Sélectionner"
+                      placeholder={l.select}
                       options={niveauFrancaisOptions}
                       value={value?.toString()}
                       onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : selected?.value || '1'))}
@@ -286,14 +388,14 @@ export default function StepOne() {
               </div>
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Production écrite (1-12)
+                  {l.writing}
                 </label>
                 <Controller
                   name="production_ecrite"
                   control={control}
                   render={({ field: { value, onChange } }) => (
                     <Select
-                      placeholder="Sélectionner"
+                      placeholder={l.select}
                       options={niveauFrancaisOptions}
                       value={value?.toString()}
                       onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : selected?.value || '1'))}
@@ -313,12 +415,12 @@ export default function StepOne() {
           {/* A2. Âge */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              A2. Date de naissance
+              {l.a2Title}
             </h3>
             <DateField
               name="date_naissance"
               control={control}
-              label="Date de naissance (JJ/MM/AAAA)"
+              label={l.dobLabel}
               error={errors.date_naissance}
             />
           </div>
@@ -326,12 +428,12 @@ export default function StepOne() {
           {/* A3. Expérience de travail */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              A3. Expérience de travail (5 dernières années)
+              {l.a3Title}
             </h3>
             <Input
-              label="Durée en mois"
+              label={l.durationMonths}
               type="number"
-              placeholder="Ex: 36"
+              placeholder={l.durationPlaceholder}
               {...register('experience_travail_mois', { valueAsNumber: true })}
               error={errors.experience_travail_mois?.message}
             />
@@ -340,14 +442,14 @@ export default function StepOne() {
           {/* A4. Niveau de scolarité */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              A4. Niveau de scolarité (plus élevé retenu)
+              {l.a4Title}
             </h3>
             <Controller
               name="niveau_scolarite"
               control={control}
               render={({ field: { value, onChange } }) => (
                 <Select
-                  placeholder="Sélectionner"
+                  placeholder={l.select}
                   options={scolariteOptions}
                   value={value}
                   onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}

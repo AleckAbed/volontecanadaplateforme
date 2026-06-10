@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { invitationsService, FormType, Category, FamilyMember, Dossier } from '@/services/invitations';
 import { documentService, DocumentTemplate } from '@/services/documents';
 import { apiService } from '@/services/api';
@@ -12,6 +13,7 @@ type SelectedItem =
   | { kind: 'document'; document_template_id: number };
 
 export default function NouvelEnvoiPage() {
+  const { t } = useTranslation();
   const router = useRouter();
 
   const [clients, setClients] = useState<any[]>([]);
@@ -55,7 +57,7 @@ export default function NouvelEnvoiPage() {
         setFormCategories(formCatsRes);
         setDocCategories(docCatsRes);
       } catch (e: any) {
-        toast.error(e.message || 'Erreur de chargement');
+        toast.error(e.message || t('dossiers.load_error'));
       } finally {
         setLoading(false);
       }
@@ -83,7 +85,7 @@ export default function NouvelEnvoiPage() {
         setRecipient('principal');
         setDossierId(null);
       } catch (e: any) {
-        if (!cancelled) toast.error(e.message || 'Erreur de chargement du client');
+        if (!cancelled) toast.error(e.message || t('envois.load_client_error'));
       } finally {
         if (!cancelled) setLoadingClientDetails(false);
       }
@@ -146,10 +148,10 @@ export default function NouvelEnvoiPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (totalSelected === 0) { toast.error('Sélectionnez au moins un formulaire ou document'); return; }
-    if (!email.trim()) { toast.error('Email requis'); return; }
-    if (clientType === 'existing' && !clientId) { toast.error('Sélectionnez un client'); return; }
-    if (clientType === 'custom' && !customName.trim()) { toast.error('Nom du client requis'); return; }
+    if (totalSelected === 0) { toast.error(t('envois.select_at_least_one')); return; }
+    if (!email.trim()) { toast.error(t('envois.email_required')); return; }
+    if (clientType === 'existing' && !clientId) { toast.error(t('envois.select_client_required')); return; }
+    if (clientType === 'custom' && !customName.trim()) { toast.error(t('envois.custom_name_required')); return; }
 
     const items: SelectedItem[] = [
       ...Array.from(selectedForms).map((id) => ({ kind: 'form' as const, form_type_id: id })),
@@ -172,33 +174,31 @@ export default function NouvelEnvoiPage() {
       });
 
       if (res.email_sent) {
-        toast.success('Invitation envoyée avec succès — email transmis au client.');
+        toast.success(t('envois.invitation_sent'));
       } else {
-        toast.error(`Invitation créée mais l'email n'a pas pu être envoyé.`, { duration: 7000 });
+        toast.error(t('envois.invitation_created_email_failed'), { duration: 7000 });
       }
       router.push(`/envois/${res.data.id}`);
     } catch (e: any) {
-      toast.error(e.message || 'Erreur');
+      toast.error(e.message || t('clients.toasts.error'));
     } finally {
       setSubmitting(false);
     }
   };
 
-  if (loading) return <div className="p-10 text-center text-gray-400">Chargement…</div>;
+  if (loading) return <div className="p-10 text-center text-gray-400">{t('common.loading')}</div>;
 
   return (
     <div className="mx-auto max-w-4xl p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Nouvel envoi</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Créez une invitation contenant un ou plusieurs formulaires et documents à remplir par le client.
-        </p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('envois.new_title')}</h1>
+        <p className="mt-1 text-sm text-gray-500">{t('envois.new_subtitle')}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* === CLIENT === */}
         <div className="rounded-xl border border-gray-200 bg-white p-5">
-          <h2 className="mb-4 text-lg font-semibold text-gray-900">1. Destinataire</h2>
+          <h2 className="mb-4 text-lg font-semibold text-gray-900">{t('envois.step1_recipient')}</h2>
 
           <div className="mb-4 flex gap-3">
             <button
@@ -210,7 +210,7 @@ export default function NouvelEnvoiPage() {
                   : 'border-gray-200 text-gray-700'
               }`}
             >
-              Client existant
+              {t('envois.client_existing')}
             </button>
             <button
               type="button"
@@ -221,20 +221,20 @@ export default function NouvelEnvoiPage() {
                   : 'border-gray-200 text-gray-700'
               }`}
             >
-              Client personnalisé
+              {t('envois.client_custom')}
             </button>
           </div>
 
           {clientType === 'existing' ? (
             <div className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Client principal *</label>
+                <label className="mb-1 block text-sm font-medium text-gray-700">{t('envois.main_client')} *</label>
                 <select
                   value={clientId ?? ''}
                   onChange={(e) => setClientId(e.target.value ? Number(e.target.value) : null)}
                   className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
                 >
-                  <option value="">— Choisir —</option>
+                  <option value="">{t('envois.choose_short')}</option>
                   {clients.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.first_name} {c.last_name} ({c.email})
@@ -248,7 +248,7 @@ export default function NouvelEnvoiPage() {
                   {/* Destinataire de l&apos;invitation : principal ou un membre de famille */}
                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Destinataire de l&apos;invitation
+                      {t('envois.invitation_recipient')}
                     </label>
                     <select
                       value={String(recipient)}
@@ -260,29 +260,29 @@ export default function NouvelEnvoiPage() {
                       className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
                     >
                       <option value="principal">
-                        Le client principal lui-même
+                        {t('envois.principal_himself')}
                       </option>
                       {familyMembers.map((m) => (
                         <option key={m.id} value={m.id} disabled={!m.email}>
-                          {m.first_name} {m.last_name} ({m.relationship})
-                          {m.email ? ` — ${m.email}` : ' — pas d\'email'}
+                          {m.first_name} {m.last_name} ({t(`clients.relationship.${m.relationship}`, { defaultValue: m.relationship })})
+                          {m.email ? ` — ${m.email}` : ` — ${t('envois.no_email_suffix')}`}
                         </option>
                       ))}
                     </select>
                     {familyMembers.length === 0 && !loadingClientDetails && (
                       <p className="mt-1 text-xs text-gray-500">
-                        Ce client n&apos;a pas de membres de famille enregistrés.
+                        {t('envois.no_family_members_short')}
                       </p>
                     )}
                     <p className="mt-1 text-xs text-gray-500">
-                      Le client principal recevra l&apos;invitation et la gérera, peu importe le destinataire.
+                      {t('envois.principal_will_receive')}
                     </p>
                   </div>
 
                   {/* Dossier optionnel */}
                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Dossier (optionnel)
+                      {t('envois.dossier_optional')}
                     </label>
                     <select
                       value={dossierId ?? ''}
@@ -290,16 +290,16 @@ export default function NouvelEnvoiPage() {
                       disabled={loadingClientDetails}
                       className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
                     >
-                      <option value="">— Aucun dossier —</option>
+                      <option value="">{t('envois.no_dossier_option')}</option>
                       {dossiers.map((d) => (
                         <option key={d.id} value={d.id}>
-                          {d.name} — {d.status}
+                          {d.name} — {t(`dossiers.status.${d.status}`, { defaultValue: d.status })}
                         </option>
                       ))}
                     </select>
                     {dossiers.length === 0 && !loadingClientDetails && (
                       <p className="mt-1 text-xs text-gray-500">
-                        Ce client n&apos;a pas encore de dossier.
+                        {t('envois.no_dossiers_for_client')}
                       </p>
                     )}
                   </div>
@@ -309,7 +309,7 @@ export default function NouvelEnvoiPage() {
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Nom complet *</label>
+                <label className="mb-1 block text-sm font-medium text-gray-700">{t('envois.full_name_label')} *</label>
                 <input
                   type="text"
                   value={customName}
@@ -318,7 +318,7 @@ export default function NouvelEnvoiPage() {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Téléphone</label>
+                <label className="mb-1 block text-sm font-medium text-gray-700">{t('envois.phone_label')}</label>
                 <input
                   type="text"
                   value={phone}
@@ -330,7 +330,7 @@ export default function NouvelEnvoiPage() {
           )}
 
           <div className="mt-4">
-            <label className="mb-1 block text-sm font-medium text-gray-700">Email *</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">{t('envois.email_label')} *</label>
             <input
               type="email"
               value={email}
@@ -345,12 +345,12 @@ export default function NouvelEnvoiPage() {
         <div className="rounded-xl border border-gray-200 bg-white p-5">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">
-              2. Formulaires <span className="text-sm font-normal text-gray-500">({selectedForms.size} sélectionné{selectedForms.size > 1 ? 's' : ''})</span>
+              {t('envois.step2_forms')} <span className="text-sm font-normal text-gray-500">({t(selectedForms.size > 1 ? 'envois.selected_count_other' : 'envois.selected_count_one', { count: selectedForms.size })})</span>
             </h2>
           </div>
 
           {formTypes.length === 0 ? (
-            <p className="text-sm text-gray-400">Aucun type de formulaire. <a href="/configuration/form-types" className="text-blue-600 hover:underline">En créer</a></p>
+            <p className="text-sm text-gray-400">{t('envois.no_form_types_short')} <a href="/configuration/form-types" className="text-blue-600 hover:underline">{t('envois.create_one')}</a></p>
           ) : (
             <div className="space-y-4">
               {formCategories.map((cat) => {
@@ -372,7 +372,7 @@ export default function NouvelEnvoiPage() {
               })}
               {/* Forms without category */}
               {(formsByCategory.get(null) || []).length > 0 && (
-                <CategorySection title="Sans catégorie">
+                <CategorySection title={t('envois.no_categories_short')}>
                   {formsByCategory.get(null)!.map((ft) => (
                     <CheckItem
                       key={`ft-${ft.id}`}
@@ -392,12 +392,12 @@ export default function NouvelEnvoiPage() {
         <div className="rounded-xl border border-gray-200 bg-white p-5">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">
-              3. Documents PDF <span className="text-sm font-normal text-gray-500">({selectedDocs.size} sélectionné{selectedDocs.size > 1 ? 's' : ''})</span>
+              {t('envois.step3_documents')} <span className="text-sm font-normal text-gray-500">({t(selectedDocs.size > 1 ? 'envois.selected_count_other' : 'envois.selected_count_one', { count: selectedDocs.size })})</span>
             </h2>
           </div>
 
           {docTemplates.length === 0 ? (
-            <p className="text-sm text-gray-400">Aucun modèle de document. <a href="/documents/nouveau" className="text-blue-600 hover:underline">En uploader</a></p>
+            <p className="text-sm text-gray-400">{t('envois.no_doc_templates_short')} <a href="/documents/nouveau" className="text-blue-600 hover:underline">{t('envois.upload_one')}</a></p>
           ) : (
             <div className="space-y-4">
               {docCategories.map((cat) => {
@@ -439,20 +439,20 @@ export default function NouvelEnvoiPage() {
 
         {/* === MESSAGE / EXPIRATION === */}
         <div className="rounded-xl border border-gray-200 bg-white p-5">
-          <h2 className="mb-4 text-lg font-semibold text-gray-900">4. Détails</h2>
+          <h2 className="mb-4 text-lg font-semibold text-gray-900">{t('envois.step4_details')}</h2>
           <div className="space-y-4">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Message au client (optionnel)</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">{t('envois.message_optional')}</label>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 rows={3}
-                placeholder="Ex : Voici les formulaires nécessaires pour votre dossier de visa…"
+                placeholder={t('envois.message_placeholder')}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Expiration (jours)</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">{t('envois.expires_days_label')}</label>
               <input
                 type="number"
                 min={1}
@@ -468,7 +468,7 @@ export default function NouvelEnvoiPage() {
         {/* === ACTIONS === */}
         <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-5">
           <div className="text-sm text-gray-700">
-            <strong>{totalSelected}</strong> élément{totalSelected !== 1 ? 's' : ''} à envoyer
+            {t(totalSelected !== 1 ? 'envois.items_to_send_other' : 'envois.items_to_send_one', { count: totalSelected })}
           </div>
           <div className="flex gap-3">
             <button
@@ -476,14 +476,14 @@ export default function NouvelEnvoiPage() {
               onClick={() => router.back()}
               className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
-              Annuler
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
               disabled={submitting || totalSelected === 0}
               className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
             >
-              {submitting ? 'Envoi…' : 'Envoyer l\'invitation'}
+              {submitting ? t('envois.submitting') : t('envois.submit_send')}
             </button>
           </div>
         </div>

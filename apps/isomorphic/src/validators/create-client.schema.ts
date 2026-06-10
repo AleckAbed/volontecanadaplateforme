@@ -1,13 +1,16 @@
 import { z } from 'zod';
 import { messages } from '@/config/messages';
+import { tMsg } from './i18n-helper';
 import { validateEmail, validatePassword } from './common-rules';
 
 const familyMemberSchema = z.object({
   first_name: z.string().min(1, { message: messages.firstNameRequired }),
   last_name: z.string().min(1, { message: messages.lastNameRequired }),
-  relationship: z.string().min(1, { message: 'La relation est requise' }),
+  relationship: z.string().min(1, { message: tMsg('La relation est requise', 'Relationship is required', 'La relación es requerida') }),
   date_of_birth: z.string().optional(),
   nationality: z.string().optional(),
+  country_of_residence: z.string().optional(),
+  address: z.string().optional(),
   passport_number: z.string().optional(),
   phone: z.string().optional(),
   email: z
@@ -30,6 +33,7 @@ export const createClientSchema = z
     phone: z.string().optional(),
     date_of_birth: z.string().optional(),
     nationality: z.string().optional(),
+    country_of_residence: z.string().optional(),
     passport_number: z.string().optional(),
     address: z.string().optional(),
     family_members: z.array(familyMemberSchema).optional().default([]),

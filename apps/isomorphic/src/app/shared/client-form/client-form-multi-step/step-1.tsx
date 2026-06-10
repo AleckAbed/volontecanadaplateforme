@@ -107,6 +107,50 @@ const STEP1_T = {
     eyeGray: "Gray",
     eyeHazel: "Hazel",
   },
+  es: {
+    intro: "Le pedimos completar este cuestionario. Tenga su pasaporte y/o su documento nacional de identidad a mano mientras lo completa. Si tiene personas a cargo (acompañantes o no), también se solicitará esta información sobre ellas.",
+    summaryTitle: "Detalles de la solicitud e Información personal",
+    detailsTitle: "Detalles de la solicitud",
+    familyMembersLabel: "¿Cuántos miembros de su familia, incluido usted mismo, estarán incluidos en esta solicitud?",
+    languagePreferenceLabel: "Idioma preferido para:",
+    correspondenceLabel: "La correspondencia:",
+    interviewLabel: "La entrevista:",
+    csqQuestion: "¿Ha recibido su Certificado de selección de Quebec (CSQ)?",
+    yes: "Sí",
+    no: "No",
+    csqNumberLabel: "Si sí, ingrese el número. Número CSQ:",
+    csqApplicationDateLabelWhenYes: "Fecha de solicitud del CSQ (AAAA/MM/DD):",
+    csqDateLabel: "Si no, ¿cuándo solicitó su CSQ? Fecha (AAAA/MM/DD):",
+    personalInfoTitle: "Información personal",
+    personalInfoIntro: "Ingrese su apellido completo, tal como aparece en su pasaporte o documento de viaje. Si su documento solo tiene un nombre, escríbalo en el campo de apellido y deje el campo de nombre vacío.",
+    lastNameLabel: "Apellido(s):",
+    firstNameLabel: "Nombre(s):",
+    uciLabel: "IUC (si tiene un identificador único de cliente):",
+    physicalTitle: "Características físicas",
+    sexLabel: "Sexo:",
+    eyeColorLabel: "Color de ojos:",
+    heightLabel: "Altura (cm):",
+    birthTitle: "Información sobre el nacimiento",
+    dobLabel: "Fecha de nacimiento (AAAA/MM/DD):",
+    placeOfBirthLabel: "Lugar de nacimiento:",
+    countryLabel: "País:",
+    selectPlaceholder: "Seleccionar",
+    step: "Paso",
+    of: "de",
+    member: "miembro",
+    members: "miembros",
+    languageFr: "Francés",
+    languageEn: "Inglés",
+    sexMale: "Masculino",
+    sexFemale: "Femenino",
+    sexOther: "Otro",
+    eyeBlue: "Azul",
+    eyeGreen: "Verde",
+    eyeBrown: "Marrón",
+    eyeBlack: "Negro",
+    eyeGray: "Gris",
+    eyeHazel: "Avellana",
+  },
 } as const;
 
 const languageOptionsFr = [
@@ -116,6 +160,10 @@ const languageOptionsFr = [
 const languageOptionsEn = [
   { label: 'French', value: 'Français' },
   { label: 'English', value: 'Anglais' },
+];
+const languageOptionsEs = [
+  { label: 'Francés', value: 'Français' },
+  { label: 'Inglés', value: 'Anglais' },
 ];
 
 const sexOptionsFr = [
@@ -127,6 +175,11 @@ const sexOptionsEn = [
   { label: 'Male', value: 'male' },
   { label: 'Female', value: 'female' },
   { label: 'Other', value: 'other' },
+];
+const sexOptionsEs = [
+  { label: 'Masculino', value: 'male' },
+  { label: 'Femenino', value: 'female' },
+  { label: 'Otro', value: 'other' },
 ];
 
 const eyeColorOptionsFr = [
@@ -145,6 +198,14 @@ const eyeColorOptionsEn = [
   { label: 'Gray', value: 'gray' },
   { label: 'Hazel', value: 'hazel' },
 ];
+const eyeColorOptionsEs = [
+  { label: 'Azul', value: 'blue' },
+  { label: 'Verde', value: 'green' },
+  { label: 'Marrón', value: 'brown' },
+  { label: 'Negro', value: 'black' },
+  { label: 'Gris', value: 'gray' },
+  { label: 'Avellana', value: 'hazel' },
+];
 
 export default function StepOne() {
   const { step, gotoNextStep } = useStepper();
@@ -152,9 +213,9 @@ export default function StepOne() {
   const [locale] = useAtom(questionnaireLocaleAtom);
   const [isAlertVisible, setIsAlertVisible] = useState(true);
   const t = STEP1_T[locale] || STEP1_T.fr;
-  const languageOptions = locale === 'en' ? languageOptionsEn : languageOptionsFr;
-  const sexOptions = locale === 'en' ? sexOptionsEn : sexOptionsFr;
-  const eyeColorOptions = locale === 'en' ? eyeColorOptionsEn : eyeColorOptionsFr;
+  const languageOptions = locale === 'en' ? languageOptionsEn : locale === 'es' ? languageOptionsEs : languageOptionsFr;
+  const sexOptions = locale === 'en' ? sexOptionsEn : locale === 'es' ? sexOptionsEs : sexOptionsFr;
+  const eyeColorOptions = locale === 'en' ? eyeColorOptionsEn : locale === 'es' ? eyeColorOptionsEs : eyeColorOptionsFr;
 
   const {
     register,

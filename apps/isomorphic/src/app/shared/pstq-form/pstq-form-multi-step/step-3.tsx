@@ -16,38 +16,169 @@ import {
 } from '@/validators/pstq-form.schema';
 import { calculatePSTQScore } from '@/services/pstq-scoring';
 
-const niveauFrancaisOptions = Array.from({ length: 12 }, (_, i) => ({
-  label: `Niveau ${i + 1}`,
-  value: (i + 1).toString(),
-}));
-
-const familleLienOptions = [
-  { label: 'Direct', value: 'direct' },
-  { label: 'Via conjoint', value: 'via_conjoint' },
-];
-
-const scolariteOptions = [
-  { label: 'Secondaire', value: 'secondaire' },
-  { label: 'Postsecondaire général (2 ans)', value: 'postsec_general_2ans' },
-  { label: 'Technique (3 ans)', value: 'technique_3ans' },
-  { label: 'Université 1er cycle (3-4 ans)', value: 'univ_1er_cycle' },
-  { label: 'Université 2e cycle', value: 'univ_2e_cycle' },
-  { label: 'Université 3e cycle', value: 'univ_3e_cycle' },
-];
-
-const diplomeQuebecOptions = [
-  { label: 'Aucun', value: 'aucun' },
-  { label: 'Secondaire', value: 'secondaire' },
-  { label: 'DEP ≥900h', value: 'dep_900h' },
-  { label: 'Technique 3 ans', value: 'technique_3ans' },
-  { label: 'Université 3-4 ans', value: 'univ_3_4ans' },
-  { label: '2e cycle', value: '2e_cycle' },
-  { label: '3e cycle', value: '3e_cycle' },
-];
+const STEP3_LABELS = {
+  fr: {
+    alert: "Bloc C - Facteurs d'adaptation (180 points maximum)",
+    scoreLabel: 'Score actuel (Bloc C):',
+    scorePoints: '/ 180 points',
+    etudesQc: 'Études QC',
+    famille: 'Famille',
+    conjoint: 'Conjoint',
+    c1Title: 'C1. Études au Québec sans diplôme',
+    durationMonths: 'Durée en mois',
+    durationPlaceholder: 'Ex: 12',
+    c2Title: 'C2. Famille au Québec',
+    familleCheckbox: "J'ai de la famille au Québec",
+    familleLien: 'Lien de parenté',
+    select: 'Sélectionner',
+    direct: 'Direct',
+    viaConjoint: 'Via conjoint',
+    c3Title: 'C3. Profil du conjoint',
+    franchais: 'Connaissance du français',
+    listening: 'Compréhension orale (1-12)',
+    speaking: 'Production orale (1-12)',
+    reading: 'Compréhension écrite (1-12)',
+    writing: 'Production écrite (1-12)',
+    age: 'Âge',
+    agePlaceholder: 'Ex: 30',
+    expQc: 'Expérience au Québec (mois)',
+    expQcPlaceholder: 'Ex: 24',
+    niveauScolarite: 'Niveau de scolarité',
+    diplomeQc: 'Diplôme obtenu au Québec',
+    level: 'Niveau',
+    eduSecondaire: 'Secondaire',
+    eduPostsec: 'Postsecondaire général (2 ans)',
+    eduTechnique: 'Technique (3 ans)',
+    eduUniv1: 'Université 1er cycle (3-4 ans)',
+    eduUniv2: 'Université 2e cycle',
+    eduUniv3: 'Université 3e cycle',
+    diplomeAucun: 'Aucun',
+    diplomeSecondaire: 'Secondaire',
+    diplomeDep900: 'DEP ≥900h',
+    diplomeTechnique: 'Technique 3 ans',
+    diplomeUniv: 'Université 3-4 ans',
+    diplome2: '2e cycle',
+    diplome3: '3e cycle',
+  },
+  en: {
+    alert: 'Block C - Adaptability factors (180 points maximum)',
+    scoreLabel: 'Current score (Block C):',
+    scorePoints: '/ 180 points',
+    etudesQc: 'QC Studies',
+    famille: 'Family',
+    conjoint: 'Spouse',
+    c1Title: 'C1. Studies in Quebec without diploma',
+    durationMonths: 'Duration in months',
+    durationPlaceholder: 'E.g. 12',
+    c2Title: 'C2. Family in Quebec',
+    familleCheckbox: 'I have family in Quebec',
+    familleLien: 'Family relationship',
+    select: 'Select',
+    direct: 'Direct',
+    viaConjoint: 'Via spouse',
+    c3Title: 'C3. Spouse profile',
+    franchais: 'French language proficiency',
+    listening: 'Listening comprehension (1-12)',
+    speaking: 'Oral production (1-12)',
+    reading: 'Reading comprehension (1-12)',
+    writing: 'Written production (1-12)',
+    age: 'Age',
+    agePlaceholder: 'E.g. 30',
+    expQc: 'Quebec experience (months)',
+    expQcPlaceholder: 'E.g. 24',
+    niveauScolarite: 'Level of education',
+    diplomeQc: 'Diploma obtained in Quebec',
+    level: 'Level',
+    eduSecondaire: 'Secondary',
+    eduPostsec: 'General post-secondary (2 years)',
+    eduTechnique: 'Technical (3 years)',
+    eduUniv1: 'University 1st cycle (3-4 years)',
+    eduUniv2: 'University 2nd cycle',
+    eduUniv3: 'University 3rd cycle',
+    diplomeAucun: 'None',
+    diplomeSecondaire: 'Secondary',
+    diplomeDep900: 'DEP ≥900h',
+    diplomeTechnique: 'Technical 3 years',
+    diplomeUniv: 'University 3-4 years',
+    diplome2: '2nd cycle',
+    diplome3: '3rd cycle',
+  },
+  es: {
+    alert: 'Bloque C - Factores de adaptación (180 puntos máximo)',
+    scoreLabel: 'Puntaje actual (Bloque C):',
+    scorePoints: '/ 180 puntos',
+    etudesQc: 'Estudios QC',
+    famille: 'Familia',
+    conjoint: 'Cónyuge',
+    c1Title: 'C1. Estudios en Quebec sin diploma',
+    durationMonths: 'Duración en meses',
+    durationPlaceholder: 'Ej: 12',
+    c2Title: 'C2. Familia en Quebec',
+    familleCheckbox: 'Tengo familia en Quebec',
+    familleLien: 'Vínculo de parentesco',
+    select: 'Seleccionar',
+    direct: 'Directo',
+    viaConjoint: 'Vía cónyuge',
+    c3Title: 'C3. Perfil del cónyuge',
+    franchais: 'Conocimiento del francés',
+    listening: 'Comprensión oral (1-12)',
+    speaking: 'Producción oral (1-12)',
+    reading: 'Comprensión escrita (1-12)',
+    writing: 'Producción escrita (1-12)',
+    age: 'Edad',
+    agePlaceholder: 'Ej: 30',
+    expQc: 'Experiencia en Quebec (meses)',
+    expQcPlaceholder: 'Ej: 24',
+    niveauScolarite: 'Nivel de estudios',
+    diplomeQc: 'Diploma obtenido en Quebec',
+    level: 'Nivel',
+    eduSecondaire: 'Secundaria',
+    eduPostsec: 'Postsecundaria general (2 años)',
+    eduTechnique: 'Técnica (3 años)',
+    eduUniv1: 'Universidad 1er ciclo (3-4 años)',
+    eduUniv2: 'Universidad 2do ciclo',
+    eduUniv3: 'Universidad 3er ciclo',
+    diplomeAucun: 'Ninguno',
+    diplomeSecondaire: 'Secundaria',
+    diplomeDep900: 'DEP ≥900h',
+    diplomeTechnique: 'Técnica 3 años',
+    diplomeUniv: 'Universidad 3-4 años',
+    diplome2: '2do ciclo',
+    diplome3: '3er ciclo',
+  },
+} as const;
 
 export default function StepThree() {
   const { step, gotoNextStep } = usePSTQStepper();
   const [formData, setFormData] = useAtom(pstqFormDataAtom);
+  const [locale] = useAtom(questionnaireLocaleAtom);
+  const t = PSTQ_STEP3_T[locale] || PSTQ_STEP3_T.fr;
+  const l = STEP3_LABELS[locale] || STEP3_LABELS.fr;
+  const niveauFrancaisOptions = Array.from({ length: 12 }, (_, i) => ({
+    label: `${l.level} ${i + 1}`,
+    value: (i + 1).toString(),
+  }));
+  const familleLienOptions = [
+    { label: l.direct, value: 'direct' },
+    { label: l.viaConjoint, value: 'via_conjoint' },
+  ];
+  const scolariteOptions = [
+    { label: l.eduSecondaire, value: 'secondaire' },
+    { label: l.eduPostsec, value: 'postsec_general_2ans' },
+    { label: l.eduTechnique, value: 'technique_3ans' },
+    { label: l.eduUniv1, value: 'univ_1er_cycle' },
+    { label: l.eduUniv2, value: 'univ_2e_cycle' },
+    { label: l.eduUniv3, value: 'univ_3e_cycle' },
+  ];
+  const diplomeQuebecOptions = [
+    { label: l.diplomeAucun, value: 'aucun' },
+    { label: l.diplomeSecondaire, value: 'secondaire' },
+    { label: l.diplomeDep900, value: 'dep_900h' },
+    { label: l.diplomeTechnique, value: 'technique_3ans' },
+    { label: l.diplomeUniv, value: 'univ_3_4ans' },
+    { label: l.diplome2, value: '2e_cycle' },
+    { label: l.diplome3, value: '3e_cycle' },
+  ];
   const [isAlertVisible, setIsAlertVisible] = useState(true);
   const [score, setScore] = useState<any>(null);
 
@@ -158,7 +289,7 @@ export default function StepThree() {
                 </div>
                 <div className="ml-3 flex-1">
                   <p className="text-sm font-bold text-blue-800 dark:text-blue-200">
-                    Bloc C - Facteurs d&apos;adaptation (180 points maximum)
+                    {l.alert}
                   </p>
                 </div>
               </div>
@@ -184,10 +315,10 @@ export default function StepThree() {
         {/* Affichage du score en temps réel */}
         {score && (
           <div className="mt-6 rounded-lg bg-white/10 p-4 backdrop-blur-sm">
-            <p className="text-sm font-semibold text-white">Score actuel (Bloc C):</p>
-            <p className="text-2xl font-bold text-white">{score.blocC.total} / 180 points</p>
+            <p className="text-sm font-semibold text-white">{l.scoreLabel}</p>
+            <p className="text-2xl font-bold text-white">{score.blocC.total} {l.scorePoints}</p>
             <div className="mt-2 text-xs text-white/80">
-              Études QC: {score.blocC.etudes_quebec} | Famille: {score.blocC.famille} | Conjoint: {score.blocC.conjoint}
+              {l.etudesQc}: {score.blocC.etudes_quebec} | {l.famille}: {score.blocC.famille} | {l.conjoint}: {score.blocC.conjoint}
             </div>
           </div>
         )}
@@ -199,24 +330,22 @@ export default function StepThree() {
         className="col-span-full rounded-lg bg-white p-5 @4xl:col-span-7 @4xl:p-7 dark:bg-gray-0"
       >
         <div className="grid gap-6">
-          {/* C1. Études au Québec sans diplôme */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              C1. Études au Québec sans diplôme
+              {l.c1Title}
             </h3>
             <Input
-              label="Durée en mois"
+              label={l.durationMonths}
               type="number"
-              placeholder="Ex: 12"
+              placeholder={l.durationPlaceholder}
               {...register('etudes_quebec_sans_diplome_mois', { valueAsNumber: true })}
               error={errors.etudes_quebec_sans_diplome_mois?.message}
             />
           </div>
 
-          {/* C2. Famille au Québec */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              C2. Famille au Québec
+              {l.c2Title}
             </h3>
             <div className="mb-4">
               <Controller
@@ -224,7 +353,7 @@ export default function StepThree() {
                 control={control}
                 render={({ field: { value, onChange } }) => (
                   <Checkbox
-                    label="J'ai de la famille au Québec"
+                    label={l.familleCheckbox}
                     checked={value || false}
                     onChange={(e) => onChange(e.target.checked)}
                   />
@@ -237,8 +366,8 @@ export default function StepThree() {
                 control={control}
                 render={({ field: { value, onChange } }) => (
                   <Select
-                    label="Lien de parenté"
-                    placeholder="Sélectionner"
+                    label={l.familleLien}
+                    placeholder={l.select}
                     options={familleLienOptions}
                     value={value}
                     onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
@@ -254,28 +383,27 @@ export default function StepThree() {
             )}
           </div>
 
-          {/* C3. Profil du conjoint */}
           {avecConjoint && (
             <div>
               <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-                C3. Profil du conjoint
+                {l.c3Title}
               </h3>
               <div className="grid gap-6">
                 <div>
                   <h4 className="mb-3 text-base font-medium text-gray-700 dark:text-gray-300">
-                    Connaissance du français
+                    {l.franchais}
                   </h4>
                   <div className="grid gap-4 @3xl:grid-cols-2">
                     <div>
                       <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Compréhension orale (1-12)
+                        {l.listening}
                       </label>
                       <Controller
                         name="conjoint_francais_comprehension_orale"
                         control={control}
                         render={({ field: { value, onChange } }) => (
                           <Select
-                            placeholder="Sélectionner"
+                            placeholder={l.select}
                             options={niveauFrancaisOptions}
                             value={value?.toString()}
                             onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : selected?.value || '1'))}
@@ -291,14 +419,14 @@ export default function StepThree() {
                     </div>
                     <div>
                       <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Production orale (1-12)
+                        {l.speaking}
                       </label>
                       <Controller
                         name="conjoint_francais_production_orale"
                         control={control}
                         render={({ field: { value, onChange } }) => (
                           <Select
-                            placeholder="Sélectionner"
+                            placeholder={l.select}
                             options={niveauFrancaisOptions}
                             value={value?.toString()}
                             onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : selected?.value || '1'))}
@@ -314,14 +442,14 @@ export default function StepThree() {
                     </div>
                     <div>
                       <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Compréhension écrite (1-12)
+                        {l.reading}
                       </label>
                       <Controller
                         name="conjoint_francais_comprehension_ecrite"
                         control={control}
                         render={({ field: { value, onChange } }) => (
                           <Select
-                            placeholder="Sélectionner"
+                            placeholder={l.select}
                             options={niveauFrancaisOptions}
                             value={value?.toString()}
                             onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : selected?.value || '1'))}
@@ -337,14 +465,14 @@ export default function StepThree() {
                     </div>
                     <div>
                       <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Production écrite (1-12)
+                        {l.writing}
                       </label>
                       <Controller
                         name="conjoint_francais_production_ecrite"
                         control={control}
                         render={({ field: { value, onChange } }) => (
                           <Select
-                            placeholder="Sélectionner"
+                            placeholder={l.select}
                             options={niveauFrancaisOptions}
                             value={value?.toString()}
                             onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : selected?.value || '1'))}
@@ -363,18 +491,18 @@ export default function StepThree() {
                 <div className="grid gap-4 @3xl:grid-cols-2">
                   <div>
                     <Input
-                      label="Âge"
+                      label={l.age}
                       type="number"
-                      placeholder="Ex: 30"
+                      placeholder={l.agePlaceholder}
                       {...register('conjoint_age', { valueAsNumber: true })}
                       error={errors.conjoint_age?.message}
                     />
                   </div>
                   <div>
                     <Input
-                      label="Expérience au Québec (mois)"
+                      label={l.expQc}
                       type="number"
-                      placeholder="Ex: 24"
+                      placeholder={l.expQcPlaceholder}
                       {...register('conjoint_experience_quebec_mois', { valueAsNumber: true })}
                       error={errors.conjoint_experience_quebec_mois?.message}
                     />
@@ -387,8 +515,8 @@ export default function StepThree() {
                       control={control}
                       render={({ field: { value, onChange } }) => (
                         <Select
-                          label="Niveau de scolarité"
-                          placeholder="Sélectionner"
+                          label={l.niveauScolarite}
+                          placeholder={l.select}
                           options={scolariteOptions}
                           value={value}
                           onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
@@ -408,8 +536,8 @@ export default function StepThree() {
                       control={control}
                       render={({ field: { value, onChange } }) => (
                         <Select
-                          label="Diplôme obtenu au Québec"
-                          placeholder="Sélectionner"
+                          label={l.diplomeQc}
+                          placeholder={l.select}
                           options={diplomeQuebecOptions}
                           value={value}
                           onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}

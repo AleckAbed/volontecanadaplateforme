@@ -1,365 +1,244 @@
-import { routes } from '@/config/routes';
-import { DUMMY_ID } from '@/config/constants';
+/**
+ * Index des pages cherchables depuis la barre de recherche du header.
+ *
+ * Chaque entrée a :
+ *  - name      : libellé affiché
+ *  - href      : URL cible
+ *  - keywords  : mots-clés (français + anglais + synonymes) qui matchent la recherche
+ *  - section   : catégorie pour le groupement
+ *
+ * Les entêtes (sans `href`) servent de séparateurs de section dans la liste.
+ */
 
-// Note: do not add href in the label object, it is rendering as label
-export const pageLinks = [
-  // label start
+export interface PageLink {
+  name: string;
+  href?: string;
+  keywords?: string[];
+  section?: string;
+}
+
+export const pageLinks: PageLink[] = [
+  // ────────────────────────────── Tableau de bord ──────────────────────────────
+  { name: 'Tableau de bord' },
+  {
+    name: 'Dashboard',
+    href: '/',
+    section: 'Tableau de bord',
+    keywords: ['accueil', 'home', 'main', 'principal', 'overview', 'résumé', 'tableau de bord', 'kpi'],
+  },
   {
-    name: 'Home',
-  },
-  // label end
-  {
-    name: 'E-Commerce',
-    href: routes.eCommerce.dashboard,
-  },
-  {
-    name: 'Support',
-    href: routes.support.dashboard,
-  },
-  {
-    name: 'Logistics',
-    href: routes.logistics.dashboard,
-  },
-  {
-    name: 'Analytics',
-    href: routes.analytics,
-  },
-  {
-    name: 'File Manager',
-    href: routes.file.dashboard,
-  },
-  {
-    name: 'Appointment',
-    href: routes.appointment.dashboard,
-  },
-  {
-    name: 'Executive',
-    href: routes.executive.dashboard,
-  },
-  {
-    name: 'Job Board',
-    href: routes.jobBoard.dashboard,
-  },
-  {
-    name: 'Financial',
-    href: routes.financial.dashboard,
-  },
-  {
-    name: 'Bidding',
-    href: routes.bidding.dashboard,
-  },
-  {
-    name: 'Podcast',
-    href: routes.podcast.dashboard,
-  },
-  // label start
-  {
-    name: 'Apps',
-  },
-  // label end
-  {
-    name: 'Products',
-    href: routes.eCommerce.products,
-  },
-  {
-    name: 'Product Details',
-    href: routes.eCommerce.productDetails(DUMMY_ID),
-  },
-  {
-    name: 'Create Product',
-    href: routes.eCommerce.createProduct,
-  },
-  {
-    name: 'Edit Product',
-    href: routes.eCommerce.ediProduct(DUMMY_ID),
-  },
-  {
-    name: 'Categories',
-    href: routes.eCommerce.categories,
-  },
-  {
-    name: 'Create Category',
-    href: routes.eCommerce.createCategory,
-  },
-  {
-    name: 'Edit Category',
-    href: routes.eCommerce.editCategory(DUMMY_ID),
-  },
-  {
-    name: 'Orders',
-    href: routes.eCommerce.orders,
-  },
-  {
-    name: 'Order Details',
-    href: routes.eCommerce.orderDetails(DUMMY_ID),
-  },
-  {
-    name: 'Create Order',
-    href: routes.eCommerce.createOrder,
-  },
-  {
-    name: 'Edit Order',
-    href: routes.eCommerce.editOrder(DUMMY_ID),
-  },
-  {
-    name: 'Reviews',
-    href: routes.eCommerce.reviews,
-  },
-  {
-    name: 'Shop',
-    href: routes.eCommerce.shop,
-  },
-  {
-    name: 'Cart',
-    href: routes.eCommerce.cart,
-  },
-  {
-    name: 'Checkout & Payment',
-    href: routes.eCommerce.checkout,
-  },
-  {
-    name: 'Support Inbox',
-    href: routes.support.inbox,
-  },
-  {
-    name: 'Support Snippets',
-    href: routes.support.snippets,
-  },
-  {
-    name: 'Support Templates',
-    href: routes.support.templates,
-  },
-  {
-    name: 'Invoice List',
-    href: routes.invoice.home,
-  },
-  {
-    name: 'Invoice Details',
-    href: routes.invoice.details(DUMMY_ID),
-  },
-  {
-    name: 'Create Invoice',
-    href: routes.invoice.create,
-  },
-  {
-    name: 'Edit Invoice',
-    href: routes.invoice.edit(DUMMY_ID),
-  },
-  {
-    name: 'Shipment List',
-    href: routes.logistics.shipmentList,
-  },
-  {
-    name: 'Shipment Details',
-    href: routes.logistics.shipmentDetails(DUMMY_ID),
-  },
-  {
-    name: 'Tracking',
-    href: routes.logistics.tracking(DUMMY_ID),
-  },
-  {
-    name: 'File Manager',
-    href: routes.file.manager,
-  },
-  // label start
-  {
-    name: 'Widgets',
-  },
-  // label end
-  {
-    name: 'Cards',
-    href: routes.widgets.cards,
-  },
-  {
-    name: 'Icons',
-    href: routes.widgets.icons,
-  },
-  {
-    name: 'Charts',
-    href: routes.widgets.charts,
-  },
-  // {
-  //   name: 'Banners',
-  //   href: routes.widgets.banners,
-  // },
-  {
-    name: 'Maps',
-    href: routes.widgets.maps,
-  },
-  // label start
-  {
-    name: 'Forms',
-  },
-  // label end
-  {
-    name: 'Profile Settings',
-    href: routes.forms.profileSettings,
-  },
-  {
-    name: 'Notification Preference',
-    href: routes.forms.notificationPreference,
-  },
-  {
-    name: 'Personal Information',
-    href: routes.forms.personalInformation,
-  },
-  {
-    name: 'Newsletter',
-    href: routes.forms.newsletter,
-  },
-  // {
-  //   name: 'Multi Step',
-  //   href: routes.forms.multiStep,
-  // },
-  {
-    name: 'Payment checkout',
-    href: routes.eCommerce.checkout,
-  },
-  // label start
-  {
-    name: 'Tables',
-  },
-  // label end
-  {
-    name: 'Basic',
-    href: routes.tables.basic,
-  },
-  {
-    name: 'Collapsible',
-    href: routes.tables.collapsible,
-  },
-  {
-    name: 'Enhanced',
-    href: routes.tables.enhanced,
-  },
-  {
-    name: 'Sticky Header',
-    href: routes.tables.stickyHeader,
-  },
-  {
-    name: 'Pagination',
-    href: routes.tables.pagination,
-  },
-  {
-    name: 'Search',
-    href: routes.tables.search,
-  },
-  // label start
-  {
-    name: 'Pages',
-  },
-  // label end
-  {
-    name: 'Profile',
-    href: routes.profile,
-  },
-  {
-    name: 'Welcome',
-    href: routes.welcome,
-  },
-  {
-    name: 'Coming soon',
-    href: routes.comingSoon,
-  },
-  {
-    name: 'Access Denied',
-    href: routes.accessDenied,
-  },
-  {
-    name: 'Not Found',
-    href: routes.notFound,
-  },
-  {
-    name: 'Maintenance',
-    href: routes.maintenance,
-  },
+    name: 'Statistiques',
+    href: '/analytics',
+    section: 'Tableau de bord',
+    keywords: ['statistiques', 'stats', 'analytics', 'rapports', 'metrics', 'chiffres', 'kpi', 'donnees'],
+  },
+
+  // ────────────────────────────── Clients & Dossiers ───────────────────────────
+  { name: 'Clients & Dossiers' },
+  {
+    name: 'Liste des clients',
+    href: '/admin/clients',
+    section: 'Clients & Dossiers',
+    keywords: ['clients', 'client', 'liste', 'personnes', 'utilisateurs', 'fiche', 'people', 'customer'],
+  },
   {
-    name: 'Blank',
-    href: routes.blank,
+    name: 'Nouveau client',
+    href: '/admin/clients/create',
+    section: 'Clients & Dossiers',
+    keywords: ['nouveau client', 'ajouter client', 'créer client', 'inscription', 'add client', 'new'],
   },
-  // label start
   {
-    name: 'Authentication',
+    name: 'Dossiers',
+    href: '/admin/dossiers',
+    section: 'Clients & Dossiers',
+    keywords: ['dossier', 'dossiers', 'cas', 'case', 'file', 'demande', 'demarche', 'immigration', 'visa'],
   },
-  // label end
   {
-    name: 'Modern Sign Up',
-    href: routes.auth.signUp1,
+    name: 'Nouveau dossier',
+    href: '/admin/dossiers/create',
+    section: 'Clients & Dossiers',
+    keywords: ['nouveau dossier', 'créer dossier', 'open case', 'new file', 'nouvelle demarche'],
   },
+
+  // ────────────────────────────── Documents ────────────────────────────────────
+  { name: 'Documents' },
   {
-    name: 'Vintage Sign Up',
-    href: routes.auth.signUp2,
+    name: 'Gestionnaire de fichiers',
+    href: '/file-manager',
+    section: 'Documents',
+    keywords: ['fichiers', 'files', 'documents', 'pdf', 'dossier partage', 'stockage', 'storage', 'gestionnaire'],
   },
   {
-    name: 'Trendy Sign Up',
-    href: routes.auth.signUp3,
+    name: 'Modèles de documents',
+    href: '/configuration/document-templates',
+    section: 'Documents',
+    keywords: ['modèles', 'templates', 'pdf', 'formulaires', 'gabarit', 'document type', 'documents officiels'],
   },
+
+  // ────────────────────────────── Rendez-vous ──────────────────────────────────
+  { name: 'Agenda & Rendez-vous' },
   {
-    name: 'Elegant Sign Up',
-    href: routes.auth.signUp4,
+    name: 'Calendrier des rendez-vous',
+    href: '/admin/appointments',
+    section: 'Agenda & Rendez-vous',
+    keywords: ['rendez-vous', 'rdv', 'agenda', 'calendrier', 'meetings', 'appointments', 'planning'],
   },
   {
-    name: 'Classic Sign Up',
-    href: routes.auth.signUp5,
+    name: 'Nouveau rendez-vous',
+    href: '/admin/appointments/create',
+    section: 'Agenda & Rendez-vous',
+    keywords: ['nouveau rdv', 'créer rendez-vous', 'reservation', 'booking', 'new appointment'],
   },
+
+  // ────────────────────────────── Services & Immigration ──────────────────────
+  { name: 'Services & Immigration' },
   {
-    name: 'Modern Sign In',
-    href: routes.auth.signIn1,
+    name: "Services d'immigration",
+    href: '/services-immigration',
+    section: 'Services & Immigration',
+    keywords: [
+      'visa', 'visas', 'immigration', 'service', 'services', 'permis', 'permit',
+      'travail', 'work', 'études', 'study', 'student', 'residence permanente',
+      'pr', 'citoyenneté', 'citizenship', 'parrainage', 'sponsorship',
+      'refugie', 'refugee', 'asile', 'asylum', 'express entry', 'pnp',
+      'visiteur', 'tourist', 'visitor', 'super visa',
+    ],
   },
+
+  // ────────────────────────────── Envois & Formulaires ────────────────────────
+  { name: 'Envois & Formulaires' },
   {
-    name: 'Vintage Sign In',
-    href: routes.auth.signIn2,
+    name: 'Envois groupés',
+    href: '/envois',
+    section: 'Envois & Formulaires',
+    keywords: ['envois', 'envoi', 'invitations', 'invitation', 'groupé', 'bulk', 'campagne'],
   },
   {
-    name: 'Trendy Sign In',
-    href: routes.auth.signIn3,
+    name: 'Nouvel envoi',
+    href: '/envois/nouveau',
+    section: 'Envois & Formulaires',
+    keywords: ['nouvel envoi', 'créer envoi', 'new send', 'nouvelle invitation'],
   },
   {
-    name: 'Elegant Sign In',
-    href: routes.auth.signIn4,
+    name: 'Questionnaires (legacy)',
+    href: '/questionnaires',
+    section: 'Envois & Formulaires',
+    keywords: ['questionnaire', 'formulaire', 'form', 'survey', 'enquête', 'legacy'],
   },
   {
-    name: 'Classic Sign In',
-    href: routes.auth.signIn5,
+    name: 'Catégories de formulaires',
+    href: '/configuration/categories',
+    section: 'Envois & Formulaires',
+    keywords: ['catégorie', 'categories', 'classement', 'tags', 'rubrique'],
   },
   {
-    name: 'Modern Forgot Password',
-    href: routes.auth.forgotPassword1,
+    name: 'Types de formulaires',
+    href: '/configuration/form-types',
+    section: 'Envois & Formulaires',
+    keywords: ['type formulaire', 'form type', 'gabarit', 'modèle formulaire'],
   },
+
+  // ────────────────────────────── Communication ────────────────────────────────
+  { name: 'Communication' },
   {
-    name: 'Vintage Forgot Password',
-    href: routes.auth.forgotPassword2,
+    name: 'Messages',
+    href: '/admin/messages',
+    section: 'Communication',
+    keywords: ['messages', 'chat', 'discussion', 'inbox', 'boîte de réception', 'conversations'],
   },
   {
-    name: 'Trendy Forgot Password',
-    href: routes.auth.forgotPassword3,
+    name: 'Notifications',
+    href: '/admin/notifications',
+    section: 'Communication',
+    keywords: ['notifications', 'alertes', 'alerts', 'rappel', 'reminder'],
   },
   {
-    name: 'Elegant Forgot Password',
-    href: routes.auth.forgotPassword4,
+    name: 'Nouvelles & Articles',
+    href: '/admin/news/articles',
+    section: 'Communication',
+    keywords: ['news', 'nouvelles', 'articles', 'blog', 'actualités', 'publications'],
   },
   {
-    name: 'Classic Forgot Password',
-    href: routes.auth.forgotPassword5,
+    name: 'Tableau de bord nouvelles',
+    href: '/podcast',
+    section: 'Communication',
+    keywords: ['news', 'nouvelles', 'feed', 'actualités', 'sources', 'rss'],
   },
+
+  // ────────────────────────────── Administration ───────────────────────────────
+  { name: 'Administration' },
   {
-    name: 'Modern OTP Page',
-    href: routes.auth.otp1,
+    name: 'Liste des administrateurs',
+    href: '/admin/users/admins',
+    section: 'Administration',
+    keywords: ['administrateurs', 'admins', 'équipe', 'team', 'staff', 'utilisateurs admin'],
   },
   {
-    name: 'Vintage OTP Page',
-    href: routes.auth.otp2,
+    name: 'Ajouter un administrateur',
+    href: '/admin/users/admins/create',
+    section: 'Administration',
+    keywords: ['nouvel admin', 'créer admin', 'invitation admin', 'add admin', 'new admin'],
   },
   {
-    name: 'Trendy OTP Page',
-    href: routes.auth.otp3,
+    name: 'Mon profil',
+    href: '/forms/profile-settings',
+    section: 'Administration',
+    keywords: [
+      'profil', 'profile', 'mon compte', 'paramètres profil', 'account', 'avatar',
+      'mot de passe', 'password', 'écran de verrouillage', 'lock screen',
+      'images de fond', 'wallpaper', 'background',
+    ],
   },
   {
-    name: 'Elegant OTP Page',
-    href: routes.auth.otp4,
+    name: 'Paramètres généraux',
+    href: '/admin/settings/general',
+    section: 'Administration',
+    keywords: ['paramètres', 'settings', 'configuration', 'général'],
   },
   {
-    name: 'Classic OTP Page',
-    href: routes.auth.otp5,
+    name: 'Sécurité',
+    href: '/admin/settings/security',
+    section: 'Administration',
+    keywords: ['sécurité', 'security', 'mot de passe', 'password', '2fa', 'sessions'],
   },
 ];
+
+/** Normaliser une chaîne pour la comparaison (sans accents, minuscules). */
+function normalize(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .trim();
+}
+
+/**
+ * Filtre l'index selon la requête. Match sur le nom, la section et les mots-clés.
+ * Chaque token de la requête doit matcher au moins une partie pour qu'une entrée soit retenue.
+ * Les en-têtes de section sont injectées avant le premier résultat de chaque section.
+ */
+export function searchPages(query: string): PageLink[] {
+  const q = normalize(query);
+  if (!q) return pageLinks;
+
+  const tokens = q.split(/\s+/).filter(Boolean);
+
+  const matches = pageLinks.filter((p) => {
+    if (!p.href) return false; // ignorer les en-têtes
+    const haystack = normalize([p.name, p.section ?? '', (p.keywords ?? []).join(' ')].join(' '));
+    return tokens.every((t) => haystack.includes(t));
+  });
+
+  // Re-grouper avec les en-têtes de section
+  const result: PageLink[] = [];
+  const sectionsAdded = new Set<string>();
+  for (const m of matches) {
+    const sec = m.section ?? '';
+    if (sec && !sectionsAdded.has(sec)) {
+      result.push({ name: sec });
+      sectionsAdded.add(sec);
+    }
+    result.push(m);
+  }
+  return result;
+}

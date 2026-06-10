@@ -7,6 +7,7 @@ import { routes } from '@/config/routes';
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 
 export default function ProfileMenu({
   buttonClassName,
@@ -18,8 +19,8 @@ export default function ProfileMenu({
   username?: boolean;
 }) {
   const { currentUser, userType } = useAuth();
+  const { t } = useTranslation();
 
-  // Déterminer le nom à afficher avec vérifications robustes
   const displayName = React.useMemo(() => {
     if (!currentUser) return 'User';
     
@@ -48,7 +49,7 @@ export default function ProfileMenu({
           />
           {!!username && (
             <span className="username hidden text-gray-200 dark:text-gray-700 md:inline-flex">
-              Hi, {displayName}
+              {t('profile_menu.hi')}, {displayName}
             </span>
           )}
         </button>
@@ -81,23 +82,19 @@ function ProfileMenuPopover({ children }: React.PropsWithChildren<{}>) {
   );
 }
 
-const menuItems = [
-  {
-    name: 'My Profile',
-    href: routes.profile,
-  },
-  {
-    name: 'Account Settings',
-    href: routes.forms.profileSettings,
-  },
-  {
-    name: 'Activity Log',
-    href: '#',
-  },
-];
+function useMenuItems() {
+  const { t } = useTranslation();
+  return [
+    { name: t('profile_menu.my_profile'), href: routes.profile },
+    { name: t('profile_menu.account_settings'), href: routes.forms.profileSettings },
+    { name: t('profile_menu.activity_log'), href: '#' },
+  ];
+}
 
 function DropdownMenu() {
   const { logout, currentUser, userType } = useAuth();
+  const { t } = useTranslation();
+  const menuItems = useMenuItems();
 
   const handleSignOut = async () => {
     await logout();
@@ -152,7 +149,7 @@ function DropdownMenu() {
           variant="text"
           onClick={handleSignOut}
         >
-          Déconnexion
+          {t('profile_menu.sign_out')}
         </Button>
       </div>
     </div>

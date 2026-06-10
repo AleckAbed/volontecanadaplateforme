@@ -16,30 +16,156 @@ import {
 } from '@/validators/pstq-form.schema';
 import { calculatePSTQScore } from '@/services/pstq-scoring';
 
-const diagnosticOptions = [
-  { label: 'Équilibre', value: 'equilibre' },
-  { label: 'Léger déficit', value: 'leger_deficit' },
-  { label: 'Déficit', value: 'deficit' },
-];
-
-const diplomeQuebecOptions = [
-  { label: 'Aucun', value: 'aucun' },
-  { label: 'Secondaire', value: 'secondaire' },
-  { label: 'DEP ≥900h', value: 'dep_900h' },
-  { label: 'Technique 3 ans', value: 'technique_3ans' },
-  { label: 'Université 3-4 ans', value: 'univ_3_4ans' },
-  { label: '2e cycle', value: '2e_cycle' },
-  { label: '3e cycle', value: '3e_cycle' },
-];
-
-const offreEmploiLieuOptions = [
-  { label: 'Montréal', value: 'montreal' },
-  { label: 'Hors Montréal', value: 'hors_montreal' },
-];
+const PSTQ_STEP2_LABELS = {
+  fr: {
+    alert: 'Bloc B - Réponse aux besoins du Québec (700 points maximum)',
+    scoreLabel: 'Score actuel (Bloc B):',
+    scorePoints: '/ 700 points',
+    scoreProfession: 'Profession',
+    scoreDiplome: 'Diplôme QC',
+    scoreExpQc: 'Expérience QC',
+    b1Title: 'B1. Profession principale + diagnostic',
+    cnpCode: 'Code CNP',
+    cnpPlaceholder: 'Ex: 2171',
+    diagnostic: 'Diagnostic',
+    select: 'Sélectionner',
+    diagEquilibre: 'Équilibre',
+    diagLeger: 'Léger déficit',
+    diagDeficit: 'Déficit',
+    expProfMois: 'Expérience professionnelle (mois)',
+    expProfPlaceholder: 'Ex: 36',
+    b2Title: 'B2. Diplôme obtenu au Québec',
+    diplomeAucun: 'Aucun',
+    diplomeSecondaire: 'Secondaire',
+    diplomeDep900: 'DEP ≥900h',
+    diplomeTechnique: 'Technique 3 ans',
+    diplomeUniv: 'Université 3-4 ans',
+    diplome2: '2e cycle',
+    diplome3: '3e cycle',
+    b3Title: 'B3. Expérience de travail au Québec',
+    durationMonths: 'Durée en mois',
+    durationPlaceholder: 'Ex: 24',
+    b4Title: 'B4. Expérience hors Montréal',
+    residenceMonths: 'Résidence (mois)',
+    workMonths: 'Travail (mois)',
+    studyMonths: 'Études (mois)',
+    extPlaceholder: 'Ex: 48',
+    b5Title: "B5. Offre d'emploi validée",
+    offreLabel: "J'ai une offre d'emploi validée",
+    offreLieu: 'Lieu',
+    lieuMontreal: 'Montréal',
+    lieuHorsMontreal: 'Hors Montréal',
+    b6Title: "B6. Autorisation d'exercer",
+    autorisationLabel: "J'ai un permis ou une reconnaissance partielle/complète",
+  },
+  en: {
+    alert: "Block B - Response to Quebec's needs (700 points maximum)",
+    scoreLabel: 'Current score (Block B):',
+    scorePoints: '/ 700 points',
+    scoreProfession: 'Profession',
+    scoreDiplome: 'QC Diploma',
+    scoreExpQc: 'QC Experience',
+    b1Title: 'B1. Main profession + diagnostic',
+    cnpCode: 'NOC code',
+    cnpPlaceholder: 'E.g. 2171',
+    diagnostic: 'Diagnostic',
+    select: 'Select',
+    diagEquilibre: 'Balanced',
+    diagLeger: 'Slight deficit',
+    diagDeficit: 'Deficit',
+    expProfMois: 'Professional experience (months)',
+    expProfPlaceholder: 'E.g. 36',
+    b2Title: 'B2. Diploma obtained in Quebec',
+    diplomeAucun: 'None',
+    diplomeSecondaire: 'Secondary',
+    diplomeDep900: 'DEP ≥900h',
+    diplomeTechnique: 'Technical 3 years',
+    diplomeUniv: 'University 3-4 years',
+    diplome2: '2nd cycle',
+    diplome3: '3rd cycle',
+    b3Title: 'B3. Work experience in Quebec',
+    durationMonths: 'Duration in months',
+    durationPlaceholder: 'E.g. 24',
+    b4Title: 'B4. Experience outside Montreal',
+    residenceMonths: 'Residence (months)',
+    workMonths: 'Work (months)',
+    studyMonths: 'Studies (months)',
+    extPlaceholder: 'E.g. 48',
+    b5Title: 'B5. Validated job offer',
+    offreLabel: 'I have a validated job offer',
+    offreLieu: 'Location',
+    lieuMontreal: 'Montreal',
+    lieuHorsMontreal: 'Outside Montreal',
+    b6Title: 'B6. Authorization to practice',
+    autorisationLabel: 'I have a permit or partial/full recognition',
+  },
+  es: {
+    alert: 'Bloque B - Respuesta a las necesidades de Quebec (700 puntos máximo)',
+    scoreLabel: 'Puntaje actual (Bloque B):',
+    scorePoints: '/ 700 puntos',
+    scoreProfession: 'Profesión',
+    scoreDiplome: 'Diploma QC',
+    scoreExpQc: 'Experiencia QC',
+    b1Title: 'B1. Profesión principal + diagnóstico',
+    cnpCode: 'Código NOC',
+    cnpPlaceholder: 'Ej: 2171',
+    diagnostic: 'Diagnóstico',
+    select: 'Seleccionar',
+    diagEquilibre: 'Equilibrio',
+    diagLeger: 'Déficit leve',
+    diagDeficit: 'Déficit',
+    expProfMois: 'Experiencia profesional (meses)',
+    expProfPlaceholder: 'Ej: 36',
+    b2Title: 'B2. Diploma obtenido en Quebec',
+    diplomeAucun: 'Ninguno',
+    diplomeSecondaire: 'Secundaria',
+    diplomeDep900: 'DEP ≥900h',
+    diplomeTechnique: 'Técnica 3 años',
+    diplomeUniv: 'Universidad 3-4 años',
+    diplome2: '2do ciclo',
+    diplome3: '3er ciclo',
+    b3Title: 'B3. Experiencia laboral en Quebec',
+    durationMonths: 'Duración en meses',
+    durationPlaceholder: 'Ej: 24',
+    b4Title: 'B4. Experiencia fuera de Montreal',
+    residenceMonths: 'Residencia (meses)',
+    workMonths: 'Trabajo (meses)',
+    studyMonths: 'Estudios (meses)',
+    extPlaceholder: 'Ej: 48',
+    b5Title: 'B5. Oferta de empleo validada',
+    offreLabel: 'Tengo una oferta de empleo validada',
+    offreLieu: 'Lugar',
+    lieuMontreal: 'Montreal',
+    lieuHorsMontreal: 'Fuera de Montreal',
+    b6Title: 'B6. Autorización para ejercer',
+    autorisationLabel: 'Tengo un permiso o reconocimiento parcial/completo',
+  },
+} as const;
 
 export default function StepTwo() {
   const { step, gotoNextStep } = usePSTQStepper();
   const [formData, setFormData] = useAtom(pstqFormDataAtom);
+  const [locale] = useAtom(questionnaireLocaleAtom);
+  const t = PSTQ_STEP2_T[locale] || PSTQ_STEP2_T.fr;
+  const l = PSTQ_STEP2_LABELS[locale] || PSTQ_STEP2_LABELS.fr;
+  const diagnosticOptions = [
+    { label: l.diagEquilibre, value: 'equilibre' },
+    { label: l.diagLeger, value: 'leger_deficit' },
+    { label: l.diagDeficit, value: 'deficit' },
+  ];
+  const diplomeQuebecOptions = [
+    { label: l.diplomeAucun, value: 'aucun' },
+    { label: l.diplomeSecondaire, value: 'secondaire' },
+    { label: l.diplomeDep900, value: 'dep_900h' },
+    { label: l.diplomeTechnique, value: 'technique_3ans' },
+    { label: l.diplomeUniv, value: 'univ_3_4ans' },
+    { label: l.diplome2, value: '2e_cycle' },
+    { label: l.diplome3, value: '3e_cycle' },
+  ];
+  const offreEmploiLieuOptions = [
+    { label: l.lieuMontreal, value: 'montreal' },
+    { label: l.lieuHorsMontreal, value: 'hors_montreal' },
+  ];
   const [isAlertVisible, setIsAlertVisible] = useState(true);
   const [score, setScore] = useState<any>(null);
 
@@ -149,7 +275,7 @@ export default function StepTwo() {
                 </div>
                 <div className="ml-3 flex-1">
                   <p className="text-sm font-bold text-blue-800 dark:text-blue-200">
-                    Bloc B - Réponse aux besoins du Québec (700 points maximum)
+                    {l.alert}
                   </p>
                 </div>
               </div>
@@ -175,10 +301,10 @@ export default function StepTwo() {
         {/* Affichage du score en temps réel */}
         {score && (
           <div className="mt-6 rounded-lg bg-white/10 p-4 backdrop-blur-sm">
-            <p className="text-sm font-semibold text-white">Score actuel (Bloc B):</p>
-            <p className="text-2xl font-bold text-white">{score.blocB.total} / 700 points</p>
+            <p className="text-sm font-semibold text-white">{l.scoreLabel}</p>
+            <p className="text-2xl font-bold text-white">{score.blocB.total} {l.scorePoints}</p>
             <div className="mt-2 text-xs text-white/80">
-              Profession: {score.blocB.profession} | Diplôme QC: {score.blocB.diplome_quebec} | Expérience QC: {score.blocB.experience_quebec}
+              {l.scoreProfession}: {score.blocB.profession} | {l.scoreDiplome}: {score.blocB.diplome_quebec} | {l.scoreExpQc}: {score.blocB.experience_quebec}
             </div>
           </div>
         )}
@@ -190,16 +316,15 @@ export default function StepTwo() {
         className="col-span-full rounded-lg bg-white p-5 @4xl:col-span-7 @4xl:p-7 dark:bg-gray-0"
       >
         <div className="grid gap-6">
-          {/* B1. Profession principale + diagnostic */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              B1. Profession principale + diagnostic
+              {l.b1Title}
             </h3>
             <div className="grid gap-4 @3xl:grid-cols-2">
               <div>
                 <Input
-                  label="Code CNP"
-                  placeholder="Ex: 2171"
+                  label={l.cnpCode}
+                  placeholder={l.cnpPlaceholder}
                   {...register('cnp_code')}
                   error={errors.cnp_code?.message}
                 />
@@ -210,8 +335,8 @@ export default function StepTwo() {
                   control={control}
                   render={({ field: { value, onChange } }) => (
                     <Select
-                      label="Diagnostic"
-                      placeholder="Sélectionner"
+                      label={l.diagnostic}
+                      placeholder={l.select}
                       options={diagnosticOptions}
                       value={value}
                       onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
@@ -227,9 +352,9 @@ export default function StepTwo() {
               </div>
               <div>
                 <Input
-                  label="Expérience professionnelle (mois)"
+                  label={l.expProfMois}
                   type="number"
-                  placeholder="Ex: 36"
+                  placeholder={l.expProfPlaceholder}
                   {...register('experience_profession_mois', { valueAsNumber: true })}
                   error={errors.experience_profession_mois?.message}
                 />
@@ -237,17 +362,16 @@ export default function StepTwo() {
             </div>
           </div>
 
-          {/* B2. Diplôme obtenu au Québec */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              B2. Diplôme obtenu au Québec
+              {l.b2Title}
             </h3>
             <Controller
               name="diplome_quebec"
               control={control}
               render={({ field: { value, onChange } }) => (
                 <Select
-                  placeholder="Sélectionner"
+                  placeholder={l.select}
                   options={diplomeQuebecOptions}
                   value={value}
                   onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
@@ -262,54 +386,51 @@ export default function StepTwo() {
             />
           </div>
 
-          {/* B3. Expérience de travail au Québec */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              B3. Expérience de travail au Québec
+              {l.b3Title}
             </h3>
             <Input
-              label="Durée en mois"
+              label={l.durationMonths}
               type="number"
-              placeholder="Ex: 24"
+              placeholder={l.durationPlaceholder}
               {...register('experience_quebec_mois', { valueAsNumber: true })}
               error={errors.experience_quebec_mois?.message}
             />
           </div>
 
-          {/* B4. Expérience hors Montréal */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              B4. Expérience hors Montréal
+              {l.b4Title}
             </h3>
             <div className="grid gap-4 @3xl:grid-cols-3">
               <Input
-                label="Résidence (mois)"
+                label={l.residenceMonths}
                 type="number"
-                placeholder="Ex: 48"
+                placeholder={l.extPlaceholder}
                 {...register('residence_hors_montreal_mois', { valueAsNumber: true })}
                 error={errors.residence_hors_montreal_mois?.message}
               />
               <Input
-                label="Travail (mois)"
+                label={l.workMonths}
                 type="number"
-                placeholder="Ex: 48"
+                placeholder={l.extPlaceholder}
                 {...register('travail_hors_montreal_mois', { valueAsNumber: true })}
                 error={errors.travail_hors_montreal_mois?.message}
               />
               <Input
-                label="Études (mois)"
+                label={l.studyMonths}
                 type="number"
-                placeholder="Ex: 48"
+                placeholder={l.extPlaceholder}
                 {...register('etudes_hors_montreal_mois', { valueAsNumber: true })}
                 error={errors.etudes_hors_montreal_mois?.message}
               />
             </div>
           </div>
 
-          {/* B5. Offre d&apos;emploi validée */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              B5. Offre d&apos;emploi validée
+              {l.b5Title}
             </h3>
             <div className="mb-4">
               <Controller
@@ -317,7 +438,7 @@ export default function StepTwo() {
                 control={control}
                 render={({ field: { value, onChange } }) => (
                   <Checkbox
-                    label="J'ai une offre d'emploi validée"
+                    label={l.offreLabel}
                     checked={value || false}
                     onChange={(e) => onChange(e.target.checked)}
                   />
@@ -330,8 +451,8 @@ export default function StepTwo() {
                 control={control}
                 render={({ field: { value, onChange } }) => (
                   <Select
-                    label="Lieu"
-                    placeholder="Sélectionner"
+                    label={l.offreLieu}
+                    placeholder={l.select}
                     options={offreEmploiLieuOptions}
                     value={value}
                     onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
@@ -347,17 +468,16 @@ export default function StepTwo() {
             )}
           </div>
 
-          {/* B6. Autorisation d&apos;exercer */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              B6. Autorisation d&apos;exercer
+              {l.b6Title}
             </h3>
             <Controller
               name="autorisation_exercer"
               control={control}
               render={({ field: { value, onChange } }) => (
                 <Checkbox
-                  label="J'ai un permis ou une reconnaissance partielle/complète"
+                  label={l.autorisationLabel}
                   checked={value || false}
                   onChange={(e) => onChange(e.target.checked)}
                 />

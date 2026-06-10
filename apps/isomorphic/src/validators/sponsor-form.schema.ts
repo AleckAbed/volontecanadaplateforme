@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { tMsg } from '@/validators/i18n-helper';
 
 // Schéma de validation pour le formulaire de parrainage (Sponsor Form)
 
@@ -87,8 +88,8 @@ export const sponsorFormStep1Schema = z.object({
 // Étape 2: Renseignements sur le répondant - Données personnelles
 export const sponsorFormStep2Schema = z.object({
   // Données personnelles
-  lastName: z.string().min(1, { message: 'Le nom de famille est requis' }),
-  firstName: z.string().min(1, { message: 'Le prénom est requis' }),
+  lastName: z.string().min(1, { message: tMsg('Le nom de famille est requis', 'Surname is required', 'El apellido es requerido') }),
+  firstName: z.string().min(1, { message: tMsg('Le prénom est requis', 'First name is required', 'El nombre es requerido') }),
   phoneNumber: z.string().optional(),
   dateAndPlaceOfBirth: z.string().optional(),
   nationality: z.string().optional(),

@@ -2,7 +2,7 @@
  * Traductions FR/EN pour les steps 3 à 10 et congratulations du client-form.
  */
 
-export type FormLocale = 'fr' | 'en';
+export type FormLocale = 'fr' | 'en' | 'es';
 
 export const STEP3_T = {
   fr: {
@@ -49,11 +49,34 @@ export const STEP3_T = {
     select: 'Select',
     country: 'Country:',
   },
+  es: {
+    summaryTitle: 'Pasaporte, documento de identidad y educación/empleo',
+    summaryDesc: 'Por favor proporcione la información sobre su pasaporte, documento nacional de identidad y los detalles de su educación/empleo',
+    passport: 'Pasaporte',
+    passportNumber: 'Número de pasaporte/documento de viaje:',
+    issueCountry: 'País de expedición:',
+    issueDate: 'Fecha de expedición (AAAA/MM/DD):',
+    expiryDate: 'Fecha de expiración (AAAA/MM/DD):',
+    nationalId: 'Documento nacional de identidad',
+    nationalIdNumber: 'Número del documento nacional de identidad:',
+    nationalIdCountry: 'País de expedición:',
+    educationEmployment: 'Detalles de educación/empleo',
+    educationInfo: 'Información sobre los estudios',
+    highestLevel: 'Nivel de estudios más alto:',
+    totalYears: 'Número total de años de estudios:',
+    employmentInfo: 'Información sobre la profesión',
+    current: 'Empleo actual:',
+    planned: 'Empleo previsto:',
+    date: 'Fecha (AAAA/MM/DD):',
+    select: 'Seleccionar',
+    country: 'País:',
+  },
 };
 
 export const STEP4_T = {
   fr: { summaryTitle: 'Scolarité', summaryDesc: "Indiquez le nombre d'années que vous avez réussies pour chacun des niveaux d'études suivants" },
   en: { summaryTitle: 'Education', summaryDesc: 'Indicate the number of years completed for each of the following levels of study' },
+  es: { summaryTitle: 'Educación', summaryDesc: 'Indique el número de años completados para cada uno de los siguientes niveles de estudios' },
 };
 export const STEP5_T = {
   fr: {
@@ -80,26 +103,43 @@ export const STEP5_T = {
     errorFromAfterTo: 'For each address, "From" date must be before or equal to "To" date. Row {{row}}.',
     errorAddressDateGap: 'Address periods must cover the entire required period from {{start}} to {{end}} with no gaps. Check that there are no missing dates between your entries.',
   },
+  es: {
+    summaryTitle: 'Dirección',
+    summaryDesc: 'Indique todas las direcciones donde ha residido desde su 18º cumpleaños o durante los últimos 10 años, lo más reciente. No use direcciones de apartado postal.',
+    addressHistoryTitle: 'Historial de direcciones',
+    addressHistoryIntro: 'Indique todas las direcciones donde ha residido desde su 18º cumpleaños o durante los últimos 10 años, lo más reciente. No use direcciones de apartado postal.',
+    errorNoDateOfBirth: 'Por favor complete su fecha de nacimiento en el paso 1 para validar las direcciones.',
+    errorAtLeastOneAddress: 'Por favor añada al menos una dirección con fechas "Desde" y "Hasta".',
+    errorMissingDatesInRow: 'Cada dirección debe tener las fechas "Desde" y "Hasta". Fila {{row}}.',
+    errorAddressDateRange: 'Las fechas de cada dirección deben estar entre el {{start}} y el {{end}} (desde su 18º cumpleaños o los últimos 10 años). Fila {{row}}.',
+    errorFromAfterTo: 'Para cada dirección, la fecha "Desde" debe ser anterior o igual a la fecha "Hasta". Fila {{row}}.',
+    errorAddressDateGap: 'Los periodos deben cubrir todo el rango requerido del {{start}} al {{end}} sin lagunas. Verifique que no haya huecos en sus fechas.',
+  },
 };
 export const STEP6_T = {
   fr: { summaryTitle: 'Antécédents personnels', summaryDesc: "Veuillez préciser vos antécédents personnels au cours des 10 dernières années ou depuis votre 18e anniversaire de naissance si cela remonte à moins de 10 ans. Commencez par l'information la plus récente." },
   en: { summaryTitle: 'Personal background', summaryDesc: 'Provide your personal history for the past 10 years or since your 18th birthday if that was less than 10 years ago. Start with the most recent information.' },
+  es: { summaryTitle: 'Antecedentes personales', summaryDesc: 'Indique sus antecedentes personales de los últimos 10 años o desde su 18º cumpleaños si esto fue hace menos de 10 años. Empiece por la información más reciente.' },
 };
 export const STEP7_T = {
   fr: { summaryTitle: 'Famille', summaryDesc: 'Veuillez fournir les informations sur les membres de votre famille' },
   en: { summaryTitle: 'Family', summaryDesc: 'Please provide information about your family members' },
+  es: { summaryTitle: 'Familia', summaryDesc: 'Por favor proporcione información sobre los miembros de su familia' },
 };
 export const STEP8_T = {
   fr: { summaryTitle: 'Liste des voyages', summaryDesc: 'Veuillez énumérer tous les voyages que vous et les membres de votre famille âgés de 18 ans ou plus avez effectués depuis les 10 dernières années hors de votre pays d\'origine ou de résidence' },
   en: { summaryTitle: 'List of travels', summaryDesc: 'List all trips you and family members aged 18 or over have made in the last 10 years outside your country of origin or residence' },
+  es: { summaryTitle: 'Lista de viajes', summaryDesc: 'Enumere todos los viajes que usted y los miembros de su familia mayores de 18 años han realizado en los últimos 10 años fuera de su país de origen o residencia' },
 };
 export const STEP9_T = {
   fr: { summaryTitle: 'Section A - Lien de parenté', summaryDesc: 'Veuillez confirmer les informations sur les membres de votre famille' },
   en: { summaryTitle: 'Section A - Family relationship', summaryDesc: 'Please confirm the information about your family members' },
+  es: { summaryTitle: 'Sección A - Vínculo de parentesco', summaryDesc: 'Por favor confirme la información sobre los miembros de su familia' },
 };
 export const STEP10_T = {
   fr: { summaryTitle: 'Questions de sécurité', summaryDesc: 'Est-ce que vous-même ou, si vous êtes le requérant principal, l\'un des membres de votre famille nommés sur la demande de résidence permanente au Canada :' },
   en: { summaryTitle: 'Security questions', summaryDesc: 'Have you, or, if you are the principal applicant, any of your family members named in the application for permanent residence in Canada:' },
+  es: { summaryTitle: 'Preguntas de seguridad', summaryDesc: 'Ha usted, o si es el solicitante principal, alguno de los miembros de su familia mencionados en la solicitud de residencia permanente en Canadá:' },
 };
 
 export const CONGRATULATIONS_T = {
@@ -122,5 +162,15 @@ export const CONGRATULATIONS_T = {
     downloadPdf: 'Download PDF version',
     previewPdf: 'Preview PDF',
     errorSubmit: 'Error submitting',
+  },
+  es: {
+    submitting: 'Enviando...',
+    pleaseWait: 'Por favor espere mientras guardamos su formulario.',
+    success: '¡Formulario enviado con éxito!',
+    successDesc: 'Su formulario ha sido enviado con éxito. Nos pondremos en contacto pronto para los siguientes pasos.',
+    backHome: 'Volver al inicio',
+    downloadPdf: 'Descargar versión PDF',
+    previewPdf: 'Vista previa PDF',
+    errorSubmit: 'Error al enviar',
   },
 };

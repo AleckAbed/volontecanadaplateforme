@@ -10,11 +10,42 @@ import { STEP5_T } from '@/app/shared/client-form/client-form-translations';
 import DynamicTable from './dynamic-table';
 import type { AddressEntry } from '@/validators/client-form.schema';
 
+const STEP5_LABELS = {
+  fr: {
+    fromDate: 'Du (AAAA-MM)',
+    toDate: 'Au (AAAA-MM)',
+    streetAndNumber: 'Rue et numéro civique',
+    city: 'Ville ou village',
+    province: 'Province, État ou district',
+    postalCode: 'Code postal/ZIP',
+    country: 'Pays ou territoire',
+  },
+  en: {
+    fromDate: 'From (YYYY-MM)',
+    toDate: 'To (YYYY-MM)',
+    streetAndNumber: 'Street and number',
+    city: 'City or town',
+    province: 'Province, State or district',
+    postalCode: 'Postal/ZIP code',
+    country: 'Country or territory',
+  },
+  es: {
+    fromDate: 'Desde (AAAA-MM)',
+    toDate: 'Hasta (AAAA-MM)',
+    streetAndNumber: 'Calle y número',
+    city: 'Ciudad o pueblo',
+    province: 'Provincia, Estado o distrito',
+    postalCode: 'Código postal/ZIP',
+    country: 'País o territorio',
+  },
+} as const;
+
 export default function StepFive() {
   const { step, gotoNextStep } = useStepper();
   const [formData, setFormData] = useAtom(formDataAtom);
   const [locale] = useAtom(questionnaireLocaleAtom);
   const t = STEP5_T[locale] || STEP5_T.fr;
+  const l = STEP5_LABELS[locale] || STEP5_LABELS.fr;
   const [addressHistory, setAddressHistory] = useState<AddressEntry[]>(
     formData?.addressHistory || []
   );
@@ -62,13 +93,13 @@ export default function StepFive() {
           title={t.addressHistoryTitle}
           description={t.addressHistoryIntro}
           columns={[
-            { key: 'fromDate', label: 'Du (AAAA-MM)', type: 'date', placeholder: 'YYYY-MM' },
-            { key: 'toDate', label: 'Au (AAAA-MM)', type: 'date', placeholder: 'YYYY-MM' },
-            { key: 'streetAndNumber', label: 'Rue et numéro civique', type: 'text' },
-            { key: 'city', label: 'Ville ou village', type: 'text' },
-            { key: 'province', label: 'Province, État ou district', type: 'text' },
-            { key: 'postalCode', label: 'Code postal/ZIP', type: 'text' },
-            { key: 'country', label: 'Pays ou territoire', type: 'text' },
+            { key: 'fromDate', label: l.fromDate, type: 'date', placeholder: 'YYYY-MM' },
+            { key: 'toDate', label: l.toDate, type: 'date', placeholder: 'YYYY-MM' },
+            { key: 'streetAndNumber', label: l.streetAndNumber, type: 'text' },
+            { key: 'city', label: l.city, type: 'text' },
+            { key: 'province', label: l.province, type: 'text' },
+            { key: 'postalCode', label: l.postalCode, type: 'text' },
+            { key: 'country', label: l.country, type: 'text' },
           ]}
           data={addressHistory}
           onAdd={addAddressEntry}

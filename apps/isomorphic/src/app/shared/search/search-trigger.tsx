@@ -1,23 +1,25 @@
+'use client';
+
 import { PiCommand, PiMagnifyingGlassBold } from 'react-icons/pi';
+import { useTranslation } from 'react-i18next';
 import cn from '@core/utils/class-names';
 
 type SearchTriggerProps = {
   placeholderClassName?: string;
   icon?: React.ReactNode;
   lang?: string;
-  t?: (key: string) => string | undefined;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 export default function SearchTrigger({
   icon,
   className,
   placeholderClassName,
-  t,
   ...props
 }: SearchTriggerProps) {
+  const { t } = useTranslation();
   return (
     <button
-      aria-label="Search"
+      aria-label={t('common.search')}
       className={cn(
         'group inline-flex items-center focus:outline-none active:translate-y-px xl:h-10 xl:w-full xl:max-w-sm xl:rounded-lg xl:border xl:border-muted xl:py-2 xl:pe-2 xl:ps-3.5 xl:shadow-sm xl:backdrop-blur-md xl:transition-colors xl:duration-200 xl:hover:border-gray-900 xl:hover:outline-double xl:hover:outline-[0.5px] xl:hover:outline-gray-900 xl:focus-visible:border-gray-900 xl:focus-visible:outline-double xl:focus-visible:outline-[0.5px] xl:focus-visible:outline-gray-900',
         className
@@ -35,7 +37,7 @@ export default function SearchTrigger({
           placeholderClassName
         )}
       >
-        Search your page...
+        {t('common.search_trigger_placeholder')}
       </span>
       <span className="search-command ms-auto hidden items-center text-sm text-gray-600 lg:flex lg:rounded-md lg:bg-primary lg:px-1.5 lg:py-1 lg:text-xs lg:font-semibold lg:text-primary-foreground xl:justify-normal">
         <PiCommand strokeWidth={1.3} className="h-[15px] w-[15px]" />K

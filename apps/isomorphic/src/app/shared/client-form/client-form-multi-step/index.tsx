@@ -290,6 +290,13 @@ function pickClientFields(input: any): FormDataType {
   return out as FormDataType;
 }
 
+/**
+ * Steps du questionnaire client.
+ * Note : le PDF original avait une étape 9 (Section A - Lien de parenté) qui a
+ * été fusionnée dans l'étape 7 (Famille). Le fichier step-9.tsx n'existe pas
+ * volontairement — on saute de step-8 (voyages) à step-10 (sécurité).
+ * Côté UX, l'utilisateur voit "9 sur 10" puis "10 sur 10" sans gap visible.
+ */
 export enum Step {
   StepOne,
   StepTwo,

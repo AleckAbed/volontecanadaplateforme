@@ -8,7 +8,7 @@ import { Collapse } from 'rizzui/collapse';
 import cn from '@core/utils/class-names';
 import { PiCaretDownBold } from 'react-icons/pi';
 import { menuItems } from '@/layouts/hydrogen/menu-items';
-import { adminMenuItems } from '@/layouts/hydrogen/admin-menu-items';
+import { useAdminMenuItems } from '@/layouts/hydrogen/admin-menu-items';
 import { clientMenuItems } from '@/layouts/hydrogen/client-menu-items';
 import { useAuth } from '@/hooks/useAuth';
 import StatusBadge from '@core/components/get-status-badge';
@@ -16,17 +16,16 @@ import StatusBadge from '@core/components/get-status-badge';
 export function SidebarMenu() {
   const pathname = usePathname();
   const { userType } = useAuth();
+  const adminMenuItems = useAdminMenuItems();
 
-  // Sélectionner les items de menu selon le type d'utilisateur
   const currentMenuItems = useMemo(() => {
     if (userType === 'admin') {
       return adminMenuItems;
     } else if (userType === 'client') {
       return clientMenuItems;
     }
-    // Par défaut, menu admin (ou vous pouvez retourner menuItems originaux)
     return adminMenuItems;
-  }, [userType]);
+  }, [userType, adminMenuItems]);
 
   // Debug: vérifier les items de menu
   if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {

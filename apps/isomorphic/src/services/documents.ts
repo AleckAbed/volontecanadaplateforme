@@ -19,7 +19,7 @@ async function authFetch(endpoint: string, options: RequestInit = {}) {
   };
   if (token) (headers as any).Authorization = `Bearer ${token}`;
 
-  const res = await fetch(`${getApiUrl()}${endpoint}`, { ...options, headers });
+  const res = await fetch(`${getApiUrl()}${endpoint}`, { ...options, credentials: 'include', headers });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || 'Une erreur est survenue');
   return data;
@@ -27,7 +27,7 @@ async function authFetch(endpoint: string, options: RequestInit = {}) {
 
 async function publicFetch(endpoint: string, options: RequestInit = {}) {
   const headers: HeadersInit = { Accept: 'application/json', ...options.headers };
-  const res = await fetch(`${getApiUrl()}${endpoint}`, { ...options, headers });
+  const res = await fetch(`${getApiUrl()}${endpoint}`, { ...options, credentials: 'include', headers });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || 'Une erreur est survenue');
   return data;
@@ -121,6 +121,7 @@ export const documentService = {
 
     const res = await fetch(`${getApiUrl()}/admin/document-templates`, {
       method: 'POST',
+      credentials: 'include',
       headers,
       body: formData, // multipart pour le fichier PDF
     });
@@ -146,7 +147,7 @@ export const documentService = {
     const token = getAuthToken();
     const headers: HeadersInit = { Accept: 'application/pdf' };
     if (token) (headers as any).Authorization = `Bearer ${token}`;
-    const res = await fetch(`${getApiUrl()}/admin/document-templates/${id}/pdf`, { headers });
+    const res = await fetch(`${getApiUrl()}/admin/document-templates/${id}/pdf`, { credentials: 'include', headers });
     if (!res.ok) throw new Error('Impossible de charger le PDF');
     return res.arrayBuffer();
   },

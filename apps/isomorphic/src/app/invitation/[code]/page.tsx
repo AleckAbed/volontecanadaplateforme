@@ -52,7 +52,9 @@ export default function PublicInvitationPage({ params }: { params: Promise<{ cod
       verified = sessionStorage.getItem('invitation_code') === code;
     } catch {}
     if (!verified) {
-      router.replace(`/invitation/verify?code=${code}`);
+      // Pas de paramètre URL — le visiteur doit re-saisir son email + code.
+      // Si quelqu'un partage le lien /invitation/{code}, il ne pourra pas accéder.
+      router.replace('/invitation/verify');
       return;
     }
     load();

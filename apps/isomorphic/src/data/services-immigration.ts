@@ -5,7 +5,6 @@ export type ServiceType = {
   name: string;
   description: string;
   category: string;
-  price: string;
   duration: string;
   status: 'active' | 'inactive' | 'pending';
   color?: string;
@@ -18,7 +17,6 @@ export const servicesList: ServiceType[] = [
     name: 'Visa de Visiteur',
     description: 'Visa temporaire pour visiter le Canada',
     category: 'Visa',
-    price: '150 CAD',
     duration: '2-4 semaines',
     status: 'active',
     color: '#2465FF',
@@ -28,7 +26,6 @@ export const servicesList: ServiceType[] = [
     name: 'Permis de Travail',
     description: 'Permis pour travailler au Canada',
     category: 'Travail',
-    price: '250 CAD',
     duration: '4-8 semaines',
     status: 'active',
     color: '#F5A623',
@@ -38,7 +35,6 @@ export const servicesList: ServiceType[] = [
     name: 'Résidence Permanente',
     description: 'Demande de résidence permanente',
     category: 'Immigration',
-    price: '500 CAD',
     duration: '6-12 mois',
     status: 'active',
     color: '#11A849',
@@ -48,7 +44,6 @@ export const servicesList: ServiceType[] = [
     name: 'Citoyenneté Canadienne',
     description: 'Demande de citoyenneté',
     category: 'Citoyenneté',
-    price: '630 CAD',
     duration: '12-18 mois',
     status: 'active',
     color: '#8A63D2',
@@ -58,7 +53,6 @@ export const servicesList: ServiceType[] = [
     name: 'Parrainage Familial',
     description: 'Parrainage de membres de la famille',
     category: 'Famille',
-    price: '1125 CAD',
     duration: '12-24 mois',
     status: 'active',
     color: '#FF1A1A',
@@ -68,7 +62,6 @@ export const servicesList: ServiceType[] = [
     name: 'Visa Étudiant',
     description: 'Permis d\'études pour le Canada',
     category: 'Éducation',
-    price: '150 CAD',
     duration: '4-6 semaines',
     status: 'active',
     color: '#0070F3',
@@ -80,7 +73,6 @@ export const servicesTableData = [
     id: 1,
     serviceName: 'Visa de Visiteur',
     category: 'Visa',
-    price: '150 CAD',
     duration: '2-4 semaines',
     status: 'active',
     clients: 45,
@@ -90,7 +82,6 @@ export const servicesTableData = [
     id: 2,
     serviceName: 'Permis de Travail',
     category: 'Travail',
-    price: '250 CAD',
     duration: '4-8 semaines',
     status: 'active',
     clients: 32,
@@ -100,7 +91,6 @@ export const servicesTableData = [
     id: 3,
     serviceName: 'Résidence Permanente',
     category: 'Immigration',
-    price: '500 CAD',
     duration: '6-12 mois',
     status: 'active',
     clients: 18,
@@ -110,7 +100,6 @@ export const servicesTableData = [
     id: 4,
     serviceName: 'Citoyenneté Canadienne',
     category: 'Citoyenneté',
-    price: '630 CAD',
     duration: '12-18 mois',
     status: 'pending',
     clients: 12,
@@ -120,7 +109,6 @@ export const servicesTableData = [
     id: 5,
     serviceName: 'Parrainage Familial',
     category: 'Famille',
-    price: '1125 CAD',
     duration: '12-24 mois',
     status: 'active',
     clients: 28,
@@ -130,7 +118,6 @@ export const servicesTableData = [
     id: 6,
     serviceName: 'Visa Étudiant',
     category: 'Éducation',
-    price: '150 CAD',
     duration: '4-6 semaines',
     status: 'active',
     clients: 55,
@@ -139,7 +126,3 @@ export const servicesTableData = [
 ];
 
 export type ServicesTableDataType = (typeof servicesTableData)[number];
-
-
-
-

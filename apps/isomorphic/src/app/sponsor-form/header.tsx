@@ -13,6 +13,7 @@ import {
   pickSponsorFields,
 } from '@/app/shared/sponsor-form/sponsor-form-multi-step';
 import { questionnaireLocaleAtom, type FormLocale } from '@/app/shared/questionnaire-locale';
+import { getCommonT } from '@/app/shared/form-translations';
 import { apiService } from '@/services/api';
 import toast from 'react-hot-toast';
 import { useState, useEffect } from 'react';
@@ -27,6 +28,7 @@ export default function SponsorFormHeader({ className }: HeaderProps) {
   const [locale, setLocale] = useAtom(questionnaireLocaleAtom);
   const [isSaving, setIsSaving] = useState(false);
   const [questionnaireCode, setQuestionnaireCode] = useState<string | null>(null);
+  const t = getCommonT(locale);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -38,9 +40,16 @@ export default function SponsorFormHeader({ className }: HeaderProps) {
     }
   }, []);
 
+  const pickMsg = (fr: string, en: string, es: string) =>
+    locale === 'en' ? en : locale === 'es' ? es : fr;
+
   const handleSave = async () => {
     if (!questionnaireCode) {
-      toast.error('Code de questionnaire introuvable. Veuillez accéder au formulaire via le lien reçu par email.');
+      toast.error(pickMsg(
+        'Code de questionnaire introuvable. Veuillez accéder au formulaire via le lien reçu par email.',
+        'Questionnaire code not found. Please access the form via the link received by email.',
+        'Código de cuestionario no encontrado. Por favor acceda al formulario mediante el enlace recibido por correo.'
+      ));
       return;
     }
 
@@ -49,21 +58,28 @@ export default function SponsorFormHeader({ className }: HeaderProps) {
       const safeFormData = formData != null && typeof formData === 'object' && !Array.isArray(formData) ? formData : {};
       const payload = pickSponsorFields(safeFormData);
       const response = await apiService.saveQuestionnaireData(questionnaireCode, payload);
+      const msgSuccess = pickMsg('Données sauvegardées avec succès', 'Data saved successfully', 'Datos guardados con éxito');
+      const msgError = pickMsg('Erreur lors de la sauvegarde', 'Save error', 'Error al guardar');
       if (response.success) {
-        toast.success('Données sauvegardées avec succès');
+        toast.success(msgSuccess);
       } else {
-        toast.error(response.message || 'Erreur lors de la sauvegarde');
+        toast.error(response.message || msgError);
       }
     } catch (error: any) {
-      console.error('Erreur lors de la sauvegarde:', error);
-      toast.error(error.message || 'Erreur lors de la sauvegarde');
+      console.error('Save error:', error);
+      toast.error(error.message || pickMsg('Erreur lors de la sauvegarde', 'Save error', 'Error al guardar'));
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleQuit = () => {
-    if (confirm('Êtes-vous sûr de vouloir quitter ? Vos modifications non sauvegardées seront perdues.')) {
+    const msg = pickMsg(
+      'Êtes-vous sûr de vouloir quitter ? Vos modifications non sauvegardées seront perdues.',
+      'Are you sure you want to quit? Unsaved changes will be lost.',
+      '¿Está seguro de querer salir? Los cambios no guardados se perderán.'
+    );
+    if (confirm(msg)) {
       router.push('/');
     }
   };
@@ -87,7 +103,7 @@ export default function SponsorFormHeader({ className }: HeaderProps) {
       </Link>
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2 rounded-lg border border-white/40 bg-white/10 px-4 py-2 backdrop-blur-sm">
-          <span className="text-xs font-medium text-white/90">Langue</span>
+          <span className="text-xs font-medium text-white/90">{t.language}</span>
           <RadioGroup
             value={locale}
             setValue={(v) => setLocale((v as FormLocale) || 'fr')}
@@ -111,10 +127,19 @@ export default function SponsorFormHeader({ className }: HeaderProps) {
               <span className="text-lg leading-none" aria-hidden>🇬🇧</span>
               <span className="text-sm text-white">English</span>
             </AdvancedRadio>
+            <AdvancedRadio
+              value="es"
+              title="Español"
+              className="[&_.rizzui-advanced-radio]:flex [&_.rizzui-advanced-radio]:items-center [&_.rizzui-advanced-radio]:gap-2 [&_.rizzui-advanced-radio]:px-3 [&_.rizzui-advanced-radio]:py-1.5"
+              inputClassName="[&~span]:border-2 [&~span]:border-white/70 [&~span]:rounded-full [&:checked~span]:bg-white [&:checked~span]:border-white [&:checked~span]:ring-2 [&:checked~span]:ring-white/50"
+            >
+              <span className="text-lg leading-none" aria-hidden>🇪🇸</span>
+              <span className="text-sm text-white">Español</span>
+            </AdvancedRadio>
           </RadioGroup>
         </div>
         <Button variant="text" className="text-white hover:enabled:text-white">
-          Questions?
+          {t.questions}
         </Button>
         <Button
           rounded="pill"
@@ -125,7 +150,7 @@ export default function SponsorFormHeader({ className }: HeaderProps) {
           disabled={!questionnaireCode}
         >
           <FiSave className="h-4 w-4" />
-          Sauvegarder
+          {t.save}
         </Button>
         <Button
           rounded="pill"
@@ -134,7 +159,7 @@ export default function SponsorFormHeader({ className }: HeaderProps) {
           onClick={handleQuit}
         >
           <FiX className="h-4 w-4" />
-          Quitter
+          {t.quit}
         </Button>
       </div>
     </header>

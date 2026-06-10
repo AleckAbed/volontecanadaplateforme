@@ -1,6 +1,6 @@
 'use client';
 
-import Logo from '@core/components/logo';
+import Image from 'next/image';
 import cn from '@core/utils/class-names';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -13,6 +13,17 @@ export default function Sidebar({ className }: { className?: string }) {
   const isQuestionnaires = pathname?.startsWith('/questionnaires');
   const logoHref = isQuestionnaires ? VOLONTE_SITE_URL : '/';
 
+  const LogoImg = (
+    <Image
+      src="/logo1.png"
+      alt="Volonté Canada"
+      width={180}
+      height={60}
+      priority
+      style={{ height: 'auto', maxHeight: 56, width: 'auto', maxWidth: 180 }}
+    />
+  );
+
   return (
     <aside
       className={cn(
@@ -22,20 +33,12 @@ export default function Sidebar({ className }: { className?: string }) {
     >
       <div className="sticky top-0 z-40 bg-gray-0/10 px-6 pb-5 pt-5 dark:bg-gray-100/5 2xl:px-8 2xl:pt-6">
         {isQuestionnaires ? (
-          <a
-            href={logoHref}
-            aria-label="Volonté Canada"
-            className="text-gray-800 hover:text-gray-900"
-          >
-            <Logo className="max-w-[155px]" />
+          <a href={logoHref} aria-label="Volonté Canada" className="inline-block">
+            {LogoImg}
           </a>
         ) : (
-          <Link
-            href={logoHref}
-            aria-label="Site Logo"
-            className="text-gray-800 hover:text-gray-900"
-          >
-            <Logo className="max-w-[155px]" />
+          <Link href={logoHref} aria-label="Volonté Canada" className="inline-block">
+            {LogoImg}
           </Link>
         )}
       </div>

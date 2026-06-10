@@ -17,9 +17,108 @@ import {
 import DynamicTable from '@/app/shared/client-form/client-form-multi-step/dynamic-table';
 import DateField from '@/app/shared/client-form/date-field';
 
+const STEP1_LABELS = {
+  fr: {
+    alert: 'Renseignements concernant la relation - À remplir par le répondant et le demandeur principal',
+    q16Title: '16. Quand vous êtes-vous rencontrés en personne pour la première fois ? (Date, Endroit, Décrivez les circonstances de votre première rencontre)',
+    dateLabel: 'Date (JJ/MM/AAAA)',
+    placeLabel: 'Endroit',
+    placePlaceholder: 'Entrez le lieu de la première rencontre',
+    circumstancesLabel: 'Décrivez les circonstances de votre première rencontre',
+    circumstancesPlaceholder: 'Décrivez en détail les circonstances...',
+    q17Title: '17. Quelqu\'un vous a-t-il présentés l\'un à l\'autre ?',
+    q17Placeholder: 'Si oui, précisez qui',
+    q18Title: '18. Avez-vous été en contact avant de vous rencontrer en personne ?',
+    yes: 'Oui',
+    no: 'Non',
+    q18Details: 'Si oui, donnez les détails :',
+    q18DetailsPlaceholder: 'Décrivez le type de contact...',
+    q19Title: '19. Vos amis proches, votre famille et vos enfants sont-ils au courant de votre relation ?',
+    q19DetailsPlaceholder: 'Décrivez qui est au courant...',
+    witnessesTitle: 'Personnes qui connaissent la relation',
+    wLastName: 'Nom',
+    wFirstName: 'Prénoms',
+    wHasFamilyRelationship: 'Ont-ils un lien de parenté avec le répondant ou le demandeur principal?',
+    wRelationshipType: 'Relation avec le répondant ou le demandeur principal',
+    wMeetingDate: 'Date à laquelle ils ont rencontré le répondant ou le demandeur principal (AAAA-MM-JJ)',
+    q20Title: '20. Donnez des détails dans le tableau ci-dessous des cérémonies ou des événements officiels ont-ils été organisés pour reconnaître ou célébrer votre union',
+    ceremoniesTitle: 'Cérémonies et événements',
+    cDate: 'Date (AAAA-MM-JJ)',
+    cDescription: 'Description de la cérémonie ou de l\'événement',
+    cLocation: 'Lieu',
+    cNumberOfGuests: 'Nombre d\'invités',
+    cOfficiatedBy: 'Qui a célébré la cérémonie, le cas échéant?',
+  },
+  en: {
+    alert: 'Relationship information - To be completed by the sponsor and the principal applicant',
+    q16Title: '16. When did you meet in person for the first time? (Date, Place, Describe the circumstances of your first meeting)',
+    dateLabel: 'Date (DD/MM/YYYY)',
+    placeLabel: 'Place',
+    placePlaceholder: 'Enter the place of the first meeting',
+    circumstancesLabel: 'Describe the circumstances of your first meeting',
+    circumstancesPlaceholder: 'Describe the circumstances in detail...',
+    q17Title: '17. Did anyone introduce you to each other?',
+    q17Placeholder: 'If yes, specify who',
+    q18Title: '18. Were you in contact before meeting in person?',
+    yes: 'Yes',
+    no: 'No',
+    q18Details: 'If yes, provide details:',
+    q18DetailsPlaceholder: 'Describe the type of contact...',
+    q19Title: '19. Are your close friends, family and children aware of your relationship?',
+    q19DetailsPlaceholder: 'Describe who is aware...',
+    witnessesTitle: 'People who know about the relationship',
+    wLastName: 'Surname',
+    wFirstName: 'Given names',
+    wHasFamilyRelationship: 'Are they related to the sponsor or principal applicant?',
+    wRelationshipType: 'Relationship to the sponsor or principal applicant',
+    wMeetingDate: 'Date they met the sponsor or principal applicant (YYYY-MM-DD)',
+    q20Title: '20. Provide details below of any ceremonies or official events organized to recognize or celebrate your union',
+    ceremoniesTitle: 'Ceremonies and events',
+    cDate: 'Date (YYYY-MM-DD)',
+    cDescription: 'Description of the ceremony or event',
+    cLocation: 'Location',
+    cNumberOfGuests: 'Number of guests',
+    cOfficiatedBy: 'Who officiated the ceremony, if applicable?',
+  },
+  es: {
+    alert: 'Información sobre la relación - Para completar por el patrocinador y el solicitante principal',
+    q16Title: '16. ¿Cuándo se conocieron en persona por primera vez? (Fecha, Lugar, Describa las circunstancias de su primer encuentro)',
+    dateLabel: 'Fecha (DD/MM/AAAA)',
+    placeLabel: 'Lugar',
+    placePlaceholder: 'Ingrese el lugar del primer encuentro',
+    circumstancesLabel: 'Describa las circunstancias de su primer encuentro',
+    circumstancesPlaceholder: 'Describa las circunstancias en detalle...',
+    q17Title: '17. ¿Alguien los presentó el uno al otro?',
+    q17Placeholder: 'Si sí, especifique quién',
+    q18Title: '18. ¿Tuvieron contacto antes de conocerse en persona?',
+    yes: 'Sí',
+    no: 'No',
+    q18Details: 'Si sí, proporcione los detalles:',
+    q18DetailsPlaceholder: 'Describa el tipo de contacto...',
+    q19Title: '19. ¿Sus amigos cercanos, familia e hijos están al tanto de su relación?',
+    q19DetailsPlaceholder: 'Describa quién está al tanto...',
+    witnessesTitle: 'Personas que conocen la relación',
+    wLastName: 'Apellido',
+    wFirstName: 'Nombres',
+    wHasFamilyRelationship: '¿Tienen un vínculo de parentesco con el patrocinador o el solicitante principal?',
+    wRelationshipType: 'Relación con el patrocinador o el solicitante principal',
+    wMeetingDate: 'Fecha en que conocieron al patrocinador o al solicitante principal (AAAA-MM-DD)',
+    q20Title: '20. Proporcione detalles en el cuadro siguiente sobre ceremonias o eventos oficiales organizados para reconocer o celebrar su unión',
+    ceremoniesTitle: 'Ceremonias y eventos',
+    cDate: 'Fecha (AAAA-MM-DD)',
+    cDescription: 'Descripción de la ceremonia o evento',
+    cLocation: 'Lugar',
+    cNumberOfGuests: 'Número de invitados',
+    cOfficiatedBy: '¿Quién ofició la ceremonia, si aplica?',
+  },
+} as const;
+
 export default function StepOne() {
   const { step, gotoNextStep } = useSponsorStepper();
   const [formData, setFormData] = useAtom(sponsorFormDataAtom);
+  const [locale] = useAtom(questionnaireLocaleAtom);
+  const t = SPONSOR_STEP1_T[locale] || SPONSOR_STEP1_T.fr;
+  const l = STEP1_LABELS[locale] || STEP1_LABELS.fr;
   const { dataLoadedKey } = useSponsorFormLoad();
   const [isAlertVisible, setIsAlertVisible] = useState(true);
 
@@ -50,7 +149,6 @@ export default function StepOne() {
   const hadContactBeforeMeeting = watch('hadContactBeforeMeeting');
   const isInitialLoad = useRef(true);
 
-  // Mettre à jour le formulaire quand formData change (chargement depuis la DB)
   useEffect(() => {
     if (isInitialLoad.current) {
       reset({
@@ -70,7 +168,6 @@ export default function StepOne() {
     }
   }, [formData, reset]);
 
-  // Réappliquer les données chargées quand le parent a fini de charger (retour sur la page)
   useEffect(() => {
     if (dataLoadedKey != null) {
       reset({
@@ -89,16 +186,15 @@ export default function StepOne() {
     }
   }, [dataLoadedKey]);
 
-  // Synchroniser les données du formulaire avec l'atom avant la sauvegarde
   const formValues = watch();
   const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   useEffect(() => {
     if (!isInitialLoad.current) {
       if (syncTimeoutRef.current) {
         clearTimeout(syncTimeoutRef.current);
       }
-      
+
       syncTimeoutRef.current = setTimeout(() => {
         setFormData((prev) => ({
           ...prev,
@@ -106,7 +202,7 @@ export default function StepOne() {
         }));
       }, 500);
     }
-    
+
     return () => {
       if (syncTimeoutRef.current) {
         clearTimeout(syncTimeoutRef.current);
@@ -122,7 +218,6 @@ export default function StepOne() {
     gotoNextStep();
   };
 
-  // Gestion des témoins de la relation
   const handleAddWitness = () => {
     const currentWitnesses = watch('relationshipWitnesses') || [];
     setFormData((prev) => ({
@@ -174,7 +269,6 @@ export default function StepOne() {
     });
   };
 
-  // Gestion des cérémonies
   const handleAddCeremony = () => {
     const currentCeremonies = watch('ceremonies') || [];
     setFormData((prev) => ({
@@ -240,7 +334,7 @@ export default function StepOne() {
                 </div>
                 <div className="ml-3 flex-1">
                   <p className="text-sm font-bold text-blue-800 dark:text-blue-200">
-                    Renseignements concernant la relation - À remplir par le répondant et le demandeur principal
+                    {l.alert}
                   </p>
                 </div>
               </div>
@@ -270,27 +364,26 @@ export default function StepOne() {
         className="col-span-full rounded-lg bg-white p-5 @4xl:col-span-7 @4xl:p-7 dark:bg-gray-0"
       >
         <div className="grid gap-6">
-          {/* Question 16: Première rencontre */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              16. Quand vous êtes-vous rencontrés en personne pour la première fois ? (Date, Endroit, Décrivez les circonstances de votre première rencontre)
+              {l.q16Title}
             </label>
             <div className="grid gap-4">
               <DateField
                 name="firstMeetingDate"
                 control={control}
-                label="Date (JJ/MM/AAAA)"
+                label={l.dateLabel}
                 error={errors.firstMeetingDate}
               />
               <Input
-                label="Endroit"
-                placeholder="Entrez le lieu de la première rencontre"
+                label={l.placeLabel}
+                placeholder={l.placePlaceholder}
                 {...register('firstMeetingPlace')}
                 error={errors.firstMeetingPlace?.message}
               />
               <Textarea
-                label="Décrivez les circonstances de votre première rencontre"
-                placeholder="Décrivez en détail les circonstances..."
+                label={l.circumstancesLabel}
+                placeholder={l.circumstancesPlaceholder}
                 rows={4}
                 {...register('firstMeetingCircumstances')}
                 error={errors.firstMeetingCircumstances?.message}
@@ -298,22 +391,20 @@ export default function StepOne() {
             </div>
           </div>
 
-          {/* Question 17: Présentation */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              17. Quelqu&apos;un vous a-t-il présentés l&apos;un à l&apos;autre ?
+              {l.q17Title}
             </label>
             <Input
-              placeholder="Si oui, précisez qui"
+              placeholder={l.q17Placeholder}
               {...register('introducedBy')}
               error={errors.introducedBy?.message}
             />
           </div>
 
-          {/* Question 18: Contact avant rencontre */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              18. Avez-vous été en contact avant de vous rencontrer en personne ?
+              {l.q18Title}
             </label>
             <Controller
               name="hadContactBeforeMeeting"
@@ -328,21 +419,21 @@ export default function StepOne() {
                     value="yes"
                     className="flex-1 cursor-pointer rounded-md border border-gray-200 px-5 py-3 text-center hover:bg-gray-100 peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:text-primary"
                   >
-                    Oui
+                    {l.yes}
                   </AdvancedRadio>
                   <AdvancedRadio
                     value="no"
                     className="flex-1 cursor-pointer rounded-md border border-gray-200 px-5 py-3 text-center hover:bg-gray-100 peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:text-primary"
                   >
-                    Non
+                    {l.no}
                   </AdvancedRadio>
                 </RadioGroup>
               )}
             />
             {hadContactBeforeMeeting === 'yes' && (
               <Textarea
-                label="Si oui, donnez les détails :"
-                placeholder="Décrivez le type de contact..."
+                label={l.q18Details}
+                placeholder={l.q18DetailsPlaceholder}
                 rows={3}
                 className="mt-4"
                 {...register('contactBeforeMeetingDetails')}
@@ -351,30 +442,28 @@ export default function StepOne() {
             )}
           </div>
 
-          {/* Question 19: Amis/famille au courant */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              19. Vos amis proches, votre famille et vos enfants sont-ils au courant de votre relation ?
+              {l.q19Title}
             </label>
             <Textarea
-              label="Si oui, donnez les détails :"
-              placeholder="Décrivez qui est au courant..."
+              label={l.q18Details}
+              placeholder={l.q19DetailsPlaceholder}
               rows={3}
               {...register('familyAwareDetails')}
               error={errors.familyAwareDetails?.message}
             />
           </div>
 
-          {/* Tableau: Personnes qui connaissent la relation */}
           <div>
             <DynamicTable
-              title="Personnes qui connaissent la relation"
+              title={l.witnessesTitle}
               columns={[
-                { key: 'lastName', label: 'Nom', type: 'text' },
-                { key: 'firstName', label: 'Prénoms', type: 'text' },
-                { key: 'hasFamilyRelationship', label: 'Ont-ils un lien de parenté avec le répondant ou le demandeur principal?', type: 'text' },
-                { key: 'relationshipType', label: 'Relation avec le répondant ou le demandeur principal', type: 'text' },
-                { key: 'meetingDate', label: 'Date à laquelle ils ont rencontré le répondant ou le demandeur principal (AAAA-MM-JJ)', type: 'date' },
+                { key: 'lastName', label: l.wLastName, type: 'text' },
+                { key: 'firstName', label: l.wFirstName, type: 'text' },
+                { key: 'hasFamilyRelationship', label: l.wHasFamilyRelationship, type: 'text' },
+                { key: 'relationshipType', label: l.wRelationshipType, type: 'text' },
+                { key: 'meetingDate', label: l.wMeetingDate, type: 'date' },
               ]}
               data={watch('relationshipWitnesses') || []}
               onAdd={handleAddWitness}
@@ -384,19 +473,18 @@ export default function StepOne() {
             />
           </div>
 
-          {/* Question 20: Cérémonies/événements */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              20. Donnez des détails dans le tableau ci-dessous des cérémonies ou des événements officiels ont-ils été organisés pour reconnaître ou célébrer votre union
+              {l.q20Title}
             </label>
             <DynamicTable
-              title="Cérémonies et événements"
+              title={l.ceremoniesTitle}
               columns={[
-                { key: 'date', label: 'Date (AAAA-MM-JJ)', type: 'date' },
-                { key: 'description', label: 'Description de la cérémonie ou de l\'événement', type: 'text' },
-                { key: 'location', label: 'Lieu', type: 'text' },
-                { key: 'numberOfGuests', label: 'Nombre d\'invités', type: 'number' },
-                { key: 'officiatedBy', label: 'Qui a célébré la cérémonie, le cas échéant?', type: 'text' },
+                { key: 'date', label: l.cDate, type: 'date' },
+                { key: 'description', label: l.cDescription, type: 'text' },
+                { key: 'location', label: l.cLocation, type: 'text' },
+                { key: 'numberOfGuests', label: l.cNumberOfGuests, type: 'number' },
+                { key: 'officiatedBy', label: l.cOfficiatedBy, type: 'text' },
               ]}
               data={watch('ceremonies') || []}
               onAdd={handleAddCeremony}
@@ -410,4 +498,3 @@ export default function StepOne() {
     </>
   );
 }
-

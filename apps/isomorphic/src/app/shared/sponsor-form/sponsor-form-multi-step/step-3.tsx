@@ -7,6 +7,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import FormSummary from '@/app/shared/sponsor-form/sponsor-form-multi-step/form-summary';
 import { sponsorFormDataAtom, useSponsorStepper, useSponsorFormLoad } from '@/app/shared/sponsor-form/sponsor-form-multi-step';
+import { questionnaireLocaleAtom } from '@/app/shared/questionnaire-locale';
+import { SPONSOR_STEP3_T } from '@/app/shared/sponsor-form/sponsor-form-translations';
 import { Input, Textarea, RadioGroup, AdvancedRadio, Button } from 'rizzui';
 import {
   sponsorFormStep3Schema,
@@ -15,11 +17,114 @@ import {
 import DynamicTable from '@/app/shared/client-form/client-form-multi-step/dynamic-table';
 import DateField from '@/app/shared/client-form/date-field';
 
+const STEP3_LABELS = {
+  fr: {
+    alert: 'Renseignements concernant la relation - À remplir par le répondant et le demandeur principal',
+    yes: 'Oui',
+    no: 'Non',
+    q11: "11. Avez-vous parrainé, dans le passé, ou parrainez-vous actuellement d'autres membres de votre famille dans une demande différente ?",
+    q11Details: 'Si oui, donnez les détails :',
+    q11Placeholder: 'Décrivez les autres parrainages...',
+    q12: "12. Donnez des détails sur toute autre personne qui dépend financièrement de vous (qu'elle vive ou non avec vous) et qui ne figure pas déjà dans les tableaux ci-dessus. Incluez les anciens époux ou conjoints et tous les enfants issus des relations antérieures",
+    dependentsTitle: 'Autres personnes à charge',
+    dName: 'Nom et Prénoms',
+    dRelationship: 'Lien de parenté',
+    dDateOfBirth: 'Né le',
+    q13: '13. Quel est le niveau de scolarité le plus élevé que vous avez atteint ?',
+    q13Placeholder: 'Ex: Baccalauréat, Maîtrise, Doctorat, etc.',
+    q14: "14. Indiquez toutes les adresses où vous avez résidé au cours des cinq dernières années. N'utilisez pas d'adresse comportant une case postale",
+    addressTitle: 'Historique des adresses',
+    aFromDate: 'De (AAAA-MM)',
+    aToDate: 'À (AAAA-MM)',
+    aStreet: 'Rue et numéro',
+    aCity: 'Ville',
+    aProvince: 'Province',
+    aPostalCode: 'Code postal',
+    aCountry: 'Pays',
+    q15: "15. Avez-vous déjà été marié ou vécu dans une relation d'union de fait/concubinage auparavant?",
+    q15Note: "(Vous avez vécu en union de fait si vous avez déjà vécu avec un partenaire dans une relation engagée et conjugale – assimilable à un mariage – pendant une période d'un an ou plus)",
+    q15Intro: 'Si oui, donnez des détails sur votre époux ou conjoint de fait(s) dans le tableau ci-dessous.',
+    prevTitle: 'Relations antérieures',
+    pLastName: 'Nom',
+    pFirstName: 'Prénoms',
+    pDateOfBirth: 'Date de naissance',
+    pPlaceOfBirth: 'Ville de naissance',
+    pDeathDate: 'Si décédé, la date',
+  },
+  en: {
+    alert: 'Relationship information - To be completed by the sponsor and principal applicant',
+    yes: 'Yes',
+    no: 'No',
+    q11: '11. Have you previously sponsored, or are you currently sponsoring, other family members in a different application?',
+    q11Details: 'If yes, provide details:',
+    q11Placeholder: 'Describe the other sponsorships...',
+    q12: '12. Provide details for any other person who financially depends on you (whether or not they live with you) and who is not already listed in the tables above. Include former spouses or partners and all children from previous relationships',
+    dependentsTitle: 'Other dependents',
+    dName: 'Name and given names',
+    dRelationship: 'Relationship',
+    dDateOfBirth: 'Born on',
+    q13: '13. What is the highest level of education you have completed?',
+    q13Placeholder: "E.g. Bachelor's, Master's, Doctorate, etc.",
+    q14: '14. List all addresses where you have resided in the last five years. Do not use a P.O. box address',
+    addressTitle: 'Address history',
+    aFromDate: 'From (YYYY-MM)',
+    aToDate: 'To (YYYY-MM)',
+    aStreet: 'Street and number',
+    aCity: 'City',
+    aProvince: 'Province',
+    aPostalCode: 'Postal code',
+    aCountry: 'Country',
+    q15: '15. Have you previously been married or lived in a common-law/cohabitation relationship?',
+    q15Note: '(You have lived in a common-law relationship if you have already lived with a partner in a committed and conjugal relationship – similar to marriage – for a period of one year or more)',
+    q15Intro: 'If yes, provide details about your spouse or common-law partner(s) in the table below.',
+    prevTitle: 'Previous relationships',
+    pLastName: 'Surname',
+    pFirstName: 'Given names',
+    pDateOfBirth: 'Date of birth',
+    pPlaceOfBirth: 'City of birth',
+    pDeathDate: 'If deceased, the date',
+  },
+  es: {
+    alert: 'Información sobre la relación - Para completar por el patrocinador y el solicitante principal',
+    yes: 'Sí',
+    no: 'No',
+    q11: '11. ¿Ha patrocinado anteriormente o está patrocinando actualmente a otros miembros de su familia en una solicitud diferente?',
+    q11Details: 'Si sí, proporcione los detalles:',
+    q11Placeholder: 'Describa los otros patrocinios...',
+    q12: '12. Proporcione detalles sobre cualquier otra persona que dependa económicamente de usted (viva o no con usted) y que no figure ya en los cuadros anteriores. Incluya ex cónyuges o parejas y todos los hijos de relaciones anteriores',
+    dependentsTitle: 'Otras personas a cargo',
+    dName: 'Nombre y apellidos',
+    dRelationship: 'Vínculo de parentesco',
+    dDateOfBirth: 'Nacido(a) el',
+    q13: '13. ¿Cuál es el nivel de estudios más alto que ha alcanzado?',
+    q13Placeholder: 'Ej: Licenciatura, Maestría, Doctorado, etc.',
+    q14: '14. Indique todas las direcciones donde ha residido en los últimos cinco años. No use direcciones de apartado postal',
+    addressTitle: 'Historial de direcciones',
+    aFromDate: 'Desde (AAAA-MM)',
+    aToDate: 'Hasta (AAAA-MM)',
+    aStreet: 'Calle y número',
+    aCity: 'Ciudad',
+    aProvince: 'Provincia',
+    aPostalCode: 'Código postal',
+    aCountry: 'País',
+    q15: '15. ¿Ha estado casado anteriormente o ha vivido en una relación de unión de hecho/concubinato?',
+    q15Note: '(Ha vivido en unión de hecho si ya ha vivido con una pareja en una relación comprometida y conyugal – similar al matrimonio – durante un período de un año o más)',
+    q15Intro: 'Si sí, proporcione detalles sobre su cónyuge o pareja(s) de hecho en el cuadro siguiente.',
+    prevTitle: 'Relaciones anteriores',
+    pLastName: 'Apellido',
+    pFirstName: 'Nombres',
+    pDateOfBirth: 'Fecha de nacimiento',
+    pPlaceOfBirth: 'Ciudad de nacimiento',
+    pDeathDate: 'Si fallecido, la fecha',
+  },
+} as const;
+
 export default function StepThree() {
   const { step, gotoNextStep } = useSponsorStepper();
   const [formData, setFormData] = useAtom(sponsorFormDataAtom);
   const [locale] = useAtom(questionnaireLocaleAtom);
   const t = SPONSOR_STEP3_T[locale] || SPONSOR_STEP3_T.fr;
+  const l = STEP3_LABELS[locale] || STEP3_LABELS.fr;
   const { dataLoadedKey } = useSponsorFormLoad();
   const [isAlertVisible, setIsAlertVisible] = useState(true);
 
@@ -281,7 +386,7 @@ export default function StepThree() {
                 </div>
                 <div className="ml-3 flex-1">
                   <p className="text-sm font-bold text-blue-800 dark:text-blue-200">
-                    Renseignements concernant la relation - À remplir par le répondant et le demandeur principal
+                    {l.alert}
                   </p>
                 </div>
               </div>
@@ -311,10 +416,9 @@ export default function StepThree() {
         className="col-span-full rounded-lg bg-white p-5 @4xl:col-span-7 @4xl:p-7 dark:bg-gray-0"
       >
         <div className="grid gap-6">
-          {/* Question 11: Autres parrainages */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              11. Avez-vous parrainé, dans le passé, ou parrainez-vous actuellement d&apos;autres membres de votre famille dans une demande différente ?
+              {l.q11}
             </label>
             <Controller
               name="hasOtherSponsorships"
@@ -329,21 +433,21 @@ export default function StepThree() {
                     value="yes"
                     className="flex-1 cursor-pointer rounded-md border border-gray-200 px-5 py-3 text-center hover:bg-gray-100 peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:text-primary"
                   >
-                    Oui
+                    {l.yes}
                   </AdvancedRadio>
                   <AdvancedRadio
                     value="no"
                     className="flex-1 cursor-pointer rounded-md border border-gray-200 px-5 py-3 text-center hover:bg-gray-100 peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:text-primary"
                   >
-                    Non
+                    {l.no}
                   </AdvancedRadio>
                 </RadioGroup>
               )}
             />
             {hasOtherSponsorships === 'yes' && (
               <Textarea
-                label="Si oui, donnez les détails :"
-                placeholder="Décrivez les autres parrainages..."
+                label={l.q11Details}
+                placeholder={l.q11Placeholder}
                 rows={3}
                 {...register('otherSponsorshipsDetails')}
                 error={errors.otherSponsorshipsDetails?.message}
@@ -351,17 +455,16 @@ export default function StepThree() {
             )}
           </div>
 
-          {/* Question 12: Autres personnes à charge */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              12. Donnez des détails sur toute autre personne qui dépend financièrement de vous (qu&apos;elle vive ou non avec vous) et qui ne figure pas déjà dans les tableaux ci-dessus. Incluez les anciens époux ou conjoints et tous les enfants issus des relations antérieures
+              {l.q12}
             </label>
             <DynamicTable
-              title="Autres personnes à charge"
+              title={l.dependentsTitle}
               columns={[
-                { key: 'name', label: 'Nom et Prénoms', type: 'text' },
-                { key: 'relationship', label: 'Lien de parenté', type: 'text' },
-                { key: 'dateOfBirth', label: 'Né le', type: 'date' },
+                { key: 'name', label: l.dName, type: 'text' },
+                { key: 'relationship', label: l.dRelationship, type: 'text' },
+                { key: 'dateOfBirth', label: l.dDateOfBirth, type: 'date' },
               ]}
               data={watch('otherDependents') || []}
               onAdd={handleAddDependent}
@@ -371,33 +474,31 @@ export default function StepThree() {
             />
           </div>
 
-          {/* Question 13: Niveau de scolarité */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              13. Quel est le niveau de scolarité le plus élevé que vous avez atteint ?
+              {l.q13}
             </label>
             <Input
-              placeholder="Ex: Baccalauréat, Maîtrise, Doctorat, etc."
+              placeholder={l.q13Placeholder}
               {...register('educationLevel')}
               error={errors.educationLevel?.message}
             />
           </div>
 
-          {/* Question 14: Historique des adresses */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              14. Indiquez toutes les adresses où vous avez résidé au cours des cinq dernières années. N&apos;utilisez pas d&apos;adresse comportant une case postale
+              {l.q14}
             </label>
             <DynamicTable
-              title="Historique des adresses"
+              title={l.addressTitle}
               columns={[
-                { key: 'fromDate', label: 'De (AAAA-MM)', type: 'text', placeholder: 'YYYY-MM' },
-                { key: 'toDate', label: 'À (AAAA-MM)', type: 'text', placeholder: 'YYYY-MM' },
-                { key: 'street', label: 'Rue et numéro', type: 'text' },
-                { key: 'city', label: 'Ville', type: 'text' },
-                { key: 'province', label: 'Province', type: 'text' },
-                { key: 'postalCode', label: 'Code postal', type: 'text' },
-                { key: 'country', label: 'Pays', type: 'text' },
+                { key: 'fromDate', label: l.aFromDate, type: 'text', placeholder: 'YYYY-MM' },
+                { key: 'toDate', label: l.aToDate, type: 'text', placeholder: 'YYYY-MM' },
+                { key: 'street', label: l.aStreet, type: 'text' },
+                { key: 'city', label: l.aCity, type: 'text' },
+                { key: 'province', label: l.aProvince, type: 'text' },
+                { key: 'postalCode', label: l.aPostalCode, type: 'text' },
+                { key: 'country', label: l.aCountry, type: 'text' },
               ]}
               data={watch('addressHistory') || []}
               onAdd={handleAddAddress}
@@ -407,13 +508,12 @@ export default function StepThree() {
             />
           </div>
 
-          {/* Question 15: Relations antérieures */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              15. Avez-vous déjà été marié ou vécu dans une relation d&apos;union de fait/concubinage auparavant?
+              {l.q15}
             </label>
             <p className="mb-4 text-xs text-gray-500 dark:text-gray-400">
-              (Vous avez vécu en union de fait si vous avez déjà vécu avec un partenaire dans une relation engagée et conjugale – assimilable à un mariage – pendant une période d&apos;un an ou plus)
+              {l.q15Note}
             </p>
             <Controller
               name="hasPreviousRelationships"
@@ -428,13 +528,13 @@ export default function StepThree() {
                     value="yes"
                     className="flex-1 cursor-pointer rounded-md border border-gray-200 px-5 py-3 text-center hover:bg-gray-100 peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:text-primary"
                   >
-                    Oui
+                    {l.yes}
                   </AdvancedRadio>
                   <AdvancedRadio
                     value="no"
                     className="flex-1 cursor-pointer rounded-md border border-gray-200 px-5 py-3 text-center hover:bg-gray-100 peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:text-primary"
                   >
-                    Non
+                    {l.no}
                   </AdvancedRadio>
                 </RadioGroup>
               )}
@@ -442,16 +542,16 @@ export default function StepThree() {
             {hasPreviousRelationships === 'yes' && (
               <div>
                 <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-                  Si oui, donnez des détails sur votre époux ou conjoint de fait(s) dans le tableau ci-dessous.
+                  {l.q15Intro}
                 </p>
                 <DynamicTable
-                  title="Relations antérieures"
+                  title={l.prevTitle}
                   columns={[
-                    { key: 'lastName', label: 'Nom', type: 'text' },
-                    { key: 'firstName', label: 'Prénoms', type: 'text' },
-                    { key: 'dateOfBirth', label: 'Date de naissance', type: 'date' },
-                    { key: 'placeOfBirth', label: 'Ville de naissance', type: 'text' },
-                    { key: 'deathDate', label: 'Si décédé, la date', type: 'date' },
+                    { key: 'lastName', label: l.pLastName, type: 'text' },
+                    { key: 'firstName', label: l.pFirstName, type: 'text' },
+                    { key: 'dateOfBirth', label: l.pDateOfBirth, type: 'date' },
+                    { key: 'placeOfBirth', label: l.pPlaceOfBirth, type: 'text' },
+                    { key: 'deathDate', label: l.pDeathDate, type: 'date' },
                   ]}
                   data={watch('previousRelationships') || []}
                   onAdd={handleAddPreviousRelationship}

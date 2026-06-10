@@ -5,18 +5,20 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { invitationsService, Invitation, InvitationItemSummary } from '@/services/invitations';
 
 const XfaPdfViewer = dynamic(() => import('@/components/XfaPdfViewer'), { ssr: false });
 
-const STATUS_BADGES: Record<string, { label: string; className: string }> = {
-  pending: { label: 'En attente', className: 'bg-amber-100 text-amber-800' },
-  in_progress: { label: 'En cours', className: 'bg-blue-100 text-blue-800' },
-  completed: { label: 'Complété', className: 'bg-green-100 text-green-800' },
-  expired: { label: 'Expiré', className: 'bg-gray-100 text-gray-700' },
+const STATUS_CLASSNAMES: Record<string, string> = {
+  pending: 'bg-amber-100 text-amber-800',
+  in_progress: 'bg-blue-100 text-blue-800',
+  completed: 'bg-green-100 text-green-800',
+  expired: 'bg-gray-100 text-gray-700',
 };
 
 export default function EnvoiDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { t } = useTranslation();
   const { id } = use(params);
   const router = useRouter();
   const [inv, setInv] = useState<Invitation | null>(null);
@@ -26,6 +28,7 @@ export default function EnvoiDetailsPage({ params }: { params: Promise<{ id: str
   const [fullscreen, setFullscreen] = useState(false);
   const [viewingFormItem, setViewingFormItem] = useState<InvitationItemSummary | null>(null);
   const [formFullscreen, setFormFullscreen] = useState(false);
+  const [resending, setResending] = useState(false);
 
   const load = async () => {
     try {
@@ -48,7 +51,7 @@ export default function EnvoiDetailsPage({ params }: { params: Promise<{ id: str
     const token = (typeof window !== 'undefined') ? localStorage.getItem('auth_token') : null;
     const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
     setPdfPromise(fetch(url, { headers }).then((r) => {
-      if (!r.ok) throw new Error('Impossible de charger le PDF');
+      if (!r.ok) throw new Error(t('envois.pdf_load_error'));
       return r.arrayBuffer();
     }));
   };
@@ -57,13 +60,29 @@ export default function EnvoiDetailsPage({ params }: { params: Promise<{ id: str
     if (!inv) return;
     const url = `${window.location.origin}/invitation/${inv.unique_code}`;
     navigator.clipboard.writeText(url);
-    toast.success('Lien copié');
+    toast.success(t('envois.link_copied'));
   };
 
-  if (loading) return <div className="p-10 text-center text-gray-400">Chargement…</div>;
-  if (!inv) return <div className="p-6 text-center text-red-500">Envoi introuvable.</div>;
+  const handleResend = async () => {
+    if (!inv) return;
+    if (!confirm(t('envois.resend_confirm', { email: inv.email }))) return;
+    setResending(true);
+    try {
+      await invitationsService.resendInvitationEmail(inv.id);
+      toast.success(t('envois.resend_success'));
+      load();
+    } catch (e: any) {
+      toast.error(t('envois.resend_failed', { error: e.message || '' }));
+    } finally {
+      setResending(false);
+    }
+  };
 
-  const status = STATUS_BADGES[inv.status] || STATUS_BADGES.pending;
+  if (loading) return <div className="p-10 text-center text-gray-400">{t('common.loading')}</div>;
+  if (!inv) return <div className="p-6 text-center text-red-500">{t('envois.not_found')}</div>;
+
+  const statusClassName = STATUS_CLASSNAMES[inv.status] || STATUS_CLASSNAMES.pending;
+  const statusLabel = t(`envois.status.${inv.status}`, { defaultValue: inv.status });
   const recipient = inv.client?.name || inv.custom_name || '—';
   const completed = inv.items.filter((i) => i.status === 'completed').length;
   const total = inv.items.length;
@@ -77,55 +96,65 @@ export default function EnvoiDetailsPage({ params }: { params: Promise<{ id: str
             onClick={() => router.push('/envois')}
             className="mb-2 text-sm text-gray-500 hover:text-gray-800"
           >
-            ← Retour aux envois
+            {t('envois.back_to_list_btn')}
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">Envoi à {recipient}</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('envois.send_to', { recipient })}</h1>
           <p className="mt-1 text-sm text-gray-500">{inv.email}</p>
           {inv.family_member && (
             <p className="mt-1 text-sm text-blue-700">
-              📨 Destinataire effectif : <strong>{inv.family_member.name}</strong>
-              {' '}({inv.family_member.relationship}) — géré par le principal
+              {t('envois.actual_recipient', {
+                name: inv.family_member.name,
+                relationship: t(`clients.relationship.${inv.family_member.relationship}`, { defaultValue: inv.family_member.relationship }),
+              })}
             </p>
           )}
           {inv.dossier && (
             <p className="mt-1 text-sm text-purple-700">
-              📁 Dossier : <strong>{inv.dossier.name}</strong>
-              {inv.dossier.status ? ` — ${inv.dossier.status}` : ''}
+              {t('envois.dossier_short', { name: inv.dossier.name })}
+              {inv.dossier.status ? ` — ${t(`dossiers.status.${inv.dossier.status}`, { defaultValue: inv.dossier.status })}` : ''}
             </p>
           )}
         </div>
         <div className="flex items-center gap-2">
-          <span className={`rounded-full px-3 py-1 text-sm font-medium ${status.className}`}>{status.label}</span>
+          <span className={`rounded-full px-3 py-1 text-sm font-medium ${statusClassName}`}>{statusLabel}</span>
           <button
             onClick={copyLink}
             className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
-            📋 Copier le lien client
+            {t('envois.copy_link')}
+          </button>
+          <button
+            onClick={handleResend}
+            disabled={resending}
+            className="rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100 disabled:opacity-50"
+          >
+            {resending ? t('envois.resending') : t('envois.resend_email')}
           </button>
         </div>
       </div>
 
       {/* Meta */}
       <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-        <Stat label="Avancement" value={`${completed} / ${total}`} />
-        <Stat label="Envoyé le" value={inv.sent_at ?? '—'} />
-        <Stat label="Expire le" value={inv.expires_at ?? '—'} />
-        <Stat label="Email" value={inv.email_sent ? '✓ Envoyé' : '✗ Échec'} valueClassName={inv.email_sent ? 'text-green-700' : 'text-red-700'} />
+        <Stat label={t('envois.stat_progress')} value={`${completed} / ${total}`} />
+        <Stat label={t('envois.stat_sent')} value={inv.sent_at ?? '—'} />
+        <Stat label={t('envois.stat_expires')} value={inv.expires_at ?? '—'} />
+        <Stat label={t('envois.stat_email')} value={inv.email_sent ? t('envois.email_ok') : t('envois.email_failed')} valueClassName={inv.email_sent ? 'text-green-700' : 'text-red-700'} />
       </div>
 
       {inv.message && (
         <div className="mb-6 rounded-xl border-l-4 border-blue-500 bg-blue-50 p-4">
-          <div className="text-xs font-semibold uppercase text-blue-700">Message au client</div>
+          <div className="text-xs font-semibold uppercase text-blue-700">{t('envois.message_to_client')}</div>
           <p className="mt-1 text-sm text-gray-700">{inv.message}</p>
         </div>
       )}
 
       {/* Items */}
       <div className="rounded-xl border border-gray-200 bg-white p-5">
-        <h2 className="mb-4 text-lg font-semibold text-gray-900">Items ({total})</h2>
+        <h2 className="mb-4 text-lg font-semibold text-gray-900">{t('envois.items_count', { count: total })}</h2>
         <div className="space-y-2">
           {inv.items.map((item) => {
-            const itemStatus = STATUS_BADGES[item.status] || STATUS_BADGES.pending;
+            const itemStatusClass = STATUS_CLASSNAMES[item.status] || STATUS_CLASSNAMES.pending;
+            const itemStatusLabel = t(`envois.status.${item.status}`, { defaultValue: item.status });
             return (
               <div
                 key={item.id}
@@ -134,7 +163,7 @@ export default function EnvoiDetailsPage({ params }: { params: Promise<{ id: str
                 <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                   item.kind === 'form' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
                 }`}>
-                  {item.kind === 'form' ? 'Formulaire' : 'Document'}
+                  {item.kind === 'form' ? t('envois.kind_form') : t('envois.kind_document')}
                 </span>
                 <div className="flex-1">
                   <div className="font-medium text-gray-900">
@@ -147,17 +176,17 @@ export default function EnvoiDetailsPage({ params }: { params: Promise<{ id: str
                   )}
                 </div>
                 <div className="text-xs text-gray-500">
-                  {item.last_saved_at && <span>Modifié {item.last_saved_at}</span>}
+                  {item.last_saved_at && <span>{t('envois.modified_at', { date: item.last_saved_at })}</span>}
                 </div>
-                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${itemStatus.className}`}>
-                  {itemStatus.label}
+                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${itemStatusClass}`}>
+                  {itemStatusLabel}
                 </span>
                 {item.kind === 'document' && (item.has_filled_pdf || item.form_data) && (
                   <button
                     onClick={() => openItemPdf(item)}
                     className="rounded-lg border border-blue-600 px-3 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50"
                   >
-                    Voir PDF
+                    {t('envois.view_pdf')}
                   </button>
                 )}
                 {item.kind === 'form' && item.form_data && (
@@ -165,7 +194,7 @@ export default function EnvoiDetailsPage({ params }: { params: Promise<{ id: str
                     onClick={() => setViewingFormItem(item)}
                     className="rounded-lg border border-blue-600 px-3 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50"
                   >
-                    Voir réponses
+                    {t('envois.view_responses')}
                   </button>
                 )}
               </div>
@@ -194,15 +223,15 @@ export default function EnvoiDetailsPage({ params }: { params: Promise<{ id: str
                 <button
                   onClick={() => setFullscreen((f) => !f)}
                   className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                  title={fullscreen ? 'Sortir du plein écran' : 'Plein écran'}
+                  title={fullscreen ? t('envois.exit_fullscreen') : t('envois.fullscreen_btn')}
                 >
-                  {fullscreen ? '⤢ Réduire' : '⛶ Plein écran'}
+                  {fullscreen ? t('envois.exit_fullscreen') : t('envois.fullscreen_btn')}
                 </button>
                 <button
                   onClick={() => { setViewingItem(null); setPdfPromise(null); setFullscreen(false); }}
                   className="text-sm text-gray-500 hover:text-gray-800"
                 >
-                  Fermer ✕
+                  {t('envois.close_btn')}
                 </button>
               </div>
             </div>
@@ -232,7 +261,7 @@ export default function EnvoiDetailsPage({ params }: { params: Promise<{ id: str
           >
             <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
               <h3 className="font-semibold text-gray-900">
-                Réponses — {viewingFormItem.form_type?.name}
+                {t('envois.responses_for', { form: viewingFormItem.form_type?.name })}
               </h3>
               <div className="flex items-center gap-3">
                 {viewingFormItem.form_type?.code === 'questionnaire_demandeur_001' && (
@@ -275,25 +304,25 @@ export default function EnvoiDetailsPage({ params }: { params: Promise<{ id: str
                           },
                         });
                       } catch (e: any) {
-                        toast.error(e?.message ?? 'Génération PDF impossible');
+                        toast.error(e?.message ?? t('envois.pdf_generation_failed'));
                       }
                     }}
                     className="rounded-lg border border-blue-600 px-3 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50"
                   >
-                    📄 Télécharger en PDF
+                    {t('envois.download_pdf')}
                   </button>
                 )}
                 <button
                   onClick={() => setFormFullscreen((f) => !f)}
                   className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
                 >
-                  {formFullscreen ? '⤢ Réduire' : '⛶ Plein écran'}
+                  {formFullscreen ? t('envois.exit_fullscreen') : t('envois.fullscreen_btn')}
                 </button>
                 <button
                   onClick={() => { setViewingFormItem(null); setFormFullscreen(false); }}
                   className="text-sm text-gray-500 hover:text-gray-800"
                 >
-                  Fermer ✕
+                  {t('envois.close_btn')}
                 </button>
               </div>
             </div>
@@ -327,8 +356,11 @@ const COMPANY_INFO = {
 function FormResponsesView({
   item, recipient,
 }: { item: InvitationItemSummary; recipient?: string }) {
+  const { t, i18n } = useTranslation();
   const data = item.form_data || {};
-  const generatedAt = new Date().toLocaleDateString('fr-CA', {
+  const localeMap: Record<string, string> = { fr: 'fr-CA', en: 'en-CA', es: 'es-CA' };
+  const locale = localeMap[i18n.language] || 'fr-CA';
+  const generatedAt = new Date().toLocaleDateString(locale, {
     year: 'numeric', month: 'long', day: 'numeric',
     hour: '2-digit', minute: '2-digit',
   });
@@ -358,17 +390,17 @@ function FormResponsesView({
         {/* Form metadata */}
         <div className="px-8 py-5">
           <div className="text-xs font-semibold uppercase tracking-wider text-red-700">
-            {item.form_type?.category || 'Formulaire'}
+            {item.form_type?.category || t('envois.kind_form')}
           </div>
           <h2 className="mt-1 text-2xl font-bold text-gray-900">{item.form_type?.name}</h2>
           <div className="mt-3 grid grid-cols-1 gap-2 text-sm text-gray-600 md:grid-cols-3">
             {recipient && (
-              <div><span className="font-semibold text-gray-700">Demandeur :</span> {recipient}</div>
+              <div><span className="font-semibold text-gray-700">{t('envois.form_resp.applicant')} :</span> {recipient}</div>
             )}
             {item.last_saved_at && (
-              <div><span className="font-semibold text-gray-700">Modifié le :</span> {item.last_saved_at}</div>
+              <div><span className="font-semibold text-gray-700">{t('envois.form_resp.modified_on')} :</span> {item.last_saved_at}</div>
             )}
-            <div><span className="font-semibold text-gray-700">Édité le :</span> {generatedAt}</div>
+            <div><span className="font-semibold text-gray-700">{t('envois.form_resp.edited_on')} :</span> {generatedAt}</div>
           </div>
         </div>
       </div>
@@ -376,7 +408,7 @@ function FormResponsesView({
       {/* Body */}
       {Object.keys(data).length === 0 ? (
         <div className="rounded-xl bg-white p-12 text-center text-gray-400 shadow-sm">
-          Aucune réponse enregistrée.
+          {t('envois.form_resp.no_responses')}
         </div>
       ) : (
         <FormGroup value={data} title={null} level={0} />
@@ -398,11 +430,10 @@ function FormResponsesView({
           </div>
         </div>
         <p className="mt-3 text-center text-xs text-gray-500">
-          Document confidentiel · Préparé le {generatedAt} · {COMPANY_INFO.website} · {COMPANY_INFO.email}
+          {t('envois.form_resp.footer_confidential', { date: generatedAt })} · {COMPANY_INFO.website} · {COMPANY_INFO.email}
         </p>
         <p className="mt-2 text-center text-[10px] text-gray-400">
-          Ce document récapitule les réponses fournies par le client. Les informations sont
-          confidentielles et destinées exclusivement à un usage interne du cabinet.
+          {t('envois.form_resp.footer_disclaimer')}
         </p>
       </div>
     </div>
@@ -413,6 +444,7 @@ function FormResponsesView({
 function FormGroup({
   value, title, level,
 }: { value: any; title: string | null; level: number }) {
+  const { t } = useTranslation();
   if (value === null || value === undefined) return null;
 
   if (Array.isArray(value)) {
@@ -428,12 +460,12 @@ function FormGroup({
           {value.map((v, i) => (
             <div key={i} className="rounded-lg border border-gray-200 bg-gray-50 p-4">
               <div className="mb-3 inline-block rounded-full bg-red-100 px-3 py-0.5 text-xs font-semibold text-red-800">
-                Élément {i + 1}
+                {t('envois.form_resp.element', { n: i + 1 })}
               </div>
               {typeof v === 'object' && v !== null && !Array.isArray(v) ? (
                 <FormFieldsGrid entries={Object.entries(v)} />
               ) : (
-                <FieldDisplay label={`Valeur ${i + 1}`} value={v} />
+                <FieldDisplay label={t('envois.form_resp.value_n', { n: i + 1 })} value={v} />
               )}
             </div>
           ))}
@@ -496,6 +528,7 @@ function FormFieldsGrid({ entries }: { entries: Array<[string, any]> }) {
 
 /** A single labeled "input" displaying its value read-only. */
 function FieldDisplay({ label, value }: { label: string; value: any }) {
+  const { t } = useTranslation();
   const isLong = typeof value === 'string' && value.length > 60;
   const isBool = typeof value === 'boolean';
 
@@ -512,7 +545,7 @@ function FieldDisplay({ label, value }: { label: string; value: any }) {
               : 'border-gray-200 bg-gray-50 text-gray-600'
           }`}
         >
-          {value ? '✓ Oui' : '✗ Non'}
+          {value ? t('envois.form_resp.yes') : t('envois.form_resp.no')}
         </div>
       ) : isLong ? (
         <div className="min-h-[6rem] whitespace-pre-wrap rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900">

@@ -8,10 +8,11 @@ import TablePagination from '@core/components/table/pagination';
 import { Box, Button } from 'rizzui';
 import { apiService } from '@/services/api';
 import { useAuth } from '@/hooks/useAuth';
-import { clientListColumns } from './columns';
+import { useClientListColumns } from './columns';
 import { clientModuleDataFallback, type ClientListRow } from '@/data/client-module-data';
 import { CLIENT_LIST_REFRESH_EVENT } from '@/app/shared/clients/create-client';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 export type { ClientListRow };
 
@@ -34,9 +35,11 @@ function extractClientRows(res: any): ClientListRow[] {
 }
 
 export default function ClientListTable() {
+  const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const clientListColumns = useClientListColumns();
 
   const { table, tableData, setData } = useTanStackTable<ClientListRow>({
     tableData: clientModuleDataFallback,
@@ -70,7 +73,7 @@ export default function ClientListTable() {
       })
       .catch((err) => {
         console.error('getModuleClients:', err);
-        const message = err?.message ?? 'Erreur lors du chargement des clients';
+        const message = err?.message ?? t('clients.toasts.error');
         toast.error(message);
         setError(message);
         setData([]);
@@ -100,7 +103,7 @@ export default function ClientListTable() {
   if (loading && tableData.length === 0) {
     return (
       <Box className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-md border border-muted">
-        <p className="text-muted-foreground">Chargement des clients...</p>
+        <p className="text-muted-foreground">{t('common.loading')}</p>
       </Box>
     );
   }
@@ -110,7 +113,7 @@ export default function ClientListTable() {
       <Box className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-md border border-muted p-6">
         <p className="text-center text-muted-foreground">{error}</p>
         <Button variant="outline" onClick={loadClients}>
-          Réessayer
+          {t('common.retry')}
         </Button>
       </Box>
     );
@@ -119,7 +122,7 @@ export default function ClientListTable() {
   if (tableData.length === 0) {
     return (
       <Box className="flex min-h-[200px] items-center justify-center rounded-md border border-muted">
-        <p className="text-muted-foreground">Aucun client pour le moment.</p>
+        <p className="text-muted-foreground">{t('clients.no_clients')}</p>
       </Box>
     );
   }

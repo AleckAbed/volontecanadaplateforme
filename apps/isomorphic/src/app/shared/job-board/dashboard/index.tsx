@@ -7,6 +7,7 @@ import JobStats from './job-stats';
 import OpenJobOverview from './open-job-status';
 import JobScheduleList from './schedule-list';
 import TopReferrers from './top-referrers';
+import JobUpgradeStorage from './upgrade-storage';
 
 export default function JobDashboard() {
   return (
@@ -22,6 +23,7 @@ export default function JobDashboard() {
         <AllJobsTable className="@3xl/jd:col-span-full" />
         <OpenJobOverview className="@3xl/jd:col-span-full @5xl/jd:col-span-6" />
         <ActiveUsers className="@3xl/jd:col-span-full @5xl/jd:col-span-6" />
+        <JobUpgradeStorage className="@3xl/jd:col-span-full @5xl/jd:col-start-7 @5xl/jd:col-span-6" />
       </Box>
     </Box>
   );

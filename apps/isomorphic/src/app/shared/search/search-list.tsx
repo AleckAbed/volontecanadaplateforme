@@ -16,22 +16,15 @@ import {
   PiMagnifyingGlassBold,
   PiXBold,
 } from 'react-icons/pi';
-import { pageLinks } from './page-links.data';
+import { useTranslation } from 'react-i18next';
+import { pageLinks, searchPages } from './page-links.data';
 
 export default function SearchList({ onClose }: { onClose?: () => void }) {
+  const { t } = useTranslation();
   const inputRef = useRef(null);
   const [searchText, setSearchText] = useState('');
 
-  let menuItemsFiltered = pageLinks;
-  if (searchText.length > 0) {
-    menuItemsFiltered = pageLinks.filter((item: any) => {
-      const label = item.name;
-      return (
-        label.match(searchText.toLowerCase()) ||
-        (label.toLowerCase().match(searchText.toLowerCase()) && label)
-      );
-    });
-  }
+  const menuItemsFiltered = searchPages(searchText);
 
   useEffect(() => {
     if (inputRef?.current) {
@@ -51,7 +44,7 @@ export default function SearchList({ onClose }: { onClose?: () => void }) {
           value={searchText}
           ref={inputRef}
           onChange={(e) => setSearchText(() => e.target.value)}
-          placeholder="Search pages here"
+          placeholder={t('common.search_placeholder')}
           className="flex-1"
           prefix={
             <PiMagnifyingGlassBold className="h-[18px] w-[18px] text-gray-600" />
@@ -67,7 +60,7 @@ export default function SearchList({ onClose }: { onClose?: () => void }) {
                   setSearchText(() => '');
                 }}
               >
-                Clear
+                {t('common.clear')}
               </Button>
             )
           }
@@ -88,7 +81,7 @@ export default function SearchList({ onClose }: { onClose?: () => void }) {
             <Empty
               className="scale-75"
               image={<SearchNotFoundIcon />}
-              text="No Result Found"
+              text={t('common.no_results')}
               textClassName="text-xl"
             />
           ) : null}

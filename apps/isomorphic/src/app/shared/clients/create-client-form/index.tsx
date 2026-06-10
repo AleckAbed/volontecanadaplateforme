@@ -28,6 +28,7 @@ export type ClientFormDataType = {
   phone: string;
   date_of_birth: string;
   nationality: string;
+  country_of_residence: string;
   passport_number: string;
   address: string;
   family_members: FamilyMemberInput[];
@@ -42,6 +43,7 @@ export const initialClientFormData: ClientFormDataType = {
   phone: '',
   date_of_birth: '',
   nationality: '',
+  country_of_residence: '',
   passport_number: '',
   address: '',
   family_members: [],

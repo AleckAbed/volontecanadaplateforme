@@ -13,7 +13,7 @@ import {
   LithiumMenuItemsKeys,
   lithiumMenuItems,
 } from '@/layouts/lithium/lithium-menu-items';
-import { lithiumAdminMenuItems } from '@/layouts/lithium/admin-menu-items';
+import { useLithiumAdminMenuItems } from '@/layouts/lithium/admin-menu-items';
 import { lithiumClientMenuItems } from '@/layouts/lithium/client-menu-items';
 import { useAuth } from '@/hooks/useAuth';
 import { usePathname } from 'next/navigation';
@@ -214,8 +214,8 @@ export function LinkMenu({
 export default function HeaderMenuLeft() {
   const { direction } = useDirection();
   const { userType } = useAuth();
-  
-  // Sélectionner les menus selon le type d'utilisateur
+  const lithiumAdminMenuItems = useLithiumAdminMenuItems();
+
   const currentMenuItems = useMemo(() => {
     if (userType === 'admin') {
       return lithiumAdminMenuItems;
@@ -223,7 +223,7 @@ export default function HeaderMenuLeft() {
       return lithiumClientMenuItems;
     }
     return lithiumAdminMenuItems;
-  }, [userType]);
+  }, [userType, lithiumAdminMenuItems]);
 
   // Obtenir les clés de menu disponibles
   const menuKeys = Object.keys(currentMenuItems);

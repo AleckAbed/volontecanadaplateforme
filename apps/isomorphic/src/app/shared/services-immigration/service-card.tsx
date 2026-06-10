@@ -2,6 +2,7 @@
 
 import { PiDotsThreeBold } from 'react-icons/pi';
 import { Title, ActionIcon, Dropdown, Badge } from 'rizzui';
+import { useTranslation } from 'react-i18next';
 import cn from '@core/utils/class-names';
 import { useModal } from '@/app/shared/modal-views/use-modal';
 import ModalButton from '@/app/shared/modal-button';
@@ -16,12 +17,12 @@ export default function ServiceCard({
   name,
   description,
   category,
-  price,
   duration,
   status,
   color,
   className,
 }: ServiceCardProps) {
+  const { t } = useTranslation();
   const { openModal } = useModal();
 
   const statusColors = {
@@ -94,14 +95,14 @@ export default function ServiceCard({
                   })
                 }
               >
-                Modifier
+                {t('common.edit')}
               </span>
             </Dropdown.Item>
             <Dropdown.Item className="gap-2 text-xs sm:text-sm">
-              Dupliquer
+              {t('services_immigration.duplicate')}
             </Dropdown.Item>
             <Dropdown.Item className="gap-2 text-xs sm:text-sm text-red-600">
-              Supprimer
+              {t('common.delete')}
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
@@ -109,15 +110,9 @@ export default function ServiceCard({
 
       <div className="mt-4 space-y-2">
         <p className="text-sm text-gray-600 line-clamp-2">{description}</p>
-        <div className="flex items-center justify-between">
-          <div>
-            <span className="text-xs text-gray-500">Prix</span>
-            <p className="text-sm font-semibold">{price}</p>
-          </div>
-          <div>
-            <span className="text-xs text-gray-500">Durée</span>
-            <p className="text-sm font-semibold">{duration}</p>
-          </div>
+        <div>
+          <span className="text-xs text-gray-500">{t('services_immigration.duration_short')}</span>
+          <p className="text-sm font-semibold">{duration}</p>
         </div>
         <div className="flex items-center justify-between pt-2">
           <Badge
@@ -126,14 +121,14 @@ export default function ServiceCard({
               statusColors[status] || statusColors.inactive
             )}
           >
-            {status === 'active' ? 'Actif' : status === 'pending' ? 'En attente' : 'Inactif'}
+            {t(`services_immigration.status_label.${status}`, { defaultValue: status })}
           </Badge>
         </div>
       </div>
       <ModalButton
         customSize={700}
         variant="outline"
-        label="Modifier le Service"
+        label={t('services_immigration.edit_btn')}
         view={<EditService serviceId={1} />}
         className="items-center gap-1 text-gray-800 @lg:w-full lg:mt-6"
       />

@@ -4,6 +4,7 @@ import { useAtom } from 'jotai';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslation } from 'react-i18next';
 import { ActionIcon, Title, Text, Select } from 'rizzui';
 import { PiXBold } from 'react-icons/pi';
 import { useModal } from '@/app/shared/modal-views/use-modal';
@@ -15,20 +16,21 @@ import CreateClientFormFooter from './footer';
 
 const schema = z.object({
   client_type: z.enum(['single', 'family'], {
-    required_error: 'Choisissez le type de client',
+    required_error: 'TYPE_REQUIRED',
   }),
 });
 type FormType = z.infer<typeof schema>;
 
-const clientTypeOptions = [
-  { label: 'Client unique', value: 'single' },
-  { label: 'Famille', value: 'family' },
-];
-
 export default function StepType() {
+  const { t } = useTranslation();
   const { closeModal } = useModal();
   const { gotoNextStep } = useStepperClient();
   const [formData, setFormData] = useAtom(clientFormDataAtom);
+
+  const clientTypeOptions = [
+    { label: t('clients.create_modal.type_single'), value: 'single' },
+    { label: t('clients.create_modal.type_family'), value: 'family' },
+  ];
 
   const {
     control,
@@ -44,6 +46,10 @@ export default function StepType() {
     gotoNextStep();
   };
 
+  const typeError = errors.client_type?.message === 'TYPE_REQUIRED'
+    ? t('clients.create_modal.type_required')
+    : errors.client_type?.message;
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="relative">
       <ActionIcon
@@ -56,10 +62,10 @@ export default function StepType() {
       </ActionIcon>
       <div className="mx-auto flex max-w-md flex-col items-center gap-2.5 px-5 pb-5 pt-12 text-center md:px-7 md:pt-14">
         <Title as="h3" className="text-lg font-semibold text-gray-900 md:text-2xl">
-          Type de client
+          {t('clients.create_modal.step_type_title')}
         </Title>
         <Text className="leading-relaxed text-gray-500">
-          Le client est-il une personne seule ou une famille (demandeur principal + membres) ?
+          {t('clients.create_modal.step_type_subtitle')}
         </Text>
       </div>
       <div className="px-5 pb-5 md:px-7 md:pb-7">
@@ -72,9 +78,9 @@ export default function StepType() {
               value={value}
               onChange={onChange}
               name={name}
-              label="Type"
+              label={t('clients.create_modal.type_label')}
               className="max-w-md"
-              error={errors.client_type?.message}
+              error={typeError}
               getOptionValue={(o) => o.value}
               displayValue={(selected: string) =>
                 clientTypeOptions.find((o) => o.value === selected)?.label ?? selected
@@ -85,7 +91,7 @@ export default function StepType() {
           )}
         />
       </div>
-      <CreateClientFormFooter nextLabel="Suivant" />
+      <CreateClientFormFooter />
     </form>
   );
 }
