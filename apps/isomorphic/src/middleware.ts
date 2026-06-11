@@ -19,16 +19,19 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Appliquer le middleware à toutes les routes sauf les assets statiques
   matcher: [
     /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     * - api routes
+     * Applique le middleware à toutes les routes SAUF :
+     *  - _next/static, _next/image, favicon.ico  (Next.js internals)
+     *  - api/*                                    (gérées séparément)
+     *  - pdfjs/* et tout dossier static custom    (assets PDF viewer)
+     *  - tout fichier avec une extension statique : js, mjs, css, json, map,
+     *    woff/woff2/ttf/eot, ico, txt, xml, pdf, mp3/mp4, png/jpg/svg/etc.
+     *
+     * Sans ça, Next.js renvoie une page HTML pour les .mjs (au lieu du module
+     * JS), ce qui casse le viewer PDF.js avec : "blocked because of a
+     * disallowed MIME type (text/html)".
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$|api).*)',
+    '/((?!_next/static|_next/image|favicon.ico|api|pdfjs|.*\\.(?:js|mjs|css|json|map|woff2?|ttf|eot|ico|txt|xml|pdf|mp3|mp4|svg|png|jpg|jpeg|gif|webp|avif)$).*)',
   ],
 };
