@@ -14,6 +14,11 @@ out/
 build
 .swc/
 
+# Exception : les fichiers PDF.js viewer doivent être committés
+# (la règle 'build' ci-dessus ignorait apps/isomorphic/public/pdfjs/build/ par erreur)
+!apps/isomorphic/public/pdfjs/build/
+!apps/isomorphic/public/pdfjs/build/**
+
 # misc
 .DS_Store
 *.pem
