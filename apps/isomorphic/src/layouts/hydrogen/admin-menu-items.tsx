@@ -29,6 +29,7 @@ export function useAdminMenuItems() {
     { name: t('menu.section_clients') },
     { name: t('menu.clients'), href: '/admin/clients', icon: <PiUsersDuotone /> },
     { name: t('menu.dossiers'), href: '/admin/dossiers', icon: <PiFolderUserDuotone /> },
+    { name: t('menu.collaborators'), href: '/admin/collaborators', icon: <PiUsersDuotone /> },
     { name: t('menu.documents'), href: '/file-manager', icon: <PiFileDuotone /> },
 
     { name: t('menu.section_services') },

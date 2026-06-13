@@ -35,6 +35,7 @@ export function useAdminMenuItems() {
     { name: t('menu.section_clients') },
     { name: t('menu.clients'), href: '/admin/clients', icon: <PiUsers /> },
     { name: t('menu.dossiers'), href: '/admin/dossiers', icon: <PiFolderUser /> },
+    { name: t('menu.collaborators'), href: '/admin/collaborators', icon: <PiUsers /> },
     { name: t('menu.documents'), href: '/file-manager', icon: <PiFile /> },
 
     { name: t('menu.section_services') },

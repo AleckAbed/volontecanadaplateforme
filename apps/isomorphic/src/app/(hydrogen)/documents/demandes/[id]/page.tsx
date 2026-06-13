@@ -127,8 +127,14 @@ export default function DemandeDetailPage({ params }: { params: Promise<{ id: st
             <button
               onClick={() => {
                 if (!filledPdfPromiseRef.current) {
-                  filledPdfPromiseRef.current = fetch(documentService.getFilledPdfUrl(Number(id)))
-                    .then((r) => r.arrayBuffer());
+                  // credentials: 'include' indispensable — la route /admin/.../pdf
+                  // est protégée par auth:admin (cookie HttpOnly). Sans ça → 401.
+                  filledPdfPromiseRef.current = fetch(documentService.getFilledPdfUrl(Number(id)), {
+                    credentials: 'include',
+                  }).then((r) => {
+                    if (!r.ok) throw new Error('PDF rempli indisponible (' + r.status + ')');
+                    return r.arrayBuffer();
+                  });
                 }
                 setShowPdfViewer(true);
               }}

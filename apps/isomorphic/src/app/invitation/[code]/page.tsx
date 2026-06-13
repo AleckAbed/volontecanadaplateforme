@@ -202,6 +202,11 @@ export default function PublicInvitationPage({ params }: { params: Promise<{ cod
           })}
         </div>
 
+        {/* Documents complémentaires (uploads libres) */}
+        {invitation.allow_uploads && (
+          <UploadsSection code={code} uploads={invitation.uploads ?? []} onChange={load} />
+        )}
+
         {/* Submit all */}
         <div className="mt-8 rounded-xl border border-gray-200 bg-white p-5 text-center">
           <p className="mb-4 text-sm text-gray-600">
@@ -227,6 +232,121 @@ export default function PublicInvitationPage({ params }: { params: Promise<{ cod
 }
 
 // ─── Sub-views ──────────────────────────────────────────────────────────────
+
+const MAX_UPLOAD_BYTES = 20 * 1024 * 1024; // 20 Mo
+
+function formatBytes(n: number): string {
+  if (n < 1024) return `${n} o`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(0)} Ko`;
+  return `${(n / (1024 * 1024)).toFixed(1)} Mo`;
+}
+
+function UploadsSection({
+  code, uploads, onChange,
+}: { code: string; uploads: import('@/services/invitations').InvitationUpload[]; onChange: () => Promise<void> }) {
+  const [label, setLabel] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleUpload = async () => {
+    if (!file) { toast.error('Sélectionnez un fichier'); return; }
+    if (!label.trim()) { toast.error('Donnez un libellé au fichier'); return; }
+    if (file.size > MAX_UPLOAD_BYTES) { toast.error('Fichier trop volumineux (max 20 Mo)'); return; }
+    try {
+      setUploading(true);
+      await invitationsService.uploadFile(code, file, label.trim());
+      toast.success('Document téléversé');
+      setLabel('');
+      setFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      await onChange();
+    } catch (e: any) {
+      toast.error(e.message || 'Échec du téléversement');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDelete = async (uploadId: number) => {
+    if (!confirm('Supprimer ce document ?')) return;
+    try {
+      await invitationsService.deleteUpload(code, uploadId);
+      toast.success('Document supprimé');
+      await onChange();
+    } catch (e: any) {
+      toast.error(e.message || 'Suppression impossible');
+    }
+  };
+
+  return (
+    <div className="mt-6 rounded-xl border border-gray-200 bg-white p-5">
+      <div className="mb-1 flex items-center gap-2">
+        <span className="text-2xl">📎</span>
+        <h2 className="text-lg font-semibold text-gray-900">Documents complémentaires</h2>
+      </div>
+      <p className="mb-4 text-sm text-gray-500">
+        Ajoutez tout document utile (passeport, CNI, justificatifs…). Donnez un libellé à chaque fichier. Max 20 Mo par fichier.
+      </p>
+
+      {uploads.length > 0 && (
+        <ul className="mb-4 space-y-2">
+          {uploads.map((u) => (
+            <li
+              key={u.id}
+              className="flex items-center gap-3 rounded-lg border border-gray-100 bg-gray-50 p-3"
+            >
+              <span className="text-xl">📄</span>
+              <div className="flex-1 overflow-hidden">
+                <div className="truncate text-sm font-medium text-gray-900">{u.label}</div>
+                <div className="truncate text-xs text-gray-500">
+                  {u.original_filename} • {formatBytes(u.size)}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleDelete(u.id)}
+                className="rounded-lg px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
+              >
+                Supprimer
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <div className="space-y-3 rounded-lg border border-dashed border-gray-300 p-4">
+        <div>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Libellé du document</label>
+          <input
+            type="text"
+            value={label}
+            onChange={(e) => setLabel(e.target.value)}
+            placeholder="Ex. Passeport, Carte d'identité…"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Fichier</label>
+          <input
+            ref={fileInputRef}
+            type="file"
+            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            className="w-full text-sm text-gray-700 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-blue-700 hover:file:bg-blue-100"
+          />
+        </div>
+        <button
+          type="button"
+          onClick={handleUpload}
+          disabled={uploading || !file || !label.trim()}
+          className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {uploading ? 'Téléversement…' : 'Ajouter le document'}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function DocumentFillView({
   code, item, onBack,

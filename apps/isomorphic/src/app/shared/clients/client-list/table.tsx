@@ -49,13 +49,25 @@ export default function ClientListTable() {
         pagination: { pageIndex: 0, pageSize: 10 },
       },
       meta: {
-        handleDeleteRow: (row) => {
-          setData((prev) => prev.filter((r) => r.id !== row.id));
-          table.resetRowSelection();
+        handleDeleteRow: async (row) => {
+          try {
+            await apiService.deleteModuleClient(row.id);
+            setData((prev) => prev.filter((r) => r.id !== row.id));
+            table.resetRowSelection();
+            toast.success(t('clients.toasts.deleted'));
+          } catch (e: any) {
+            toast.error(e?.message || t('dossiers.delete_error'));
+          }
         },
-        handleMultipleDelete: (rows) => {
-          setData((prev) => prev.filter((r) => !rows.includes(r)));
-          table.resetRowSelection();
+        handleMultipleDelete: async (rows) => {
+          try {
+            await Promise.all(rows.map((r: ClientListRow) => apiService.deleteModuleClient(r.id)));
+            setData((prev) => prev.filter((r) => !rows.includes(r)));
+            table.resetRowSelection();
+            toast.success(t('clients.toasts.deleted'));
+          } catch (e: any) {
+            toast.error(e?.message || t('dossiers.delete_error'));
+          }
         },
       },
       enableColumnResizing: false,

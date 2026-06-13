@@ -66,6 +66,15 @@ export interface InvitationItemSummary {
   completed_at?: string;
 }
 
+export interface InvitationUpload {
+  id: number;
+  label: string;
+  original_filename: string;
+  mime_type?: string;
+  size: number;
+  created_at?: string;
+}
+
 export interface FamilyMember {
   id: number;
   first_name: string;
@@ -98,6 +107,7 @@ export interface Invitation {
   email: string;
   phone?: string;
   message?: string;
+  allow_uploads?: boolean;
   status: 'pending' | 'in_progress' | 'completed' | 'expired';
   sent_at?: string;
   expires_at?: string;
@@ -105,6 +115,7 @@ export interface Invitation {
   sent_by?: string;
   email_sent: boolean;
   items: InvitationItemSummary[];
+  uploads?: InvitationUpload[];
 }
 
 export interface PublicInvitationItem {
@@ -127,10 +138,12 @@ export interface PublicInvitation {
   client_name?: string;
   email: string;
   message?: string;
+  allow_uploads?: boolean;
   status: string;
   expires_at?: string;
   is_expired: boolean;
   items: PublicInvitationItem[];
+  uploads?: InvitationUpload[];
 }
 
 // ─── Service ──────────────────────────────────────────────────────────────────
@@ -224,6 +237,7 @@ export const invitationsService = {
     email: string;
     phone?: string;
     message?: string;
+    allow_uploads?: boolean;
     expires_days?: number;
     items: { kind: 'form' | 'document'; form_type_id?: number; document_template_id?: number }[];
   }): Promise<{ data: Invitation; email_sent: boolean }> {
@@ -241,8 +255,18 @@ export const invitationsService = {
     return await authFetch(`/admin/invitations/${id}/resend`, { method: 'POST' });
   },
   getAdminItemPdfUrl(invitationId: number, itemId: number): string {
-    const token = getAuthToken();
-    return `${getApiUrl()}/admin/invitations/${invitationId}/items/${itemId}/pdf?token=${token}`;
+    // Auth via cookie HttpOnly (envoyé via credentials: 'include' côté fetch).
+    return `${getApiUrl()}/admin/invitations/${invitationId}/items/${itemId}/pdf`;
+  },
+  getAdminUploadDownloadUrl(invitationId: number, uploadId: number): string {
+    return `${getApiUrl()}/admin/invitations/${invitationId}/uploads/${uploadId}/download`;
+  },
+  async downloadAdminUpload(invitationId: number, uploadId: number): Promise<Blob> {
+    const res = await fetch(this.getAdminUploadDownloadUrl(invitationId, uploadId), {
+      credentials: 'include',
+    });
+    if (!res.ok) throw new Error('Téléchargement impossible');
+    return res.blob();
   },
 
   // ─── Public (client) ────────────────────────────────────────────────────────
@@ -291,5 +315,22 @@ export const invitationsService = {
 
   async submitAll(code: string): Promise<void> {
     await publicFetch(`/invitations/${code}/submit`, { method: 'POST' });
+  },
+
+  // Documents complémentaires libres (téléversés par le client)
+  async uploadFile(code: string, file: File, label: string): Promise<InvitationUpload> {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('label', label);
+    // Pas de Content-Type manuel : le navigateur ajoute la boundary multipart.
+    const res = await publicFetch(`/invitations/${code}/uploads`, {
+      method: 'POST',
+      body: fd,
+    });
+    return res.data;
+  },
+
+  async deleteUpload(code: string, uploadId: number): Promise<void> {
+    await publicFetch(`/invitations/${code}/uploads/${uploadId}`, { method: 'DELETE' });
   },
 };

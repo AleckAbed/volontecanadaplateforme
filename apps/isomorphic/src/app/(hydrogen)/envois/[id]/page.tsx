@@ -48,12 +48,28 @@ export default function EnvoiDetailsPage({ params }: { params: Promise<{ id: str
     if (item.kind !== 'document') return;
     setViewingItem(item);
     const url = invitationsService.getAdminItemPdfUrl(Number(id), item.id);
-    const token = (typeof window !== 'undefined') ? localStorage.getItem('auth_token') : null;
-    const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
-    setPdfPromise(fetch(url, { headers }).then((r) => {
+    // Auth via cookie HttpOnly → credentials: 'include' indispensable.
+    // (le token n'est plus dans localStorage depuis la migration cookie)
+    setPdfPromise(fetch(url, { credentials: 'include' }).then((r) => {
       if (!r.ok) throw new Error(t('envois.pdf_load_error'));
       return r.arrayBuffer();
     }));
+  };
+
+  const downloadUpload = async (uploadId: number, filename: string) => {
+    try {
+      const blob = await invitationsService.downloadAdminUpload(Number(id), uploadId);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e: any) {
+      toast.error(e.message || t('envois.download_failed'));
+    }
   };
 
   const copyLink = () => {
@@ -202,6 +218,42 @@ export default function EnvoiDetailsPage({ params }: { params: Promise<{ id: str
           })}
         </div>
       </div>
+
+      {/* Documents complémentaires téléversés par le client */}
+      {inv.allow_uploads && (
+        <div className="mt-6 rounded-xl border border-gray-200 bg-white p-5">
+          <h2 className="mb-4 text-lg font-semibold text-gray-900">
+            {t('envois.uploads_title', { count: inv.uploads?.length ?? 0 })}
+          </h2>
+          {(inv.uploads?.length ?? 0) === 0 ? (
+            <p className="text-sm text-gray-400">{t('envois.uploads_empty')}</p>
+          ) : (
+            <div className="space-y-2">
+              {inv.uploads!.map((u) => (
+                <div
+                  key={u.id}
+                  className="flex items-center gap-4 rounded-lg border border-gray-200 p-4 hover:bg-gray-50"
+                >
+                  <span className="text-2xl">📎</span>
+                  <div className="flex-1 overflow-hidden">
+                    <div className="truncate font-medium text-gray-900">{u.label}</div>
+                    <div className="truncate text-xs text-gray-500">
+                      {u.original_filename} • {formatUploadSize(u.size)}
+                      {u.created_at ? ` • ${u.created_at}` : ''}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => downloadUpload(u.id, u.original_filename)}
+                    className="rounded-lg border border-blue-600 px-3 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50"
+                  >
+                    {t('envois.download_btn')}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* PDF viewer modal */}
       {viewingItem && pdfPromise && (
@@ -727,6 +779,12 @@ function humanize(key: string): string {
     .replace(/[_-]+/g, ' ')
     .replace(/([a-z])([A-Z])/g, '$1 $2')
     .replace(/^\w/, (c) => c.toUpperCase());
+}
+
+function formatUploadSize(n: number): string {
+  if (n < 1024) return `${n} o`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(0)} Ko`;
+  return `${(n / (1024 * 1024)).toFixed(1)} Mo`;
 }
 
 function Stat({ label, value, valueClassName = '' }: { label: string; value: string; valueClassName?: string }) {

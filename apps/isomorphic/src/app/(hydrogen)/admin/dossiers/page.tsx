@@ -25,6 +25,7 @@ const STATUS_COLOR: Record<string, 'warning' | 'info' | 'success' | 'danger' | '
   soumis: 'warning',
   accorde: 'success',
   refuse: 'danger',
+  rejete: 'danger',
   annule: 'secondary',
 };
 

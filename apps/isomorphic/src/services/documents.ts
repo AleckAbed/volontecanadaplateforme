@@ -39,6 +39,7 @@ export interface DocumentTemplate {
   id: number;
   name: string;
   description?: string;
+  service_name?: string | null;
   category: string;
   category_id?: number | null;
   category_label: string;
@@ -104,14 +105,29 @@ export interface PublicDocumentData {
 
 export const documentService = {
   // Templates
-  async getTemplates(): Promise<DocumentTemplate[]> {
-    const res = await authFetch('/admin/document-templates');
+  async getTemplates(params?: { service_name?: string; search?: string }): Promise<DocumentTemplate[]> {
+    const qs = new URLSearchParams();
+    if (params?.service_name) qs.set('service_name', params.service_name);
+    if (params?.search) qs.set('search', params.search);
+    const suffix = qs.toString() ? `?${qs}` : '';
+    const res = await authFetch(`/admin/document-templates${suffix}`);
     return res.data;
   },
 
   async getTemplate(id: number): Promise<DocumentTemplateDetail> {
     const res = await authFetch(`/admin/document-templates/${id}`);
     return res.data;
+  },
+
+  async updateTemplate(
+    id: number,
+    payload: { name?: string; description?: string | null; service_name?: string | null; is_active?: boolean },
+  ): Promise<void> {
+    await authFetch(`/admin/document-templates/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
   },
 
   async createTemplate(formData: FormData): Promise<{ id: number }> {
@@ -191,8 +207,9 @@ export const documentService = {
   },
 
   getFilledPdfUrl(id: number): string {
-    const token = getAuthToken();
-    return `${getApiUrl()}/admin/document-requests/${id}/pdf?token=${token}`;
+    // Auth via cookie HttpOnly (envoyé automatiquement par le navigateur).
+    // Plus de ?token= : le token n'est plus stocké côté JS.
+    return `${getApiUrl()}/admin/document-requests/${id}/pdf`;
   },
 
   // ─── Public — client via token ──────────────────────────────────────────────

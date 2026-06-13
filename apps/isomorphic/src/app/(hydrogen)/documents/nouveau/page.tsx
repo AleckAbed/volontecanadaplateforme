@@ -4,17 +4,11 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { documentService } from '@/services/documents';
-
-const categories = [
-  { value: 'ircc', label: 'Formulaire IRCC' },
-  { value: 'cabinet', label: 'Document Cabinet' },
-  { value: 'contrat', label: 'Contrat' },
-  { value: 'autre', label: 'Autre' },
-];
+import { servicesList } from '@/data/services-immigration';
 
 export default function NouveauModelePage() {
   const router = useRouter();
-  const [form, setForm] = useState({ name: '', description: '', category: 'ircc' });
+  const [form, setForm] = useState({ name: '', description: '', service_name: '' });
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -44,7 +38,7 @@ export default function NouveauModelePage() {
       const fd = new FormData();
       fd.append('name', form.name.trim());
       fd.append('description', form.description.trim());
-      fd.append('category', form.category);
+      if (form.service_name) fd.append('service_name', form.service_name);
       fd.append('pdf', file);
 
       const result = await documentService.createTemplate(fd);
@@ -121,18 +115,22 @@ export default function NouveauModelePage() {
           />
         </div>
 
-        {/* Catégorie */}
+        {/* Service d'immigration */}
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Catégorie</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Service d&apos;immigration</label>
           <select
-            value={form.category}
-            onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))}
+            value={form.service_name}
+            onChange={(e) => setForm((p) => ({ ...p, service_name: e.target.value }))}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
           >
-            {categories.map((c) => (
-              <option key={c.value} value={c.value}>{c.label}</option>
+            <option value="">— Aucun (modèle général) —</option>
+            {servicesList.filter((s) => s.status === 'active').map((s) => (
+              <option key={s.id} value={s.name}>{s.name} ({s.category})</option>
             ))}
           </select>
+          <p className="mt-1 text-xs text-gray-500">
+            Ce document sera automatiquement ajouté aux dossiers créés pour ce service.
+          </p>
         </div>
 
         {/* Description */}
