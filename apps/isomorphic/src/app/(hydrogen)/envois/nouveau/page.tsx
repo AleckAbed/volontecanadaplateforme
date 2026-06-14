@@ -247,20 +247,32 @@ export default function NouvelEnvoiPage() {
     return docTemplates.filter((d) => baseDocTemplateIds.has(d.id));
   }, [docTemplates, baseDocTemplateIds]);
 
-  // Autres modèles (hors docs de base du dossier), filtrés par service si applicable
+  // Autres modèles (hors docs de base du dossier), filtrés par service OU catégorie.
+  // Le filtre est encodé "service:<nom>" ou "cat:<enum>".
   const otherDocs = useMemo(() => {
+    const [kind, value] = docServiceFilter ? docServiceFilter.split(':', 2) : [null, null];
     return docTemplates.filter((d) => {
       if (baseDocTemplateIds.has(d.id)) return false;
-      if (docServiceFilter && (d.service_name || '') !== docServiceFilter) return false;
+      if (!kind || !value) return true;
+      if (kind === 'service') return (d.service_name || '') === value;
+      if (kind === 'cat') return (d.category || '') === value;
       return true;
     });
   }, [docTemplates, baseDocTemplateIds, docServiceFilter]);
 
   // Liste complète des services d'immigration actifs (source de vérité = servicesList).
-  // L'admin voit donc tous les services, même ceux sans modèle encore associé.
   const docServiceOptions = useMemo(() => {
     return servicesList.filter((s) => s.status === 'active').map((s) => s.name);
   }, []);
+
+  // Catégories générales (enum côté DB) — pour piocher des modèles transverses
+  // (Cabinet, IRCC, Contrat, Autres) qui ne sont pas rattachés à un service précis.
+  const docCategoryOptions = useMemo(() => ([
+    { value: 'ircc', label: 'IRCC' },
+    { value: 'cabinet', label: 'Cabinet' },
+    { value: 'contrat', label: 'Contrat' },
+    { value: 'autre', label: 'Autres' },
+  ]), []);
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -539,30 +551,35 @@ export default function NouvelEnvoiPage() {
               {baseDocs.length > 0 ? t('envois.other_docs_title') : t('envois.step3_documents')}{' '}
               <span className="text-sm font-normal text-gray-500">({t(selectedDocs.size > 1 ? 'envois.selected_count_other' : 'envois.selected_count_one', { count: selectedDocs.size })})</span>
             </h2>
-            {docServiceOptions.length > 0 && (
-              <div className="flex items-center gap-2">
-                <label className="text-xs text-gray-500">{t('envois.doc_filter_service')}</label>
-                <select
-                  value={docServiceFilter}
-                  onChange={(e) => setDocServiceFilter(e.target.value)}
-                  className="rounded-lg border border-gray-300 px-2 py-1 text-sm"
-                >
-                  <option value="">{t('envois.doc_filter_all_services')}</option>
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-gray-500">{t('envois.doc_filter_service')}</label>
+              <select
+                value={docServiceFilter}
+                onChange={(e) => setDocServiceFilter(e.target.value)}
+                className="rounded-lg border border-gray-300 px-2 py-1 text-sm"
+              >
+                <option value="">{t('envois.doc_filter_all_services')}</option>
+                <optgroup label={t('envois.doc_filter_group_services')}>
                   {docServiceOptions.map((s) => (
-                    <option key={s} value={s}>{s}</option>
+                    <option key={`svc-${s}`} value={`service:${s}`}>{s}</option>
                   ))}
-                </select>
-                {docServiceFilter && (
-                  <button
-                    type="button"
-                    onClick={() => setDocServiceFilter('')}
-                    className="text-xs text-gray-500 hover:underline"
-                  >
-                    {t('envois.doc_filter_reset')}
-                  </button>
-                )}
-              </div>
-            )}
+                </optgroup>
+                <optgroup label={t('envois.doc_filter_group_categories')}>
+                  {docCategoryOptions.map((c) => (
+                    <option key={`cat-${c.value}`} value={`cat:${c.value}`}>{c.label}</option>
+                  ))}
+                </optgroup>
+              </select>
+              {docServiceFilter && (
+                <button
+                  type="button"
+                  onClick={() => setDocServiceFilter('')}
+                  className="text-xs text-gray-500 hover:underline"
+                >
+                  {t('envois.doc_filter_reset')}
+                </button>
+              )}
+            </div>
           </div>
 
           {/* PDF ad-hoc téléversés pour cette invitation */}

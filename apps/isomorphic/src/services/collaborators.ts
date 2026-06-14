@@ -138,6 +138,30 @@ export const collaboratorsService = {
   async remove(id: number): Promise<void> {
     await authFetch(`/admin/collaborators/${id}`, { method: 'DELETE' });
   },
+  async sendWelcomeLink(id: number): Promise<{ message: string }> {
+    const res = await authFetch(`/admin/collaborators/${id}/send-welcome`, { method: 'POST' });
+    return res;
+  },
+};
+
+// ─── Activation publique (depuis le lien email) ───────────────────────────────
+
+export const collabActivationService = {
+  async checkToken(token: string): Promise<{ first_name: string; last_name: string; email: string }> {
+    const res = await publicFetch('/collaborator/check-activation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    });
+    return res.data;
+  },
+  async activate(token: string, password: string, passwordConfirmation: string): Promise<void> {
+    await publicFetch('/collaborator/activate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, password, password_confirmation: passwordConfirmation }),
+    });
+  },
 };
 
 // ─── Collaborator workspace (own login + their dossiers) ──────────────────────
@@ -206,5 +230,22 @@ export const collabWorkspaceService = {
   },
   getInvitationItemPdfUrl(dossierId: number, invitationId: number, itemId: number): string {
     return `${getApiUrl()}/collaborator/dossiers/${dossierId}/invitations/${invitationId}/items/${itemId}/pdf`;
+  },
+  async getInvitationItem(itemId: number): Promise<{
+    id: number;
+    kind: 'form' | 'document';
+    status: string;
+    form_type?: { id: number; code: string; name: string };
+    document_template?: { id: number; name: string };
+    form_data?: any;
+    has_filled_pdf: boolean;
+    invitation_id: number;
+    dossier_id: number;
+    client_name?: string;
+    last_saved_at?: string;
+    completed_at?: string;
+  }> {
+    const res = await authFetch(`/collaborator/invitation-items/${itemId}`);
+    return res.data;
   },
 };

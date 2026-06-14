@@ -19,6 +19,9 @@ export default function CollaboratorLoginPage() {
       const data = await collabWorkspaceService.login(email, password);
       if (data.token) setAuthToken(data.token);
       try {
+        // On marque la session comme « collaborator » pour que ProtectedRoute n'aille
+        // pas vérifier la session admin/client précédente avec le token collab.
+        localStorage.setItem('user_type', 'collaborator');
         localStorage.setItem('collab_user', JSON.stringify(data.collaborator));
       } catch {}
       toast.success('Connexion réussie');
@@ -73,7 +76,7 @@ export default function CollaboratorLoginPage() {
         </form>
 
         <p className="mt-6 text-center text-xs text-gray-400">
-          Pas de compte ? Contactez l'administrateur.
+          Pas de compte ? Contactez l&apos;administrateur.
         </p>
       </div>
     </div>

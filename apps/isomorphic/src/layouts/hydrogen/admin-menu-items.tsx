@@ -25,12 +25,12 @@ export function useAdminMenuItems() {
     { name: t('menu.section_dashboard') },
     { name: t('menu.dashboard'), href: '/', icon: <PiChartBarDuotone /> },
     { name: t('menu.analytics'), href: routes.analytics, icon: <PiChartBarDuotone /> },
+    { name: t('menu.file_explorer'), href: '/file-manager', icon: <PiFileDuotone /> },
 
     { name: t('menu.section_clients') },
     { name: t('menu.clients'), href: '/admin/clients', icon: <PiUsersDuotone /> },
     { name: t('menu.dossiers'), href: '/admin/dossiers', icon: <PiFolderUserDuotone /> },
     { name: t('menu.collaborators'), href: '/admin/collaborators', icon: <PiUsersDuotone /> },
-    { name: t('menu.documents'), href: '/file-manager', icon: <PiFileDuotone /> },
 
     { name: t('menu.section_services') },
     { name: t('menu.immigration_services'), href: '/services-immigration', icon: <PiBriefcaseDuotone /> },

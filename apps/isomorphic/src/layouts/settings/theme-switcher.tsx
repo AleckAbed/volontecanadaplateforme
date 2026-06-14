@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
 import { useTheme } from 'next-themes';
 import { siteConfig } from '@/config/site.config';
 import { RadioGroup } from 'rizzui/radio-group';
@@ -17,6 +18,7 @@ const themeOptions = ['light', 'dark'];
 export default function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
   const { colorPresetName } = useColorPresetName();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (theme === 'light' && colorPresetName === 'black') {
@@ -40,7 +42,7 @@ export default function ThemeSwitcher() {
   }, [theme, colorPresetName]);
 
   return (
-    <DrawerBlock title="Appearance">
+    <DrawerBlock title={t('settings.appearance_title')}>
       <RadioGroup
         value={theme ?? siteConfig.mode}
         setValue={(selectedTheme: any) => {
@@ -57,12 +59,14 @@ export default function ThemeSwitcher() {
           >
             <span className="radio-active mb-3 inline-flex rounded-lg ring-offset-4 ring-offset-background dark:ring-offset-gray-100">
               {item === 'light' ? (
-                <LightMode aria-label="Light Mode" className="h-full w-full" />
+                <LightMode aria-label={t('settings.theme_light')} className="h-full w-full" />
               ) : (
-                <DarkMode aria-label="Dark Mode" className="h-full w-full" />
+                <DarkMode aria-label={t('settings.theme_dark')} className="h-full w-full" />
               )}
             </span>
-            <span className="inline-block w-full text-center">{item}</span>
+            <span className="inline-block w-full text-center">
+              {item === 'light' ? t('settings.theme_light') : t('settings.theme_dark')}
+            </span>
           </RadioBox>
         ))}
       </RadioGroup>

@@ -1,14 +1,16 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
 import { PiXBold } from 'react-icons/pi';
 import { Title, ActionIcon } from 'rizzui';
 import cn from '@core/utils/class-names';
 
 export default function DrawerHeader({ onClose }: { onClose: () => void }) {
+  const { t } = useTranslation();
   return (
     <div className="flex items-center justify-between border-b border-muted px-5 py-3.5">
       <Title as="h5" className={cn('font-semibold')}>
-        Settings
+        {t('settings.title')}
       </Title>
       <ActionIcon
         variant="text"

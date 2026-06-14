@@ -2,29 +2,35 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { Badge } from 'rizzui/badge';
 import { ActionIcon } from 'rizzui/action-icon';
+import { Tooltip } from 'rizzui';
 import cn from '@core/utils/class-names';
 import SearchWidget from '@/app/shared/search/search';
 import MessagesDropdown from '@/layouts/messages-dropdown';
 import NotificationDropdown from '@/layouts/notification-dropdown';
 import ProfileMenu from '@/layouts/profile-menu';
 import SettingsButton from '@/layouts/settings-button';
+import LanguageSwitcher from '@/layouts/language-switcher';
 import HamburgerButton from '@/layouts/hamburger-button';
 import Logo from '@core/components/logo';
+import { lockApp } from '@/layouts/lock-screen';
 import {
   PiChatCircleDotsFill,
   PiBellSimpleRingingFill,
   PiGearFill,
+  PiLockKeyDuotone,
 } from 'react-icons/pi';
 import Sidebar from './helium-sidebar';
 
 function HeaderMenuRight() {
+  const { t } = useTranslation();
   return (
-    <div className="ms-auto grid shrink-0 grid-cols-4 items-center gap-2 text-gray-700 xs:gap-3 xl:gap-4">
+    <div className="ms-auto flex shrink-0 items-center gap-2 text-gray-700 xs:gap-3 xl:gap-4">
       <MessagesDropdown>
         <ActionIcon
-          aria-label="Messages"
+          aria-label={t('header.messages', { defaultValue: 'Messages' })}
           variant="text"
           className={cn(
             'relative h-[34px] w-[34px] overflow-hidden rounded-full shadow backdrop-blur-md before:absolute before:h-full before:w-full before:-rotate-45 before:rounded-full before:bg-gradient-to-l before:from-green-dark/25 before:via-green-dark/0 before:to-green-dark/0 dark:bg-gray-100 md:h-9 md:w-9 3xl:h-10 3xl:w-10'
@@ -41,7 +47,7 @@ function HeaderMenuRight() {
       </MessagesDropdown>
       <NotificationDropdown>
         <ActionIcon
-          aria-label="Notification"
+          aria-label={t('header.notifications')}
           variant="text"
           className={cn(
             'relative h-[34px] w-[34px] overflow-hidden rounded-full shadow backdrop-blur-md before:absolute before:h-full before:w-full before:-rotate-45 before:rounded-full before:bg-gradient-to-l before:from-orange-dark/25 before:via-orange-dark/0 before:to-orange-dark/0 dark:bg-gray-100 md:h-9 md:w-9 3xl:h-10 3xl:w-10'
@@ -56,9 +62,20 @@ function HeaderMenuRight() {
           />
         </ActionIcon>
       </NotificationDropdown>
+      <LanguageSwitcher />
       <SettingsButton className="rounded-full before:absolute before:h-full before:w-full before:-rotate-45 before:rounded-full before:bg-gradient-to-l before:from-green-dark/25 before:via-green-dark/0 before:to-green-dark/0 3xl:h-10 3xl:w-10">
         <PiGearFill className="h-[22px] w-auto animate-spin-slow" />
       </SettingsButton>
+      <Tooltip size="sm" content={t('header.lock_session')} placement="bottom" color="invert">
+        <ActionIcon
+          aria-label={t('header.lock_session')}
+          variant="text"
+          onClick={() => lockApp()}
+          className="relative h-[34px] w-[34px] shadow backdrop-blur-md dark:bg-gray-100 md:h-9 md:w-9"
+        >
+          <PiLockKeyDuotone className="h-[18px] w-auto" />
+        </ActionIcon>
+      </Tooltip>
       <ProfileMenu />
     </div>
   );

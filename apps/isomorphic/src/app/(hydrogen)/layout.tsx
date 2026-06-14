@@ -40,16 +40,16 @@ function LayoutProvider({ children }: LayoutProps) {
 
   // Configurer automatiquement le layout selon le type d'utilisateur
   useEffect(() => {
-    // Les admins peuvent choisir leur layout (par défaut Helium)
+    // Les admins ne peuvent choisir QUE Hydrogen ou Helium (cf. layout-switcher).
+    // Tout autre layout legacy en localStorage (Lithium/Beryllium/Boron/Carbon) → Helium.
+    const adminAllowed = [LAYOUT_OPTIONS.HYDROGEN, LAYOUT_OPTIONS.HELIUM];
     if (userType === 'admin') {
-      // Si pas de layout défini, mettre Helium par défaut
-      if (!layout || layout === LAYOUT_OPTIONS.LITHIUM) {
+      if (!layout || !adminAllowed.includes(layout as any)) {
         setLayout(LAYOUT_OPTIONS.HELIUM);
       }
     }
     // Les clients sont TOUJOURS fixés sur Lithium (non modifiable)
     else if (userType === 'client') {
-      // Forcer Lithium pour les clients, peu importe ce qui est dans localStorage
       if (layout !== LAYOUT_OPTIONS.LITHIUM) {
         setLayout(LAYOUT_OPTIONS.LITHIUM);
       }

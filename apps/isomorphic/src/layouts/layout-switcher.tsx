@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
 import { RadioGroup } from 'rizzui';
 import { useLayout } from '@/layouts/use-layout';
 import { LAYOUT_OPTIONS } from '@/config/enums';
@@ -7,47 +8,22 @@ import RadioBox from '@/layouts/settings/radio-box';
 import DrawerBlock from '@/layouts/settings/drawer-block';
 import HydrogenIcon from './layout-icons/hydrogen-icon';
 import HeliumIcon from './layout-icons/helium-icon';
-import LithiumIcon from './layout-icons/lithium-icon';
-import BerylliumIcon from './layout-icons/beryllium-icon';
-import BoronIcon from './layout-icons/boron-icon';
-import CarbonIcon from './layout-icons/carbon-icon';
 
 const layoutOptions = [
-  {
-    icon: HydrogenIcon,
-    value: LAYOUT_OPTIONS.HYDROGEN,
-  },
-  {
-    icon: HeliumIcon,
-    value: LAYOUT_OPTIONS.HELIUM,
-  },
-  {
-    icon: LithiumIcon,
-    value: LAYOUT_OPTIONS.LITHIUM,
-  },
-  {
-    icon: BerylliumIcon,
-    value: LAYOUT_OPTIONS.BERYLLIUM,
-  },
-  {
-    icon: BoronIcon,
-    value: LAYOUT_OPTIONS.BORON,
-  },
-  {
-    icon: CarbonIcon,
-    value: LAYOUT_OPTIONS.CARBON,
-  },
+  { icon: HydrogenIcon, value: LAYOUT_OPTIONS.HYDROGEN, labelKey: 'settings.layout_hydrogen' },
+  { icon: HeliumIcon, value: LAYOUT_OPTIONS.HELIUM, labelKey: 'settings.layout_helium' },
 ];
 
 export default function LayoutSwitcher() {
   const { layout, setLayout } = useLayout();
+  const { t } = useTranslation();
 
   return (
-    <DrawerBlock title="Layout">
+    <DrawerBlock title={t('settings.layout_title')}>
       <RadioGroup
         value={layout}
         setValue={(selectedLayout: any) => setLayout(selectedLayout)}
-        className="grid grid-cols-2 gap-4 sm:grid-cols-3"
+        className="grid grid-cols-2 gap-4"
       >
         {layoutOptions.map((item) => (
           <RadioBox
@@ -59,13 +35,13 @@ export default function LayoutSwitcher() {
             <span className="flex w-full justify-center">
               <span className="radio-active mb-3 inline-flex justify-center rounded-lg capitalize ring-offset-4 ring-offset-gray-0 duration-150 dark:ring-offset-gray-100">
                 <item.icon
-                  aria-label={item.value}
+                  aria-label={t(item.labelKey)}
                   className="h-[92px] w-full"
                 />
               </span>
             </span>{' '}
             <span className="inline-block w-full text-center">
-              {item.value}
+              {t(item.labelKey)}
             </span>
           </RadioBox>
         ))}

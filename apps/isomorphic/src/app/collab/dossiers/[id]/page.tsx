@@ -152,24 +152,38 @@ export default function CollabDossierDetailPage({ params }: { params: Promise<{ 
                     </span>
                   </div>
                   <ul className="space-y-1">
-                    {inv.items.map((it) => (
-                      <li key={it.id} className="flex items-center gap-3 rounded-lg border border-gray-100 bg-gray-50 p-2 text-sm">
-                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                          it.kind === 'form' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
-                        }`}>
-                          {it.kind === 'form' ? 'Formulaire' : 'Document'}
-                        </span>
-                        <div className="flex-1 truncate">
-                          {it.form_type?.name ?? it.document_template?.name ?? '—'}
-                        </div>
-                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                          it.status === 'completed' ? 'bg-green-100 text-green-700' :
-                          it.status === 'in_progress' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
-                        }`}>
-                          {it.status === 'completed' ? '✓ Complété' : it.status === 'in_progress' ? '◐ En cours' : '○ À faire'}
-                        </span>
-                      </li>
-                    ))}
+                    {inv.items.map((it) => {
+                      const viewUrl = it.kind === 'document'
+                        ? collabWorkspaceService.getInvitationItemPdfUrl(Number(id), inv.id, it.id)
+                        : `/collab/items/${it.id}/view`;
+                      return (
+                        <li key={it.id} className="flex items-center gap-3 rounded-lg border border-gray-100 bg-gray-50 p-2 text-sm">
+                          <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                            it.kind === 'form' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
+                          }`}>
+                            {it.kind === 'form' ? 'Formulaire' : 'Document'}
+                          </span>
+                          <div className="flex-1 truncate">
+                            {it.form_type?.name ?? it.document_template?.name ?? '—'}
+                          </div>
+                          <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                            it.status === 'completed' ? 'bg-green-100 text-green-700' :
+                            it.status === 'in_progress' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+                          }`}>
+                            {it.status === 'completed' ? '✓ Complété' : it.status === 'in_progress' ? '◐ En cours' : '○ À faire'}
+                          </span>
+                          <a
+                            href={viewUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1 rounded-lg border border-blue-300 px-2 py-1 text-[10px] font-medium text-blue-700 hover:bg-blue-50"
+                            title="Ouvrir dans un nouvel onglet (lecture seule)"
+                          >
+                            Voir ↗
+                          </a>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               ))}

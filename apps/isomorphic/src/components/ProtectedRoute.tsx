@@ -33,6 +33,7 @@ const publicRoutes = [
   '/pstq-form',
   '/invitation',
   '/document',
+  '/collab',
   '/maintenance',
   '/not-found',
 ];
