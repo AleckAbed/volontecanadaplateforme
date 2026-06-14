@@ -93,7 +93,10 @@ export default function CreateService() {
                   placeholder={t('services_immigration.category_placeholder')}
                   options={categories}
                   value={value}
-                  onChange={onChange}
+                  onChange={(option: any) => onChange(option?.value ?? '')}
+                  getOptionValue={(option: any) => option.value}
+                  displayValue={(val: any) => categories.find((c) => c.value === val)?.label ?? ''}
+                  dropdownClassName="!z-[10001]"
                   error={errors.category?.message}
                 />
               )}
@@ -113,7 +116,10 @@ export default function CreateService() {
                   placeholder={t('services_immigration.status_placeholder')}
                   options={statusOptions}
                   value={value}
-                  onChange={onChange}
+                  onChange={(option: any) => onChange(option?.value ?? '')}
+                  getOptionValue={(option: any) => option.value}
+                  displayValue={(val: any) => statusOptions.find((s) => s.value === val)?.label ?? ''}
+                  dropdownClassName="!z-[10001]"
                   error={errors.status?.message}
                 />
               )}

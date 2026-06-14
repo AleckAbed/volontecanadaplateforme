@@ -86,16 +86,22 @@ export default function DocumentTemplatesPage() {
           />
         </div>
         <div className="md:w-72">
-          <label className="mb-1 block text-xs font-medium uppercase text-gray-500">Service d&apos;immigration</label>
+          <label className="mb-1 block text-xs font-medium uppercase text-gray-500">Service d&apos;immigration / Type</label>
           <select
             value={serviceFilter}
             onChange={(e) => setServiceFilter(e.target.value)}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
           >
-            <option value="">Tous les services</option>
-            {servicesList.filter((s) => s.status === 'active').map((s) => (
-              <option key={s.id} value={s.name}>{s.name}</option>
-            ))}
+            <option value="">Tout afficher</option>
+            <optgroup label="Services d'immigration">
+              {servicesList.filter((s) => s.status === 'active').map((s) => (
+                <option key={s.id} value={s.name}>{s.name}</option>
+              ))}
+            </optgroup>
+            <optgroup label="Types généraux">
+              <option value="Documents du cabinet">Documents du cabinet</option>
+              <option value="Autre">Autre</option>
+            </optgroup>
           </select>
         </div>
         {(search || serviceFilter) && (
@@ -247,19 +253,25 @@ function EditTemplateModal({
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Service d&apos;immigration</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Service d&apos;immigration / Type</label>
             <select
               value={serviceName}
               onChange={(e) => setServiceName(e.target.value)}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
             >
               <option value="">— Aucun (modèle général) —</option>
-              {servicesList.filter((s) => s.status === 'active').map((s) => (
-                <option key={s.id} value={s.name}>{s.name} ({s.category})</option>
-              ))}
+              <optgroup label="Services d'immigration">
+                {servicesList.filter((s) => s.status === 'active').map((s) => (
+                  <option key={s.id} value={s.name}>{s.name} ({s.category})</option>
+                ))}
+              </optgroup>
+              <optgroup label="Types généraux">
+                <option value="Documents du cabinet">Documents du cabinet</option>
+                <option value="Autre">Autre</option>
+              </optgroup>
             </select>
             <p className="mt-1 text-xs text-gray-500">
-              Les futurs dossiers pour ce service ajouteront automatiquement ce document.
+              Les futurs dossiers pour le service correspondant ajouteront automatiquement ce document.
             </p>
           </div>
           <div>
