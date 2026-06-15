@@ -33,6 +33,7 @@ const demandeurSchema = z.object({
   date_of_birth: z.string().optional(),
   nationality: z.string().optional(),
   country_of_residence: z.string().optional(),
+  in_canada: z.boolean().optional(),
   passport_number: z.string().optional(),
   address: z.string().optional(),
 });
@@ -49,6 +50,7 @@ function buildPayload(data: ClientFormDataType) {
     date_of_birth: data.date_of_birth || undefined,
     nationality: data.nationality || undefined,
     country_of_residence: (data as any).country_of_residence || undefined,
+    in_canada: (data as any).in_canada,
     passport_number: data.passport_number || undefined,
     address: data.address || undefined,
     family_members:
@@ -100,6 +102,7 @@ export default function StepDemandeur() {
       date_of_birth: formData.date_of_birth,
       nationality: formData.nationality,
       country_of_residence: formData.country_of_residence,
+      in_canada: (formData as any).in_canada,
       passport_number: formData.passport_number,
       address: formData.address,
     },
@@ -116,9 +119,10 @@ export default function StepDemandeur() {
       date_of_birth: data.date_of_birth ?? '',
       nationality: data.nationality ?? '',
       country_of_residence: data.country_of_residence ?? '',
+      in_canada: (data as any).in_canada,
       passport_number: data.passport_number ?? '',
       address: data.address ?? '',
-    };
+    } as any;
     setFormData(nextData);
 
     if (!isFamily) {
@@ -227,6 +231,31 @@ export default function StepDemandeur() {
               />
             )}
           />
+        </div>
+        <div className="md:col-span-2">
+          <label className="mb-1.5 block text-sm font-medium text-gray-700">{t('clients.in_canada_question')}</label>
+          <Controller
+            name="in_canada"
+            control={control}
+            render={({ field: { value, onChange } }) => (
+              <div className="flex flex-wrap gap-3">
+                <label className={`flex cursor-pointer items-center gap-2 rounded-lg border-2 px-4 py-2 text-sm transition ${value === true ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-gray-200 hover:border-blue-300'}`}>
+                  <input type="radio" checked={value === true} onChange={() => onChange(true)} className="h-4 w-4" />
+                  {t('clients.in_canada_yes')}
+                </label>
+                <label className={`flex cursor-pointer items-center gap-2 rounded-lg border-2 px-4 py-2 text-sm transition ${value === false ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-gray-200 hover:border-blue-300'}`}>
+                  <input type="radio" checked={value === false} onChange={() => onChange(false)} className="h-4 w-4" />
+                  {t('clients.in_canada_no')}
+                </label>
+                {(value === true || value === false) && (
+                  <button type="button" onClick={() => onChange(undefined)} className="text-xs text-gray-500 hover:underline">
+                    {t('clients.in_canada_reset')}
+                  </button>
+                )}
+              </div>
+            )}
+          />
+          <p className="mt-1 text-xs text-gray-500">{t('clients.in_canada_hint')}</p>
         </div>
         <Input
           label={t('clients.passport_number')}

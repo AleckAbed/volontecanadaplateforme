@@ -501,20 +501,26 @@ export default function NouvelEnvoiPage() {
                   </CategorySection>
                 );
               })}
-              {/* Forms without category */}
-              {(formsByCategory.get(null) || []).length > 0 && (
-                <CategorySection title={t('envois.no_categories_short')}>
-                  {formsByCategory.get(null)!.map((ft) => (
-                    <CheckItem
-                      key={`ft-${ft.id}`}
-                      checked={selectedForms.has(ft.id)}
-                      onToggle={() => toggleForm(ft.id)}
-                      title={ft.name}
-                      subtitle={ft.description}
-                    />
-                  ))}
-                </CategorySection>
-              )}
+              {/* Forms whose category isn't in the visible list (cat inactif/null/inconnu).
+                  On les regroupe sous une section « Autres » plutôt que de les masquer. */}
+              {(() => {
+                const visibleCatIds = new Set(formCategories.map((c) => c.id));
+                const orphans = formTypes.filter((ft) => ft.category_id == null || !visibleCatIds.has(ft.category_id));
+                if (orphans.length === 0) return null;
+                return (
+                  <CategorySection title={t('envois.no_categories_short')}>
+                    {orphans.map((ft) => (
+                      <CheckItem
+                        key={`ft-${ft.id}`}
+                        checked={selectedForms.has(ft.id)}
+                        onToggle={() => toggleForm(ft.id)}
+                        title={ft.name}
+                        subtitle={ft.description}
+                      />
+                    ))}
+                  </CategorySection>
+                );
+              })()}
             </div>
           )}
         </div>

@@ -40,6 +40,7 @@ export interface DocumentTemplate {
   name: string;
   description?: string;
   service_name?: string | null;
+  target_location?: 'any' | 'in_canada' | 'outside_canada' | null;
   category: string;
   category_id?: number | null;
   category_label: string;
@@ -121,7 +122,13 @@ export const documentService = {
 
   async updateTemplate(
     id: number,
-    payload: { name?: string; description?: string | null; service_name?: string | null; is_active?: boolean },
+    payload: {
+      name?: string;
+      description?: string | null;
+      service_name?: string | null;
+      target_location?: 'any' | 'in_canada' | 'outside_canada' | null;
+      is_active?: boolean;
+    },
   ): Promise<void> {
     await authFetch(`/admin/document-templates/${id}`, {
       method: 'PUT',

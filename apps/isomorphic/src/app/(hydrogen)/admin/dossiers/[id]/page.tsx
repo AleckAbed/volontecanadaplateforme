@@ -272,11 +272,11 @@ export default function DossierDetailPage({ params }: { params: Promise<{ id: st
         )}
       </div>
 
-      {/* Documents de base */}
+      {/* Documents d'immigration IRCC */}
       <div className="mt-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">
-            Documents de base{' '}
+            Documents d&apos;immigration IRCC{' '}
             <span className="text-sm font-normal text-gray-500">({dossier.documents?.length ?? 0})</span>
           </h2>
           <button
@@ -295,14 +295,14 @@ export default function DossierDetailPage({ params }: { params: Promise<{ id: st
             className="mt-0.5"
           />
           <span>
-            <span className="font-medium text-gray-900">Envoyer les documents de base au client</span>
+            <span className="font-medium text-gray-900">Envoyer les documents d&apos;immigration IRCC au client</span>
             <span className="ml-1 text-xs text-gray-500">
               — si coché, ces documents seront pré-sélectionnés (modifiables) lors d&apos;une nouvelle invitation pour ce dossier.
             </span>
           </span>
         </label>
         {(dossier.documents?.length ?? 0) === 0 ? (
-          <p className="text-sm text-gray-500">Aucun document de base pour ce dossier.</p>
+          <p className="text-sm text-gray-500">Aucun document d&apos;immigration IRCC pour ce dossier.</p>
         ) : (
           <ul className="space-y-2">
             {dossier.documents!.map((d) => (
@@ -497,7 +497,7 @@ function AddBaseDocumentModal({
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
       <div className="w-full max-w-lg rounded-xl bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
-          <h3 className="text-lg font-semibold text-gray-900">Ajouter un document de base</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Ajouter un document d&apos;immigration IRCC</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-700">✕</button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4 p-5">

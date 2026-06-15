@@ -71,7 +71,7 @@ export default function CollabDossierDetailPage({ params }: { params: Promise<{ 
         <section className="mb-6 rounded-xl border border-gray-200 bg-white p-5">
           <div className="mb-1 flex items-center gap-2">
             <span className="text-2xl">📋</span>
-            <h2 className="text-lg font-semibold text-gray-900">Documents de base à remplir</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Documents d&apos;immigration IRCC à remplir</h2>
           </div>
           <p className="mb-4 text-sm text-gray-500">
             Documents internes au cabinet. Cliquez pour remplir et marquez comme terminé une fois complétés.
@@ -79,7 +79,7 @@ export default function CollabDossierDetailPage({ params }: { params: Promise<{ 
 
           {data.documents.length === 0 ? (
             <div className="rounded-lg bg-gray-50 p-6 text-center text-sm text-gray-500">
-              Aucun document de base pour ce dossier.
+              Aucun document d&apos;immigration IRCC pour ce dossier.
             </div>
           ) : (
             <ul className="space-y-2">
@@ -185,6 +185,44 @@ export default function CollabDossierDetailPage({ params }: { params: Promise<{ 
                       );
                     })}
                   </ul>
+
+                  {/* Fichiers téléversés librement par le client */}
+                  {(inv.client_uploads?.length ?? 0) > 0 && (
+                    <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50/50 p-3">
+                      <div className="mb-2 flex items-center gap-2">
+                        <span className="text-base">📎</span>
+                        <h4 className="text-sm font-semibold text-amber-900">
+                          Fichiers complémentaires envoyés par le client ({inv.client_uploads!.length})
+                        </h4>
+                      </div>
+                      <ul className="space-y-1.5">
+                        {inv.client_uploads!.map((u) => (
+                          <li
+                            key={u.id}
+                            className="flex items-center gap-3 rounded-md bg-white p-2 text-sm shadow-sm"
+                          >
+                            <span className="text-base">📄</span>
+                            <div className="flex-1 overflow-hidden">
+                              <div className="truncate font-medium text-gray-900">{u.label}</div>
+                              <div className="truncate text-xs text-gray-500">
+                                {u.original_filename} · {formatBytes(u.size)}
+                                {u.created_at ? ` · ${u.created_at}` : ''}
+                              </div>
+                            </div>
+                            <a
+                              href={collabWorkspaceService.getInvitationClientUploadUrl(Number(id), inv.id, u.id)}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1 rounded-lg border border-amber-400 px-2 py-1 text-[10px] font-medium text-amber-800 hover:bg-amber-100"
+                              title="Télécharger le fichier"
+                            >
+                              Télécharger ↓
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

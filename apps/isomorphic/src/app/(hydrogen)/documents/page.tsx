@@ -213,6 +213,9 @@ function EditTemplateModal({
   const [name, setName] = useState(template.name);
   const [description, setDescription] = useState(template.description ?? '');
   const [serviceName, setServiceName] = useState(template.service_name ?? '');
+  const [targetLocation, setTargetLocation] = useState<'any' | 'in_canada' | 'outside_canada'>(
+    (template.target_location as any) ?? 'any'
+  );
   const [saving, setSaving] = useState(false);
 
   const handleSave = async (e: React.FormEvent) => {
@@ -224,6 +227,7 @@ function EditTemplateModal({
         name: name.trim(),
         description: description.trim() || null,
         service_name: serviceName || null,
+        target_location: targetLocation,
       });
       toast.success('Modèle mis à jour');
       onSaved();
@@ -273,6 +277,32 @@ function EditTemplateModal({
             <p className="mt-1 text-xs text-gray-500">
               Les futurs dossiers pour le service correspondant ajouteront automatiquement ce document.
             </p>
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Destinataire selon la localisation du client</label>
+            <div className="grid gap-2">
+              {([
+                { value: 'any', label: 'Tous (Canada + hors Canada)' },
+                { value: 'in_canada', label: 'Au Canada uniquement' },
+                { value: 'outside_canada', label: 'Hors Canada uniquement' },
+              ] as const).map((opt) => (
+                <label
+                  key={opt.value}
+                  className={`flex cursor-pointer items-center gap-2 rounded-lg border-2 px-3 py-2 text-sm transition ${
+                    targetLocation === opt.value ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:border-blue-300'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="edit_target_location"
+                    checked={targetLocation === opt.value}
+                    onChange={() => setTargetLocation(opt.value)}
+                    className="h-4 w-4"
+                  />
+                  <span>{opt.label}</span>
+                </label>
+              ))}
+            </div>
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Description</label>

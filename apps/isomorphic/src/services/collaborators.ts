@@ -86,6 +86,15 @@ export interface CollabInvitationItem {
   completed_at?: string;
 }
 
+export interface CollabClientUpload {
+  id: number;
+  label: string;
+  original_filename: string;
+  mime_type?: string;
+  size: number;
+  created_at?: string;
+}
+
 export interface CollabInvitation {
   id: number;
   unique_code: string;
@@ -94,6 +103,7 @@ export interface CollabInvitation {
   sent_at?: string;
   expires_at?: string;
   items: CollabInvitationItem[];
+  client_uploads?: CollabClientUpload[];
 }
 
 export interface CollabDossierDetail {
@@ -230,6 +240,9 @@ export const collabWorkspaceService = {
   },
   getInvitationItemPdfUrl(dossierId: number, invitationId: number, itemId: number): string {
     return `${getApiUrl()}/collaborator/dossiers/${dossierId}/invitations/${invitationId}/items/${itemId}/pdf`;
+  },
+  getInvitationClientUploadUrl(dossierId: number, invitationId: number, uploadId: number): string {
+    return `${getApiUrl()}/collaborator/dossiers/${dossierId}/invitations/${invitationId}/uploads/${uploadId}`;
   },
   async getInvitationItem(itemId: number): Promise<{
     id: number;

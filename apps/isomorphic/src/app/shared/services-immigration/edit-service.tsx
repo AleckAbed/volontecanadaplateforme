@@ -5,7 +5,7 @@ import { PiXBold } from 'react-icons/pi';
 import { Controller, SubmitHandler } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Form } from '@core/ui/form';
-import { Input, Button, ActionIcon, Title, Select } from 'rizzui';
+import { Input, Button, ActionIcon, Title } from 'rizzui';
 import {
   CreateServiceInput,
   createServiceSchema,
@@ -84,46 +84,60 @@ export default function EditService({ serviceId }: EditServiceProps) {
             {...register('description')}
             error={errors.description?.message}
           />
-          <Controller
-            control={control}
-            name="category"
-            render={({ field: { onChange, value } }) => (
-              <Select
-                label={t('services_immigration.category')}
-                placeholder={t('services_immigration.category_placeholder')}
-                options={categories}
-                value={value}
-                onChange={(option: any) => onChange(option?.value ?? '')}
-                getOptionValue={(option: any) => option.value}
-                displayValue={(val: any) => categories.find((c) => c.value === val)?.label ?? ''}
-                dropdownClassName="!z-[10001]"
-                error={errors.category?.message}
-              />
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-gray-900">
+              {t('services_immigration.category')}
+            </label>
+            <Controller
+              control={control}
+              name="category"
+              render={({ field: { onChange, value } }) => (
+                <select
+                  value={value ?? ''}
+                  onChange={(e) => onChange(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-200 dark:bg-gray-50"
+                >
+                  <option value="">{t('services_immigration.category_placeholder')}</option>
+                  {categories.map((c) => (
+                    <option key={c.value} value={c.value}>{c.label}</option>
+                  ))}
+                </select>
+              )}
+            />
+            {errors.category?.message && (
+              <p className="mt-1 text-xs text-red-600">{errors.category.message}</p>
             )}
-          />
+          </div>
           <Input
             label={t('services_immigration.duration')}
             placeholder={t('services_immigration.duration_placeholder')}
             {...register('duration')}
             error={errors.duration?.message}
           />
-          <Controller
-            control={control}
-            name="status"
-            render={({ field: { onChange, value } }) => (
-              <Select
-                label={t('services_immigration.status')}
-                placeholder={t('services_immigration.status_placeholder')}
-                options={statusOptions}
-                value={value}
-                onChange={(option: any) => onChange(option?.value ?? '')}
-                getOptionValue={(option: any) => option.value}
-                displayValue={(val: any) => statusOptions.find((s) => s.value === val)?.label ?? ''}
-                dropdownClassName="!z-[10001]"
-                error={errors.status?.message}
-              />
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-gray-900">
+              {t('services_immigration.status')}
+            </label>
+            <Controller
+              control={control}
+              name="status"
+              render={({ field: { onChange, value } }) => (
+                <select
+                  value={value ?? ''}
+                  onChange={(e) => onChange(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-200 dark:bg-gray-50"
+                >
+                  <option value="">{t('services_immigration.status_placeholder')}</option>
+                  {statusOptions.map((s) => (
+                    <option key={s.value} value={s.value}>{s.label}</option>
+                  ))}
+                </select>
+              )}
+            />
+            {errors.status?.message && (
+              <p className="mt-1 text-xs text-red-600">{errors.status.message}</p>
             )}
-          />
+          </div>
 
           <div className="flex items-center justify-end gap-4">
             <Button

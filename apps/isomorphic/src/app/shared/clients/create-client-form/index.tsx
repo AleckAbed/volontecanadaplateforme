@@ -29,6 +29,7 @@ export type ClientFormDataType = {
   date_of_birth: string;
   nationality: string;
   country_of_residence: string;
+  in_canada?: boolean;
   passport_number: string;
   address: string;
   family_members: FamilyMemberInput[];
@@ -44,6 +45,7 @@ export const initialClientFormData: ClientFormDataType = {
   date_of_birth: '',
   nationality: '',
   country_of_residence: '',
+  in_canada: undefined,
   passport_number: '',
   address: '',
   family_members: [],

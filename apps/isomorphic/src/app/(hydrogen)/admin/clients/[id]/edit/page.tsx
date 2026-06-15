@@ -37,6 +37,7 @@ interface ClientForm {
   date_of_birth: string;
   nationality: string;
   country_of_residence: string;
+  in_canada?: boolean;
   passport_number: string;
   address: string;
   is_active: boolean;
@@ -60,6 +61,7 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
     date_of_birth: '',
     nationality: '',
     country_of_residence: '',
+    in_canada: undefined,
     passport_number: '',
     address: '',
     is_active: true,
@@ -81,6 +83,7 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
             date_of_birth: c.date_of_birth || '',
             nationality: c.nationality || '',
             country_of_residence: c.country_of_residence || '',
+            in_canada: typeof c.in_canada === 'boolean' ? c.in_canada : undefined,
             passport_number: c.passport_number || '',
             address: c.address || '',
             is_active: c.is_active !== false,
@@ -135,7 +138,7 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
       setSaving(true);
 
       // 1. Update main client info
-      await apiService.updateModuleClient(id, {
+      const payload: any = {
         client_type: form.client_type,
         first_name: form.first_name.trim(),
         last_name: form.last_name.trim(),
@@ -147,7 +150,11 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
         passport_number: form.passport_number.trim() || null,
         address: form.address.trim() || null,
         is_active: form.is_active,
-      });
+      };
+      if (typeof form.in_canada === 'boolean') {
+        payload.in_canada = form.in_canada;
+      }
+      await apiService.updateModuleClient(id, payload);
 
       // 2. Diff family members: detect deletions, updates, creations
       const originalIds = new Set(originalMembers.map((m) => m.id).filter(Boolean) as number[]);
@@ -265,6 +272,40 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
                 onChange={(v) => setForm({ ...form, country_of_residence: v })}
                 placeholder={t('clients.select_country')}
               />
+            </Field>
+            <Field label={t('clients.in_canada_question')} className="md:col-span-2">
+              <div className="flex flex-wrap gap-3">
+                <label className={`flex cursor-pointer items-center gap-2 rounded-lg border-2 px-4 py-2 text-sm transition ${form.in_canada === true ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-gray-200 hover:border-blue-300'}`}>
+                  <input
+                    type="radio"
+                    name="edit_in_canada"
+                    checked={form.in_canada === true}
+                    onChange={() => setForm({ ...form, in_canada: true })}
+                    className="h-4 w-4"
+                  />
+                  {t('clients.in_canada_yes')}
+                </label>
+                <label className={`flex cursor-pointer items-center gap-2 rounded-lg border-2 px-4 py-2 text-sm transition ${form.in_canada === false ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-gray-200 hover:border-blue-300'}`}>
+                  <input
+                    type="radio"
+                    name="edit_in_canada"
+                    checked={form.in_canada === false}
+                    onChange={() => setForm({ ...form, in_canada: false })}
+                    className="h-4 w-4"
+                  />
+                  {t('clients.in_canada_no')}
+                </label>
+                {(form.in_canada === true || form.in_canada === false) && (
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, in_canada: undefined })}
+                    className="text-xs text-gray-500 hover:underline"
+                  >
+                    {t('clients.in_canada_reset')}
+                  </button>
+                )}
+              </div>
+              <p className="mt-1 text-xs text-gray-500">{t('clients.in_canada_hint')}</p>
             </Field>
             <Field label={t('clients.passport_number')}>
               <input
