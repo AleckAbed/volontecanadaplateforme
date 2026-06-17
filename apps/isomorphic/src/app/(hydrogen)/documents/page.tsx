@@ -10,6 +10,31 @@ import {
 } from 'react-icons/pi';
 import { documentService, DocumentTemplate } from '@/services/documents';
 import { servicesList } from '@/data/services-immigration';
+import TourButton from '@/components/TourButton';
+
+const DOCUMENTS_TOUR = [
+  {
+    element: '#tour-doc-viewmode',
+    popover: {
+      title: '👁 Mode d\'affichage',
+      description: 'Basculez entre <strong>Grille</strong> (cartes visuelles), <strong>Liste</strong> (tableau dense) et <strong>Explorateur</strong> (dossiers par service). Votre choix est mémorisé.',
+    },
+  },
+  {
+    element: '#tour-doc-new',
+    popover: {
+      title: '➕ Nouveau modèle',
+      description: 'Téléversez un PDF (IRCC ou Provincial FO), liez-le à un <strong>service d\'immigration</strong>, choisissez sa <strong>nature</strong> et sa <strong>localisation cible</strong>. Il sera auto-attaché aux futurs dossiers du même service.',
+    },
+  },
+  {
+    element: '#tour-doc-filters',
+    popover: {
+      title: '🔍 Filtres',
+      description: 'Recherchez par nom/description, ou filtrez par <strong>service d\'immigration</strong> ou <strong>type général</strong> (cabinet, IRCC, etc.).',
+    },
+  },
+];
 
 type ViewMode = 'grid' | 'list' | 'explorer';
 const VIEW_STORAGE_KEY = 'documentsView';
@@ -89,13 +114,15 @@ export default function DocumentTemplatesPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <TourButton steps={DOCUMENTS_TOUR} storageKey="tour-documents-seen" />
           {/* Switcher de vue */}
-          <div className="inline-flex items-center rounded-lg border border-gray-200 bg-white p-0.5 shadow-sm">
+          <div id="tour-doc-viewmode" className="inline-flex items-center rounded-lg border border-gray-200 bg-white p-0.5 shadow-sm">
             <ViewBtn icon={<PiSquaresFourDuotone className="h-5 w-5" />} label="Grille" active={view === 'grid'} onClick={() => changeView('grid')} />
             <ViewBtn icon={<PiListDuotone className="h-5 w-5" />} label="Liste" active={view === 'list'} onClick={() => changeView('list')} />
             <ViewBtn icon={<PiFoldersDuotone className="h-5 w-5" />} label="Explorateur" active={view === 'explorer'} onClick={() => changeView('explorer')} />
           </div>
           <Link
+            id="tour-doc-new"
             href="/documents/nouveau"
             className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
           >
@@ -105,7 +132,7 @@ export default function DocumentTemplatesPage() {
       </div>
 
       {/* Filtres */}
-      <div className="mb-5 flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 md:flex-row md:items-end">
+      <div id="tour-doc-filters" className="mb-5 flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 md:flex-row md:items-end">
         <div className="flex-1">
           <label className="mb-1 block text-xs font-medium uppercase text-gray-500">Rechercher</label>
           <input
@@ -474,9 +501,9 @@ function ExplorerView({ templates, onEdit, onDelete, deleting }: ViewProps) {
 
 function DocTypeBadge({ docType }: { docType?: string }) {
   if (docType === 'fo') {
-    return <span className="rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-semibold text-purple-700">FO Provincial</span>;
+    return <span className="rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-semibold text-purple-700" title="Provincial — MIFI">Provincial (MIFI)</span>;
   }
-  return <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-semibold text-indigo-700">IRCC Fédéral</span>;
+  return <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-semibold text-indigo-700" title="Fédéral — IRCC">Fédéral (IRCC)</span>;
 }
 
 function EditTemplateModal({
@@ -556,8 +583,8 @@ function EditTemplateModal({
             <label className="mb-1 block text-sm font-medium text-gray-700">Nature du document</label>
             <div className="grid gap-2 md:grid-cols-2">
               {([
-                { value: 'ircc', label: 'Gouvernemental (IRCC)' },
-                { value: 'fo', label: 'Provincial (FO)' },
+                { value: 'ircc', label: 'Fédéral (IRCC)' },
+                { value: 'fo', label: 'Provincial (MIFI)' },
               ] as const).map((opt) => (
                 <label
                   key={opt.value}

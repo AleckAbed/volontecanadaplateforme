@@ -152,8 +152,8 @@ export default function NouveauModelePage() {
           <label className="mb-1 block text-sm font-medium text-gray-700">Nature du document</label>
           <div className="grid gap-2 md:grid-cols-2">
             {([
-              { value: 'ircc', label: 'Gouvernemental (IRCC)', hint: 'Formulaire fédéral d\'immigration' },
-              { value: 'fo', label: 'Provincial (FO)', hint: 'Formulaire d\'une province (CSQ, etc.)' },
+              { value: 'ircc', label: 'Fédéral (IRCC)', hint: 'Formulaire fédéral d\'Immigration, Réfugiés et Citoyenneté Canada' },
+              { value: 'fo', label: 'Provincial (MIFI)', hint: 'Formulaire provincial du Ministère de l\'Immigration (CSQ, etc.)' },
             ] as const).map((opt) => (
               <label
                 key={opt.value}

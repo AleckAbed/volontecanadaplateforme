@@ -56,6 +56,7 @@
         "core": "workspace:*",
         "date-arithmetic": "^4.1.0",
         "dayjs": "^1.11.13",
+        "driver.js": "^1.4.0",
         "eslint": "9.23.0",
         "eslint-config-next": "15.2.6",
         "fs-extra": "^11.3.0",

@@ -18,6 +18,38 @@ import {
   PiPaperPlaneTiltDuotone,
 } from 'react-icons/pi';
 import { collaboratorsService, Collaborator } from '@/services/collaborators';
+import TourButton from '@/components/TourButton';
+
+const COLLABORATORS_TOUR = [
+  {
+    element: '#tour-collab-new',
+    popover: {
+      title: '➕ Créer un compte',
+      description: 'Ajoutez un nouveau collaborateur (nom, courriel, mot de passe initial). Le compte est créé <strong>inactif</strong> jusqu\'à l\'activation.',
+    },
+  },
+  {
+    element: '#tour-collab-stats',
+    popover: {
+      title: '📊 Vue d\'ensemble',
+      description: 'Total, actifs, inactifs et nombre de dossiers attribués. Les chiffres se mettent à jour automatiquement.',
+    },
+  },
+  {
+    element: '#tour-collab-search',
+    popover: {
+      title: '🔍 Recherche rapide',
+      description: 'Filtrez la liste par <strong>nom, courriel ou téléphone</strong>. Pratique quand votre équipe grandit.',
+    },
+  },
+  {
+    element: '#tour-collab-cards',
+    popover: {
+      title: '👥 Les collaborateurs',
+      description: 'Chaque carte permet d\'<strong>envoyer un lien de connexion</strong> (vert), <strong>modifier</strong> ou <strong>supprimer</strong>. Le lien d\'activation expire dans 7 jours.',
+    },
+  },
+];
 
 export default function CollaboratorsPage() {
   const { t } = useTranslation();
@@ -94,19 +126,23 @@ export default function CollaboratorsPage() {
             </p>
           </div>
         </div>
-        <button
-          onClick={() => { setEditing(null); setShowForm(true); }}
-          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:shadow-xl hover:shadow-blue-500/30 active:scale-[0.98]"
-        >
-          <PiPlusBold className="h-4 w-4" />
-          {t('collaborators.new_btn')}
-        </button>
+        <div className="flex items-center gap-2">
+          <TourButton steps={COLLABORATORS_TOUR} storageKey="tour-collaborators-seen" />
+          <button
+            id="tour-collab-new"
+            onClick={() => { setEditing(null); setShowForm(true); }}
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:shadow-xl hover:shadow-blue-500/30 active:scale-[0.98]"
+          >
+            <PiPlusBold className="h-4 w-4" />
+            {t('collaborators.new_btn')}
+          </button>
+        </div>
       </div>
 
       {/* === Stats + recherche : visibles seulement si au moins un collab === */}
       {items.length > 0 && (
         <>
-          <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <div id="tour-collab-stats" className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
             <StatCard
               icon={<PiUsersThreeDuotone className="h-5 w-5" />}
               label={t('collaborators.stat_total')}
@@ -133,7 +169,7 @@ export default function CollaboratorsPage() {
             />
           </div>
 
-          <div className="mb-5 flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-2.5 shadow-sm">
+          <div id="tour-collab-search" className="mb-5 flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-2.5 shadow-sm">
             <PiMagnifyingGlassBold className="ml-2 h-4 w-4 text-gray-400" />
             <input
               type="text"
@@ -164,11 +200,11 @@ export default function CollaboratorsPage() {
       ) : items.length === 0 ? (
         <EmptyState onCreate={() => { setEditing(null); setShowForm(true); }} />
       ) : filtered.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center text-sm text-gray-500">
+        <div id="tour-collab-cards" className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center text-sm text-gray-500">
           {t('collaborators.no_search_result')}
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div id="tour-collab-cards" className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filtered.map((c) => (
             <CollaboratorCard
               key={c.id}

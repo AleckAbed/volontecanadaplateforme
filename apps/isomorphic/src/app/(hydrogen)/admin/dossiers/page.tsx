@@ -7,6 +7,31 @@ import { useTranslation } from 'react-i18next';
 import { Badge, ActionIcon, Tooltip } from 'rizzui';
 import { PiPlusBold, PiEyeDuotone, PiPencilDuotone, PiTrashDuotone, PiFolderOpenDuotone } from 'react-icons/pi';
 import { apiService } from '@/services/api';
+import TourButton from '@/components/TourButton';
+
+const DOSSIERS_LIST_TOUR = [
+  {
+    element: '#tour-dossiers-add',
+    popover: {
+      title: '📁 Créer un nouveau dossier',
+      description: 'Cliquez ici pour <strong>ouvrir un nouveau dossier</strong> pour un de vos clients (RP, visa de visiteur, parrainage…). Les documents IRCC liés au service choisi seront <strong>auto-attachés</strong>.',
+    },
+  },
+  {
+    element: '#tour-dossiers-filters',
+    popover: {
+      title: '🔍 Filtrer par statut',
+      description: 'Cliquez sur un statut pour filtrer rapidement : En cours, Soumis, Accordé, etc. Le compteur « Tous » donne le total de vos dossiers.',
+    },
+  },
+  {
+    element: '#tour-dossiers-table',
+    popover: {
+      title: '📋 Liste des dossiers',
+      description: 'Chaque ligne montre un dossier. Les <strong>actions</strong> à droite permettent de <strong>voir le détail</strong>, <strong>modifier</strong>, ou <strong>supprimer</strong>. Cliquez sur le nom du dossier pour ouvrir sa fiche complète.',
+    },
+  },
+];
 
 interface Dossier {
   id: number;
@@ -68,20 +93,24 @@ export default function DossiersListPage() {
 
   return (
     <div className="p-6">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('dossiers.title')}</h1>
           <p className="mt-1 text-sm text-gray-500">{t('dossiers.subtitle')}</p>
         </div>
-        <Link
-          href="/admin/dossiers/create"
-          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-        >
-          <PiPlusBold className="h-4 w-4" /> {t('dossiers.add')}
-        </Link>
+        <div className="flex items-center gap-2">
+          <TourButton steps={DOSSIERS_LIST_TOUR} storageKey="tour-dossiers-list-seen" />
+          <Link
+            id="tour-dossiers-add"
+            href="/admin/dossiers/create"
+            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+          >
+            <PiPlusBold className="h-4 w-4" /> {t('dossiers.add')}
+          </Link>
+        </div>
       </div>
 
-      <div className="mb-4 flex flex-wrap gap-2">
+      <div id="tour-dossiers-filters" className="mb-4 flex flex-wrap gap-2">
         <FilterPill active={!statusFilter} onClick={() => setStatusFilter('')}>
           {t('dossiers.all_count', { count: items.length })}
         </FilterPill>
@@ -106,7 +135,7 @@ export default function DossiersListPage() {
           </Link>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+        <div id="tour-dossiers-table" className="overflow-hidden rounded-xl border border-gray-200 bg-white">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>

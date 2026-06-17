@@ -8,6 +8,45 @@ import { invitationsService, FormType, Category, FamilyMember, Dossier } from '@
 import { documentService, DocumentTemplate } from '@/services/documents';
 import { apiService } from '@/services/api';
 import { servicesList } from '@/data/services-immigration';
+import TourButton from '@/components/TourButton';
+
+const ENVOI_NEW_TOUR = [
+  {
+    element: '#tour-envoi-recipient',
+    popover: {
+      title: '👤 Choix du destinataire',
+      description: 'Sélectionnez un <strong>client existant</strong> ou saisissez les coordonnées d\'un destinataire ponctuel. Si le client est une famille, vous pouvez aussi cibler un <strong>membre précis</strong>.',
+    },
+  },
+  {
+    element: '#tour-envoi-base-docs',
+    popover: {
+      title: '📋 Documents Fédéraux / Provinciaux du dossier',
+      description: 'Si le dossier sélectionné a des documents IRCC ou MIFI marqués <strong>« à envoyer au client »</strong>, ils apparaissent ici, pré-cochés. Vous pouvez les décocher si besoin.',
+    },
+  },
+  {
+    element: '#tour-envoi-forms',
+    popover: {
+      title: '📝 Formulaires (questionnaires)',
+      description: 'Cochez les <strong>questionnaires web</strong> que le client devra remplir (demandeur, répondant, PSTQ…).',
+    },
+  },
+  {
+    element: '#tour-envoi-docs',
+    popover: {
+      title: '📄 Documents à inclure',
+      description: 'Cochez les <strong>modèles de PDF</strong> à demander. Utilisez le filtre par service ou le bouton « Téléverser un PDF spécifique » pour un fichier <strong>jetable</strong>.',
+    },
+  },
+  {
+    element: '#tour-envoi-details',
+    popover: {
+      title: '✉️ Message et options',
+      description: 'Ajoutez un <strong>message personnalisé</strong>, fixez la durée de validité, et autorisez ou non le client à téléverser ses propres pièces (passeport, justificatifs…).',
+    },
+  },
+];
 
 type SelectedItem =
   | { kind: 'form'; form_type_id: number }
@@ -328,8 +367,11 @@ export default function NouvelEnvoiPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* === CLIENT === */}
-        <div className="rounded-xl border border-gray-200 bg-white p-5">
-          <h2 className="mb-4 text-lg font-semibold text-gray-900">{t('envois.step1_recipient')}</h2>
+        <div id="tour-envoi-recipient" className="rounded-xl border border-gray-200 bg-white p-5">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-900">{t('envois.step1_recipient')}</h2>
+            <TourButton steps={ENVOI_NEW_TOUR} storageKey="tour-envoi-new-seen" label="Visite guidée" />
+          </div>
 
           <div className="mb-4 flex gap-3">
             <button
@@ -473,7 +515,7 @@ export default function NouvelEnvoiPage() {
         </div>
 
         {/* === FORMULAIRES === */}
-        <div className="rounded-xl border border-gray-200 bg-white p-5">
+        <div id="tour-envoi-forms" className="rounded-xl border border-gray-200 bg-white p-5">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">
               {t('envois.step2_forms')} <span className="text-sm font-normal text-gray-500">({t(selectedForms.size > 1 ? 'envois.selected_count_other' : 'envois.selected_count_one', { count: selectedForms.size })})</span>
@@ -527,7 +569,7 @@ export default function NouvelEnvoiPage() {
 
         {/* === DOCUMENTS DE BASE DU DOSSIER === */}
         {baseDocs.length > 0 && (
-          <div className="rounded-xl border-2 border-blue-200 bg-blue-50/50 p-5">
+          <div id="tour-envoi-base-docs" className="rounded-xl border-2 border-blue-200 bg-blue-50/50 p-5">
             <div className="mb-1 flex items-center gap-2">
               <span className="text-xl">📋</span>
               <h2 className="text-lg font-semibold text-gray-900">
@@ -551,7 +593,7 @@ export default function NouvelEnvoiPage() {
         )}
 
         {/* === AUTRES MODÈLES === */}
-        <div className="rounded-xl border border-gray-200 bg-white p-5">
+        <div id="tour-envoi-docs" className="rounded-xl border border-gray-200 bg-white p-5">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-semibold text-gray-900">
               {baseDocs.length > 0 ? t('envois.other_docs_title') : t('envois.step3_documents')}{' '}
@@ -659,7 +701,7 @@ export default function NouvelEnvoiPage() {
         </div>
 
         {/* === MESSAGE / EXPIRATION === */}
-        <div className="rounded-xl border border-gray-200 bg-white p-5">
+        <div id="tour-envoi-details" className="rounded-xl border border-gray-200 bg-white p-5">
           <h2 className="mb-4 text-lg font-semibold text-gray-900">{t('envois.step4_details')}</h2>
           <div className="space-y-4">
             <div>

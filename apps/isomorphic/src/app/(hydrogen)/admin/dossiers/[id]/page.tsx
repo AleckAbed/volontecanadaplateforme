@@ -29,8 +29,54 @@ import { apiService } from '@/services/api';
 import { dossierDocumentsService } from '@/services/dossier-documents';
 import { documentService, DocumentTemplate } from '@/services/documents';
 import { dossierSupplementaryService, SupplementaryFile, ExportCatalog } from '@/services/dossier-supplementary';
+import TourButton from '@/components/TourButton';
 
 const XfaPdfViewer = dynamic(() => import('@/components/XfaPdfViewer'), { ssr: false });
+
+const DOSSIER_DETAIL_TOUR_STEPS = [
+  {
+    element: '#tour-actions',
+    popover: {
+      title: '🎯 Actions principales',
+      description: 'Depuis ici vous pouvez <strong>exporter les fichiers en ZIP</strong>, <strong>envoyer une invitation</strong> au client, ou <strong>modifier</strong> le dossier.',
+    },
+  },
+  {
+    element: '#tour-collab',
+    popover: {
+      title: '👤 Collaborateur assigné',
+      description: 'Le collaborateur affecté à ce dossier. Vous pouvez <strong>suspendre temporairement son accès</strong> sans le retirer définitivement.',
+    },
+  },
+  {
+    element: '#tour-docs-ircc',
+    popover: {
+      title: '🇨🇦 Documents Fédéraux (IRCC)',
+      description: 'Formulaires <strong>fédéraux</strong> d\'Immigration, Réfugiés et Citoyenneté Canada. Cliquez sur <strong>Aperçu</strong> pour les visualiser sans quitter la page.',
+    },
+  },
+  {
+    element: '#tour-docs-fo',
+    popover: {
+      title: '🏛 Documents Provinciaux (MIFI)',
+      description: 'Formulaires <strong>provinciaux</strong> du Ministère de l\'Immigration, de la Francisation et de l\'Intégration (CSQ, etc.). Même fonctionnement que la section IRCC.',
+    },
+  },
+  {
+    element: '#tour-supp',
+    popover: {
+      title: '📎 Documents supplémentaires',
+      description: 'Téléversez <strong>tout type de fichier</strong> (PDF, image, Word, Excel…). Le collaborateur pourra les consulter en lecture seule.',
+    },
+  },
+  {
+    element: '#tour-notes',
+    popover: {
+      title: '📝 Note du dossier',
+      description: 'Modifiez la note <strong>directement ici</strong>, sans aller dans le menu Modifier. Pratique pour des annotations rapides.',
+    },
+  },
+];
 
 interface DossierDocSummary {
   id: number;
@@ -272,7 +318,8 @@ export default function DossierDetailPage({ params }: { params: Promise<{ id: st
         <button onClick={() => router.push('/admin/dossiers')} className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800">
           <PiArrowLeftBold className="h-4 w-4" /> {t('dossiers.back_to_list')}
         </button>
-        <div className="flex flex-wrap items-center gap-2">
+        <div id="tour-actions" className="flex flex-wrap items-center gap-2">
+          <TourButton steps={DOSSIER_DETAIL_TOUR_STEPS} storageKey="tour-dossier-detail-seen" />
           <button
             onClick={() => setExportOpen(true)}
             className="inline-flex items-center gap-2 rounded-lg border border-purple-300 bg-purple-50 px-4 py-2 text-sm font-semibold text-purple-700 hover:bg-purple-100"
@@ -346,7 +393,7 @@ export default function DossierDetailPage({ params }: { params: Promise<{ id: st
       </div>
 
       {/* Collaborateur assigné — avec toggle révoquer */}
-      <div className="mt-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div id="tour-collab" className="mt-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="mb-3 text-lg font-semibold text-gray-900">Collaborateur assigné</h2>
         {dossier.collaborator ? (
           <>
@@ -406,7 +453,7 @@ export default function DossierDetailPage({ params }: { params: Promise<{ id: st
           className="mt-0.5"
         />
         <span>
-          <span className="font-medium text-gray-900">Envoyer les documents IRCC / Provinciaux au client</span>
+          <span className="font-medium text-gray-900">Envoyer les documents Fédéraux (IRCC) / Provinciaux (MIFI) au client</span>
           <span className="ml-1 text-xs text-gray-500">
             — si coché, ces documents seront pré-sélectionnés (modifiables) lors d&apos;une nouvelle invitation pour ce dossier.
           </span>
@@ -415,7 +462,8 @@ export default function DossierDetailPage({ params }: { params: Promise<{ id: st
 
       {/* Sections documents — split FO + IRCC */}
       <DocSection
-        title="Documents gouvernementaux (IRCC)"
+        sectionId="tour-docs-ircc"
+        title="Documents Fédéraux (IRCC)"
         accent="indigo"
         icon="🇨🇦"
         docs={(dossier.documents ?? []).filter((d) => (d.doc_type ?? 'ircc') === 'ircc')}
@@ -424,7 +472,8 @@ export default function DossierDetailPage({ params }: { params: Promise<{ id: st
         onPreview={(d) => setPreviewDoc({ id: d.id, name: d.name, filled: d.has_filled_pdf })}
       />
       <DocSection
-        title="Documents provinciaux (FO)"
+        sectionId="tour-docs-fo"
+        title="Documents provinciaux (MIFI)"
         accent="violet"
         icon="🏛"
         docs={(dossier.documents ?? []).filter((d) => d.doc_type === 'fo')}
@@ -435,6 +484,7 @@ export default function DossierDetailPage({ params }: { params: Promise<{ id: st
 
       {/* Documents supplémentaires (admin upload tout type, preview/téléchargement) */}
       <SupplementarySection
+        sectionId="tour-supp"
         files={dossier.supplementary_files ?? []}
         suppLabel={suppLabel}
         setSuppLabel={setSuppLabel}
@@ -446,6 +496,7 @@ export default function DossierDetailPage({ params }: { params: Promise<{ id: st
 
       {/* Notes inline éditable */}
       <NotesEditor
+        sectionId="tour-notes"
         value={notesValue}
         onChange={setNotesValue}
         onSave={handleSaveNotes}
@@ -822,8 +873,9 @@ const ACCENT_STYLES = {
 } as const;
 
 function DocSection({
-  title, accent, icon, docs, onAdd, onDelete, onPreview,
+  sectionId, title, accent, icon, docs, onAdd, onDelete, onPreview,
 }: {
+  sectionId?: string;
   title: string;
   accent: keyof typeof ACCENT_STYLES;
   icon: string;
@@ -834,7 +886,7 @@ function DocSection({
 }) {
   const s = ACCENT_STYLES[accent];
   return (
-    <div className={`mt-6 rounded-xl border-2 ${s.border} ${s.bg} p-6 shadow-sm`}>
+    <div id={sectionId} className={`mt-6 rounded-xl border-2 ${s.border} ${s.bg} p-6 shadow-sm`}>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <h2 className={`text-lg font-semibold ${s.title}`}>
           <span className="mr-2">{icon}</span>
@@ -907,8 +959,9 @@ function DocSection({
 // ─── Section fichiers supplémentaires (tout type) ───────────────────────────
 
 function SupplementarySection({
-  files, suppLabel, setSuppLabel, uploading, onUpload, onDelete, fileInputRef,
+  sectionId, files, suppLabel, setSuppLabel, uploading, onUpload, onDelete, fileInputRef,
 }: {
+  sectionId?: string;
   files: SupplementaryFileSummary[];
   suppLabel: string;
   setSuppLabel: (s: string) => void;
@@ -923,7 +976,7 @@ function SupplementarySection({
   };
 
   return (
-    <div className="mt-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+    <div id={sectionId} className="mt-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
       <h2 className="mb-1 text-lg font-semibold text-gray-900">
         <span className="mr-2">📎</span>
         Documents supplémentaires{' '}
@@ -1008,8 +1061,9 @@ function SupplementarySection({
 // ─── Éditeur de notes inline ────────────────────────────────────────────────
 
 function NotesEditor({
-  value, onChange, onSave, saving, currentValue,
+  sectionId, value, onChange, onSave, saving, currentValue,
 }: {
+  sectionId?: string;
   value: string;
   onChange: (v: string) => void;
   onSave: () => void;
@@ -1018,7 +1072,7 @@ function NotesEditor({
 }) {
   const dirty = value !== currentValue;
   return (
-    <div className="mt-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+    <div id={sectionId} className="mt-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
       <div className="mb-2 flex items-center gap-2">
         <PiNotePencilDuotone className="h-5 w-5 text-blue-600" />
         <h2 className="text-lg font-semibold text-gray-900">Note du dossier</h2>
@@ -1129,15 +1183,15 @@ function ExportZipModal({
             <div className="space-y-5">
               {/* IRCC */}
               <CatalogGroup
-                title="🇨🇦 Documents IRCC (gouvernementaux)"
+                title="🇨🇦 Documents Fédéraux (IRCC)"
                 items={catalog.ircc}
                 kind="ircc"
                 selected={selected}
                 onToggle={toggle}
               />
-              {/* FO */}
+              {/* FO/MIFI */}
               <CatalogGroup
-                title="🏛 Documents Provinciaux (FO)"
+                title="🏛 Documents Provinciaux (MIFI)"
                 items={catalog.fo}
                 kind="fo"
                 selected={selected}
