@@ -40,10 +40,14 @@ export const dossierDocumentsService = {
     const res = await authFetch(`/admin/dossiers/${dossierId}/documents`);
     return res.data;
   },
-  async create(dossierId: number, name: string, file: File, description?: string): Promise<DossierDocument> {
+  async create(
+    dossierId: number, name: string, file: File,
+    description?: string, docType?: 'ircc' | 'fo',
+  ): Promise<DossierDocument> {
     const fd = new FormData();
     fd.append('name', name);
     if (description) fd.append('description', description);
+    if (docType) fd.append('doc_type', docType);
     fd.append('pdf', file);
     const res = await authFetch(`/admin/dossiers/${dossierId}/documents`, {
       method: 'POST',
@@ -56,11 +60,13 @@ export const dossierDocumentsService = {
     documentTemplateId: number,
     name?: string,
     description?: string,
+    docType?: 'ircc' | 'fo',
   ): Promise<DossierDocument> {
     const fd = new FormData();
     fd.append('document_template_id', String(documentTemplateId));
     if (name) fd.append('name', name);
     if (description) fd.append('description', description);
+    if (docType) fd.append('doc_type', docType);
     const res = await authFetch(`/admin/dossiers/${dossierId}/documents`, {
       method: 'POST',
       body: fd,

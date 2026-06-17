@@ -8,11 +8,14 @@ import { useTranslation } from 'react-i18next';
 import { Form } from '@core/ui/form';
 import { Input, Button, Tooltip, ActionIcon, Title } from 'rizzui';
 import { useCopyToClipboard } from '@core/hooks/use-copy-to-clipboard';
+import toast from 'react-hot-toast';
 import {
   CreateServiceInput,
   createServiceSchema,
 } from '@/validators/create-service.schema';
 import { useModal } from '@/app/shared/modal-views/use-modal';
+import { immigrationServicesService } from '@/services/immigration-services';
+import { IMMIGRATION_SERVICES_REFRESH_EVENT } from '@/data/services-immigration';
 
 const CATEGORY_KEYS = ['Visa', 'Travail', 'Immigration', 'Citoyenneté', 'Famille', 'Éducation'];
 const STATUS_KEYS = ['active', 'inactive', 'pending'] as const;
@@ -28,21 +31,31 @@ export default function CreateService() {
   const categories = CATEGORY_KEYS.map((k) => ({ label: t(`services_immigration.categories_list.${k}`, { defaultValue: k }), value: k }));
   const statusOptions = STATUS_KEYS.map((k) => ({ label: t(`services_immigration.status_label.${k}`), value: k }));
 
-  const onSubmit: SubmitHandler<CreateServiceInput> = (data) => {
-    setLoading(true);
-    setTimeout(() => {
-      console.log('data', data);
-      setLoading(false);
-      setReset({
-        serviceName: '',
-        description: '',
-        category: '',
-        duration: '',
-        status: 'active',
-        serviceColor: '',
+  const onSubmit: SubmitHandler<CreateServiceInput> = async (data) => {
+    try {
+      setLoading(true);
+      const getColor = (data as any).serviceColor;
+      const colorRgba = getColor
+        ? `rgba(${getColor.r ?? 0}, ${getColor.g ?? 0}, ${getColor.b ?? 0}, ${getColor.a ?? 1})`
+        : null;
+      await immigrationServicesService.create({
+        name: (data as any).serviceName,
+        description: data.description || undefined,
+        category: data.category || undefined,
+        duration: data.duration || undefined,
+        color: colorRgba || undefined,
+        status: (data.status as any) || 'active',
       });
+      toast.success(t('services_immigration.toasts.created', { defaultValue: 'Service créé' }));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent(IMMIGRATION_SERVICES_REFRESH_EVENT));
+      }
       closeModal();
-    }, 600);
+    } catch (e: any) {
+      toast.error(e.message || t('services_immigration.toasts.create_error', { defaultValue: 'Échec de la création' }));
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCopyToClipboard = (rgba: string) => {

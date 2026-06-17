@@ -1,4 +1,11 @@
-// Données de test pour les services d'immigration
+// Données de test pour les services d'immigration.
+// La SOURCE DE VÉRITÉ est désormais l'API (table immigration_services en BD) :
+// utilisez `immigrationServicesService.list()`. Cette constante reste un fallback
+// pour les composants qui consomment encore la liste de façon synchrone.
+
+/** Event broadcasté quand un service est créé/modifié/supprimé — recharge les listes ouvertes. */
+export const IMMIGRATION_SERVICES_REFRESH_EVENT = 'immigration-services:refresh';
+
 
 export type ServiceType = {
   id: number;

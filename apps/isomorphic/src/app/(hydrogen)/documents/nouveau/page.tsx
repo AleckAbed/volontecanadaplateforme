@@ -8,7 +8,13 @@ import { servicesList } from '@/data/services-immigration';
 
 export default function NouveauModelePage() {
   const router = useRouter();
-  const [form, setForm] = useState({ name: '', description: '', service_name: '', target_location: 'any' as 'any' | 'in_canada' | 'outside_canada' });
+  const [form, setForm] = useState({
+    name: '',
+    description: '',
+    service_name: '',
+    target_location: 'any' as 'any' | 'in_canada' | 'outside_canada',
+    doc_type: 'ircc' as 'ircc' | 'fo',
+  });
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -40,6 +46,7 @@ export default function NouveauModelePage() {
       fd.append('description', form.description.trim());
       if (form.service_name) fd.append('service_name', form.service_name);
       fd.append('target_location', form.target_location);
+      fd.append('doc_type', form.doc_type);
       fd.append('pdf', file);
 
       const result = await documentService.createTemplate(fd);
@@ -138,6 +145,36 @@ export default function NouveauModelePage() {
           <p className="mt-1 text-xs text-gray-500">
             Ce document sera automatiquement ajouté aux dossiers créés pour le service correspondant.
           </p>
+        </div>
+
+        {/* Type de document (gouv. IRCC vs provincial FO) */}
+        <div>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Nature du document</label>
+          <div className="grid gap-2 md:grid-cols-2">
+            {([
+              { value: 'ircc', label: 'Gouvernemental (IRCC)', hint: 'Formulaire fédéral d\'immigration' },
+              { value: 'fo', label: 'Provincial (FO)', hint: 'Formulaire d\'une province (CSQ, etc.)' },
+            ] as const).map((opt) => (
+              <label
+                key={opt.value}
+                className={`flex cursor-pointer flex-col rounded-lg border-2 px-3 py-2 text-sm transition ${
+                  form.doc_type === opt.value ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:border-blue-300'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="doc_type"
+                    checked={form.doc_type === opt.value}
+                    onChange={() => setForm((p) => ({ ...p, doc_type: opt.value }))}
+                    className="h-4 w-4"
+                  />
+                  <span className="font-medium text-gray-900">{opt.label}</span>
+                </div>
+                <span className="ml-6 mt-0.5 text-xs text-gray-500">{opt.hint}</span>
+              </label>
+            ))}
+          </div>
         </div>
 
         {/* Destinataire selon localisation */}

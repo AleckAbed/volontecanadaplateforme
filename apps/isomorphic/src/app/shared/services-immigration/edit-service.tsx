@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PiXBold } from 'react-icons/pi';
 import { Controller, SubmitHandler } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -11,7 +11,9 @@ import {
   createServiceSchema,
 } from '@/validators/create-service.schema';
 import { useModal } from '@/app/shared/modal-views/use-modal';
-import { servicesList } from '@/data/services-immigration';
+import { IMMIGRATION_SERVICES_REFRESH_EVENT } from '@/data/services-immigration';
+import { immigrationServicesService, ImmigrationServiceItem } from '@/services/immigration-services';
+import toast from 'react-hot-toast';
 
 const CATEGORY_KEYS = ['Visa', 'Travail', 'Immigration', 'Citoyenneté', 'Famille', 'Éducation'];
 const STATUS_KEYS = ['active', 'inactive', 'pending'] as const;
@@ -24,8 +26,23 @@ export default function EditService({ serviceId }: EditServiceProps) {
   const { t } = useTranslation();
   const { closeModal } = useModal();
   const [isLoading, setLoading] = useState(false);
+  const [service, setService] = useState<ImmigrationServiceItem | null>(null);
+  const [loadingService, setLoadingService] = useState(true);
 
-  const service = servicesList.find((s) => s.id === serviceId);
+  useEffect(() => {
+    (async () => {
+      try {
+        const list = await immigrationServicesService.list();
+        const s = list.find((x) => x.id === serviceId);
+        if (s) setService(s);
+        else toast.error('Service introuvable');
+      } catch (e: any) {
+        toast.error(e.message || 'Chargement impossible');
+      } finally {
+        setLoadingService(false);
+      }
+    })();
+  }, [serviceId]);
 
   const categories = CATEGORY_KEYS.map((k) => ({ label: t(`services_immigration.categories_list.${k}`, { defaultValue: k }), value: k }));
   const statusOptions = STATUS_KEYS.map((k) => ({ label: t(`services_immigration.status_label.${k}`), value: k }));
@@ -46,18 +63,39 @@ export default function EditService({ serviceId }: EditServiceProps) {
         status: 'active',
       };
 
-  const onSubmit: SubmitHandler<CreateServiceInput> = (data) => {
-    setLoading(true);
-    setTimeout(() => {
-      console.log('data', data);
-      setLoading(false);
+  const onSubmit: SubmitHandler<CreateServiceInput> = async (data) => {
+    try {
+      setLoading(true);
+      await immigrationServicesService.update(serviceId, {
+        name: (data as any).serviceName,
+        description: data.description || undefined,
+        category: data.category || undefined,
+        duration: data.duration || undefined,
+        status: (data.status as any) || 'active',
+      });
+      toast.success(t('services_immigration.toasts.updated', { defaultValue: 'Service mis à jour' }));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent(IMMIGRATION_SERVICES_REFRESH_EVENT));
+      }
       closeModal();
-    }, 600);
+    } catch (e: any) {
+      toast.error(e.message || t('services_immigration.toasts.update_error', { defaultValue: 'Échec' }));
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (loadingService) {
+    return (
+      <div className="flex items-center justify-center p-10 text-sm text-gray-500">
+        Chargement du service…
+      </div>
+    );
+  }
 
   return (
     <Form<CreateServiceInput>
-      defaultValues={defaultValues}
+      useFormProps={{ defaultValues: defaultValues as any }}
       onSubmit={onSubmit}
       validationSchema={createServiceSchema}
       className="flex flex-grow flex-col gap-6 p-6 @container [&_.rizzui-input-label]:font-medium [&_.rizzui-input-label]:text-gray-900"
