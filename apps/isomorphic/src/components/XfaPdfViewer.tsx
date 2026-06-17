@@ -143,7 +143,7 @@ export default function XfaPdfViewer({
       // source of truth (it contains values from ALL pages, not just rendered ones).
       mergeAnnotationStorage(win, formValuesRef.current);
 
-      const formData = { ...formValuesRef.current };
+      const formData = sanitizeFormData({ ...formValuesRef.current });
       const data: Uint8Array = await PDFViewerApplication.pdfDocument.saveDocument();
 
       console.log('[XfaPdfViewer] saving', {
@@ -218,6 +218,33 @@ const FORM_FIELD_SELECTOR =
   '.annotationLayer input, .annotationLayer textarea, .annotationLayer select';
 
 /**
+ * Nettoie le payload avant de le sauvegarder OU avant de le réinjecter
+ * dans pdf.js. Stratégie :
+ *  - On garde les valeurs lisibles (clés sans préfixe ou avec préfixe `pdfjs_internal_id_`)
+ *  - On garde les __as__KEY mais on RETIRE `borderColor` qui déclenche
+ *    `ColorConverters["RGB_HTML"] is not a function` (bug pdf.js) et casse
+ *    la couche d'annotations au prochain rendu.
+ *  - On retire aussi `formattedValue` qui n'apporte rien et peut interférer.
+ */
+function sanitizeFormData(input: Record<string, any>): Record<string, any> {
+  const out: Record<string, any> = {};
+  for (const [key, raw] of Object.entries(input)) {
+    if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+      // Copie sans borderColor ni formattedValue (champs problématiques)
+      const cleaned: Record<string, any> = {};
+      for (const [k, v] of Object.entries(raw)) {
+        if (k === 'borderColor' || k === 'formattedValue') continue;
+        cleaned[k] = v;
+      }
+      out[key] = cleaned;
+    } else {
+      out[key] = raw;
+    }
+  }
+  return out;
+}
+
+/**
  * Restore previously-saved values into PDF.js's annotationStorage so that
  * XFA-rendered fields pick them up on draw, regardless of which page
  * gets rendered first.
@@ -226,8 +253,10 @@ function restoreAnnotationStorage(win: any, values: Record<string, any>): void {
   try {
     const storage = win?.PDFViewerApplication?.pdfDocument?.annotationStorage;
     if (!storage || typeof storage.setValue !== 'function') return;
+    // Sanitize avant injection : élimine les borderColor qui crashent pdf.js
+    const clean = sanitizeFormData(values);
     let restored = 0;
-    Object.entries(values).forEach(([key, value]) => {
+    Object.entries(clean).forEach(([key, value]) => {
       if (!key.startsWith('__as__')) return;
       const realKey = key.slice('__as__'.length);
       try {

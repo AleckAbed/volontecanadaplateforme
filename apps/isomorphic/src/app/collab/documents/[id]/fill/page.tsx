@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import { collabWorkspaceService } from '@/services/collaborators';
 import CollabHeader from '../../../_components/collab-header';
 
-const XfaPdfViewer = dynamic(() => import('@/components/XfaPdfViewer'), { ssr: false });
+const SmartPdfViewer = dynamic(() => import('@/components/SmartPdfViewer'), { ssr: false });
 
 function uint8ToBase64(bytes: Uint8Array): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -91,7 +91,7 @@ export default function CollabFillDocumentPage({ params }: { params: Promise<{ i
         </div>
         <div className="flex-1 overflow-hidden">
           {loadedMeta && (
-            <XfaPdfViewer
+            <SmartPdfViewer
               filePromise={filePromiseRef.current!}
               fileName={`${docName}.pdf`}
               readOnly={false}

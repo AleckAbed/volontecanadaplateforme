@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import { invitationsService, PublicInvitation, PublicInvitationItem } from '@/services/invitations';
 
-const XfaPdfViewer = dynamic(() => import('@/components/XfaPdfViewer'), { ssr: false });
+const SmartPdfViewer = dynamic(() => import('@/components/SmartPdfViewer'), { ssr: false });
 
 const STATUS_INFO: Record<string, { label: string; color: string; icon: string }> = {
   pending: { label: 'À faire', color: 'bg-gray-100 text-gray-700', icon: '○' },
@@ -400,7 +400,7 @@ function DocumentFillView({
         </button>
       </header>
       <div className="flex-1 overflow-hidden">
-        <XfaPdfViewer
+        <SmartPdfViewer
           filePromise={filePromiseRef.current}
           fileName={`${item.name}.pdf`}
           readOnly={false}

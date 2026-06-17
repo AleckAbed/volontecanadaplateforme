@@ -87,6 +87,7 @@ interface DossierDocSummary {
   description?: string;
   status: 'in_progress' | 'completed';
   has_filled_pdf: boolean;
+  filled_by?: 'admin' | 'collab' | 'client' | null;
   last_saved_at?: string;
   completed_at?: string;
 }
@@ -475,7 +476,7 @@ export default function DossierDetailPage({ params }: { params: Promise<{ id: st
       <DocSection
         sectionId="tour-docs-fo"
         title="Documents provinciaux (MIFI)"
-        accent="violet"
+        accent="indigo"
         icon="🏛"
         docs={(dossier.documents ?? []).filter((d) => d.doc_type === 'fo')}
         onAdd={() => { setAddingDocType('fo'); setAddingDoc(true); }}
@@ -927,14 +928,33 @@ function DocSection({
               }`}>
                 {d.status === 'completed' ? '✓ Terminé' : '◐ En cours'}
               </span>
+              {d.has_filled_pdf && d.filled_by && (
+                <span
+                  className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                    d.filled_by === 'collab' ? 'bg-sky-100 text-sky-700'
+                    : d.filled_by === 'client' ? 'bg-purple-100 text-purple-700'
+                    : 'bg-emerald-100 text-emerald-700'
+                  }`}
+                  title={`Dernière modification par ${d.filled_by === 'collab' ? 'le collaborateur' : d.filled_by === 'client' ? 'le client' : 'l\'administrateur'}`}
+                >
+                  {d.filled_by === 'collab' ? '🧑‍💼 Collab' : d.filled_by === 'client' ? '👤 Client' : '⚙️ Admin'}
+                </span>
+              )}
               <button
                 onClick={() => onPreview(d)}
                 className="inline-flex items-center gap-1 rounded-lg border border-blue-300 px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-50"
-                title={d.has_filled_pdf ? 'Voir la version remplie par le collaborateur' : 'Voir le PDF template'}
+                title="Aperçu en lecture seule"
               >
                 <PiEyeDuotone className="h-3.5 w-3.5" />
                 {d.has_filled_pdf ? 'Aperçu rempli' : 'Aperçu'}
               </button>
+              <a
+                href={`/admin/dossier-documents/${d.id}/fill`}
+                className="inline-flex items-center gap-1 rounded-lg border border-amber-300 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800 hover:bg-amber-100"
+                title="Modifier le PDF (vous écrasez la dernière version)"
+              >
+                ✏️ Modifier
+              </a>
               {d.has_filled_pdf && (
                 <button
                   onClick={() => onPreview({ ...d, has_filled_pdf: false })}
@@ -978,8 +998,8 @@ function SupplementarySection({
   };
 
   return (
-    <div id={sectionId} className="mt-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-      <h2 className="mb-1 text-lg font-semibold text-gray-900">
+    <div id={sectionId} className="mt-6 rounded-xl border-2 border-indigo-200 bg-indigo-50/40 p-6 shadow-sm">
+      <h2 className="mb-1 text-lg font-semibold text-indigo-800">
         <span className="mr-2">📎</span>
         Documents supplémentaires{' '}
         <span className="text-sm font-normal text-gray-500">({files.length})</span>

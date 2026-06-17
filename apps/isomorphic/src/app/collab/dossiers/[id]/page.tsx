@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { collabWorkspaceService, CollabDossierDetail, CollabUpload } from '@/services/collaborators';
+import { collabWorkspaceService, CollabDossierDetail, CollabUpload, CollabDocument, CollabSupplementaryFile } from '@/services/collaborators';
 import CollabHeader from '../../_components/collab-header';
 
 const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
@@ -67,59 +67,31 @@ export default function CollabDossierDetailPage({ params }: { params: Promise<{ 
           )}
         </div>
 
-        {/* Documents de base (éditables) */}
-        <section className="mb-6 rounded-xl border border-gray-200 bg-white p-5">
-          <div className="mb-1 flex items-center gap-2">
-            <span className="text-2xl">📋</span>
-            <h2 className="text-lg font-semibold text-gray-900">Documents d&apos;immigration IRCC à remplir</h2>
-          </div>
-          <p className="mb-4 text-sm text-gray-500">
-            Documents internes au cabinet. Cliquez pour remplir et marquez comme terminé une fois complétés.
-          </p>
+        {/* Documents Fédéraux (IRCC) — éditables */}
+        <CollabDocSection
+          title="Documents Fédéraux (IRCC) à remplir"
+          icon="🇨🇦"
+          docs={(data.documents ?? []).filter((d) => (d.doc_type ?? 'ircc') === 'ircc')}
+          emptyLabel="Aucun document fédéral (IRCC) pour ce dossier."
+          onFill={(d) => router.push(`/collab/documents/${d.id}/fill`)}
+          onMarkComplete={handleMarkComplete}
+        />
 
-          {data.documents.length === 0 ? (
-            <div className="rounded-lg bg-gray-50 p-6 text-center text-sm text-gray-500">
-              Aucun document d&apos;immigration IRCC pour ce dossier.
-            </div>
-          ) : (
-            <ul className="space-y-2">
-              {data.documents.map((d) => (
-                <li
-                  key={d.id}
-                  className="flex flex-wrap items-center gap-3 rounded-lg border border-gray-200 p-3 hover:bg-gray-50"
-                >
-                  <span className="text-xl">📄</span>
-                  <div className="flex-1 overflow-hidden">
-                    <div className="truncate font-medium text-gray-900">{d.name}</div>
-                    {d.description && <div className="truncate text-xs text-gray-500">{d.description}</div>}
-                    {d.last_saved_at && (
-                      <div className="mt-0.5 text-xs text-gray-400">Sauvegardé le {d.last_saved_at}</div>
-                    )}
-                  </div>
-                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                    d.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-800'
-                  }`}>
-                    {d.status === 'completed' ? '✓ Terminé' : '◐ En cours'}
-                  </span>
-                  <button
-                    onClick={() => router.push(`/collab/documents/${d.id}/fill`)}
-                    className="rounded-lg border border-blue-600 px-3 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50"
-                  >
-                    {d.status === 'completed' ? 'Modifier' : 'Remplir'}
-                  </button>
-                  {d.status === 'in_progress' && d.has_filled_pdf && (
-                    <button
-                      onClick={() => handleMarkComplete(d.id)}
-                      className="rounded-lg bg-green-600 px-3 py-1 text-xs font-semibold text-white hover:bg-green-700"
-                    >
-                      Marquer terminé
-                    </button>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+        {/* Documents Provinciaux (MIFI) — éditables */}
+        <CollabDocSection
+          title="Documents provinciaux (MIFI) à remplir"
+          icon="🏛"
+          docs={(data.documents ?? []).filter((d) => d.doc_type === 'fo')}
+          emptyLabel="Aucun document provincial (MIFI) pour ce dossier."
+          onFill={(d) => router.push(`/collab/documents/${d.id}/fill`)}
+          onMarkComplete={handleMarkComplete}
+        />
+
+        {/* Documents supplémentaires (lecture seule, preview/download) */}
+        <SupplementaryReadOnlySection
+          dossierId={Number(id)}
+          files={data.supplementary_files ?? []}
+        />
 
         {/* Invitations envoyées au client (read-only) */}
         <section className="mb-6 rounded-xl border border-gray-200 bg-white p-5">
@@ -239,6 +211,141 @@ export default function CollabDossierDetailPage({ params }: { params: Promise<{ 
         )}
       </main>
     </>
+  );
+}
+
+// ─── Section docs à remplir (réutilisable IRCC + MIFI) ─────────────────────
+
+function CollabDocSection({
+  title, icon, docs, emptyLabel, onFill, onMarkComplete,
+}: {
+  title: string;
+  icon: string;
+  docs: CollabDocument[];
+  emptyLabel: string;
+  onFill: (d: CollabDocument) => void;
+  onMarkComplete: (id: number) => void;
+}) {
+  return (
+    <section className="mb-6 rounded-xl border-2 border-indigo-200 bg-indigo-50/40 p-5">
+      <div className="mb-1 flex items-center gap-2">
+        <span className="text-2xl">{icon}</span>
+        <h2 className="text-lg font-semibold text-indigo-800">{title}</h2>
+        <span className="ml-1 text-sm font-normal text-gray-500">({docs.length})</span>
+      </div>
+      <p className="mb-4 text-sm text-gray-600">
+        Documents internes au cabinet. Cliquez pour remplir et marquez comme terminé une fois complétés.
+      </p>
+
+      {docs.length === 0 ? (
+        <div className="rounded-lg bg-white/60 p-6 text-center text-sm text-gray-500">
+          {emptyLabel}
+        </div>
+      ) : (
+        <ul className="space-y-2">
+          {docs.map((d) => (
+            <li
+              key={d.id}
+              className="flex flex-wrap items-center gap-3 rounded-lg border border-gray-200 bg-white p-3 hover:bg-gray-50"
+            >
+              <span className="text-xl">📄</span>
+              <div className="flex-1 overflow-hidden">
+                <div className="truncate font-medium text-gray-900">{d.name}</div>
+                {d.description && <div className="truncate text-xs text-gray-500">{d.description}</div>}
+                {d.last_saved_at && (
+                  <div className="mt-0.5 text-xs text-gray-400">Sauvegardé le {d.last_saved_at}</div>
+                )}
+              </div>
+              <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                d.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-800'
+              }`}>
+                {d.status === 'completed' ? '✓ Terminé' : '◐ En cours'}
+              </span>
+              <button
+                onClick={() => onFill(d)}
+                className="rounded-lg border border-blue-600 px-3 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50"
+              >
+                {d.status === 'completed' ? 'Modifier' : 'Remplir'}
+              </button>
+              {d.status === 'in_progress' && d.has_filled_pdf && (
+                <button
+                  onClick={() => onMarkComplete(d.id)}
+                  className="rounded-lg bg-green-600 px-3 py-1 text-xs font-semibold text-white hover:bg-green-700"
+                >
+                  Marquer terminé
+                </button>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+// ─── Section supplementaires (lecture seule) ─────────────────────────────
+
+function SupplementaryReadOnlySection({
+  dossierId, files,
+}: { dossierId: number; files: CollabSupplementaryFile[] }) {
+  const isPreviewable = (mime?: string) => {
+    if (!mime) return false;
+    return mime === 'application/pdf' || mime.startsWith('image/');
+  };
+
+  return (
+    <section className="mb-6 rounded-xl border-2 border-indigo-200 bg-indigo-50/40 p-5">
+      <div className="mb-1 flex items-center gap-2">
+        <span className="text-2xl">📎</span>
+        <h2 className="text-lg font-semibold text-indigo-800">
+          Documents supplémentaires
+        </h2>
+        <span className="ml-1 text-sm font-normal text-gray-500">({files.length})</span>
+      </div>
+      <p className="mb-4 text-sm text-gray-600">
+        Fichiers ajoutés par l&apos;administrateur. Vous pouvez les consulter et les télécharger (lecture seule).
+      </p>
+
+      {files.length === 0 ? (
+        <div className="rounded-lg bg-white/60 p-6 text-center text-sm text-gray-500">
+          Aucun document supplémentaire disponible pour ce dossier.
+        </div>
+      ) : (
+        <ul className="space-y-2">
+          {files.map((f) => (
+            <li
+              key={f.id}
+              className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-3"
+            >
+              <span className="text-xl">📄</span>
+              <div className="flex-1 overflow-hidden">
+                <div className="truncate font-medium text-gray-900">{f.label}</div>
+                <div className="truncate text-xs text-gray-500">
+                  {f.original_filename} · {formatBytes(f.size)}
+                  {f.created_at ? ` · ${f.created_at}` : ''}
+                </div>
+              </div>
+              {isPreviewable(f.mime_type) && (
+                <button
+                  onClick={() => collabWorkspaceService.openSupplementaryPreview(dossierId, f.id, f.original_filename)
+                    .catch((e: any) => toast.error(e.message || 'Aperçu impossible'))}
+                  className="inline-flex items-center gap-1 rounded-lg border border-blue-300 px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-50"
+                >
+                  👁 Prévisualiser
+                </button>
+              )}
+              <button
+                onClick={() => collabWorkspaceService.downloadSupplementary(dossierId, f.id, f.original_filename)
+                  .catch((e: any) => toast.error(e.message || 'Téléchargement impossible'))}
+                className="inline-flex items-center gap-1 rounded-lg border border-emerald-300 px-2 py-1 text-xs font-medium text-emerald-700 hover:bg-emerald-50"
+              >
+                ↓ Télécharger
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 

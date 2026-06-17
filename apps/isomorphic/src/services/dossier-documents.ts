@@ -90,4 +90,29 @@ export const dossierDocumentsService = {
   getFilledUrl(id: number): string {
     return `${getApiUrl()}/admin/dossier-documents/${id}/filled`;
   },
+  /** PDF prêt à éditer côté admin (rempli si existe, sinon template). */
+  async fetchEditPdf(id: number): Promise<ArrayBuffer> {
+    const token = getAuthToken();
+    const headers: HeadersInit = { Accept: 'application/pdf' };
+    if (token) (headers as any).Authorization = `Bearer ${token}`;
+    const res = await fetch(`${getApiUrl()}/admin/dossier-documents/${id}/edit-pdf`, {
+      credentials: 'include', headers,
+    });
+    if (!res.ok) throw new Error('PDF indisponible (HTTP ' + res.status + ')');
+    return res.arrayBuffer();
+  },
+  /** L'admin sauvegarde dans le filled_pdf_path partagé. */
+  async saveAsAdmin(id: number, pdfBase64: string, formData?: Record<string, any>): Promise<void> {
+    await authFetch(`/admin/dossier-documents/${id}/save-as-admin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pdf_base64: pdfBase64, form_data: formData ?? null }),
+    });
+  },
+  async markComplete(id: number): Promise<void> {
+    await authFetch(`/admin/dossier-documents/${id}/mark-complete`, { method: 'POST' });
+  },
+  async markInProgress(id: number): Promise<void> {
+    await authFetch(`/admin/dossier-documents/${id}/mark-in-progress`, { method: 'POST' });
+  },
 };

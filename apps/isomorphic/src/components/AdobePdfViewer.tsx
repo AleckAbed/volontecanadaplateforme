@@ -8,8 +8,9 @@ interface AdobePdfViewerProps {
   fileName?: string;
   /** Read-only preview (no form filling, no save) */
   readOnly?: boolean;
-  /** Called with the PDF bytes when the user saves */
-  onSave?: (pdfBytes: Uint8Array) => Promise<void>;
+  /** Called with the PDF bytes when the user saves.
+   *  formData is empty for Adobe (le viewer ne l'expose pas) — la source de vérité reste le PDF binaire. */
+  onSave?: (pdfBytes: Uint8Array, formData: Record<string, any>) => Promise<void>;
   className?: string;
 }
 
@@ -82,7 +83,7 @@ export default function AdobePdfViewer({
             window.AdobeDC.View.Enum.CallbackType.SAVE_API,
             async (_metaData: any, content: Uint8Array) => {
               try {
-                await onSave(content);
+                await onSave(content, {});
                 return { code: window.AdobeDC.View.Enum.ApiResponseCode.SUCCESS };
               } catch {
                 return { code: window.AdobeDC.View.Enum.ApiResponseCode.FAIL };

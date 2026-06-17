@@ -57,6 +57,7 @@ export interface CollabDossierSummary {
 
 export interface CollabDocument {
   id: number;
+  doc_type?: 'ircc' | 'fo';
   name: string;
   description?: string;
   status: 'in_progress' | 'completed';
@@ -64,6 +65,15 @@ export interface CollabDocument {
   form_data?: any;
   last_saved_at?: string;
   completed_at?: string;
+}
+
+export interface CollabSupplementaryFile {
+  id: number;
+  label: string;
+  original_filename: string;
+  mime_type?: string;
+  size: number;
+  created_at?: string;
 }
 
 export interface CollabUpload {
@@ -119,6 +129,7 @@ export interface CollabDossierDetail {
   family_member?: { id: number; name: string; relationship?: string };
   documents: CollabDocument[];
   uploads: CollabUpload[];
+  supplementary_files?: CollabSupplementaryFile[];
   invitations: CollabInvitation[];
 }
 
@@ -243,6 +254,47 @@ export const collabWorkspaceService = {
   },
   getInvitationClientUploadUrl(dossierId: number, invitationId: number, uploadId: number): string {
     return `${getApiUrl()}/collaborator/dossiers/${dossierId}/invitations/${invitationId}/uploads/${uploadId}`;
+  },
+
+  /**
+   * Ouvre un fichier supplémentaire en preview (nouvel onglet) avec auth Bearer
+   * — nécessaire car les <a target="_blank"> ne transmettent pas le token.
+   */
+  async openSupplementaryPreview(dossierId: number, fileId: number, filename: string): Promise<void> {
+    const token = getAuthToken();
+    const headers: HeadersInit = { Accept: 'application/octet-stream' };
+    if (token) (headers as any).Authorization = `Bearer ${token}`;
+    const res = await fetch(`${getApiUrl()}/collaborator/dossiers/${dossierId}/supplementary-files/${fileId}`, {
+      credentials: 'include',
+      headers,
+    });
+    if (!res.ok) throw new Error('Fichier indisponible (HTTP ' + res.status + ')');
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const win = window.open(url, '_blank');
+    if (!win) {
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove();
+    }
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  },
+
+  async downloadSupplementary(dossierId: number, fileId: number, filename: string): Promise<void> {
+    const token = getAuthToken();
+    const headers: HeadersInit = { Accept: 'application/octet-stream' };
+    if (token) (headers as any).Authorization = `Bearer ${token}`;
+    const res = await fetch(`${getApiUrl()}/collaborator/dossiers/${dossierId}/supplementary-files/${fileId}?download=1`, {
+      credentials: 'include',
+      headers,
+    });
+    if (!res.ok) throw new Error('Fichier indisponible (HTTP ' + res.status + ')');
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10_000);
   },
   async getInvitationItem(itemId: number): Promise<{
     id: number;
