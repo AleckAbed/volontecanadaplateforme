@@ -30,6 +30,7 @@ import { dossierDocumentsService } from '@/services/dossier-documents';
 import { documentService, DocumentTemplate } from '@/services/documents';
 import { dossierSupplementaryService, SupplementaryFile, ExportCatalog } from '@/services/dossier-supplementary';
 import TourButton from '@/components/TourButton';
+import { getAuthToken } from '@/lib/auth-storage';
 
 const XfaPdfViewer = dynamic(() => import('@/components/XfaPdfViewer'), { ssr: false });
 
@@ -811,8 +812,11 @@ function PdfPreviewModal({
     const url = showFilled
       ? dossierDocumentsService.getFilledUrl(docId)
       : dossierDocumentsService.getTemplateUrl(docId);
-    return fetch(url, { credentials: 'include' }).then((r) => {
-      if (!r.ok) throw new Error('PDF indisponible');
+    const token = getAuthToken();
+    const headers: HeadersInit = {};
+    if (token) (headers as any).Authorization = `Bearer ${token}`;
+    return fetch(url, { credentials: 'include', headers }).then((r) => {
+      if (!r.ok) throw new Error('PDF indisponible (HTTP ' + r.status + ')');
       return r.arrayBuffer();
     });
   });
@@ -932,15 +936,13 @@ function DocSection({
                 {d.has_filled_pdf ? 'Aperçu rempli' : 'Aperçu'}
               </button>
               {d.has_filled_pdf && (
-                <a
-                  href={dossierDocumentsService.getTemplateUrl(d.id)}
-                  target="_blank"
-                  rel="noreferrer"
+                <button
+                  onClick={() => onPreview({ ...d, has_filled_pdf: false })}
                   className="rounded-lg border border-gray-300 px-2 py-1 text-xs font-medium text-gray-600 hover:bg-gray-50"
                   title="Voir le PDF template vide"
                 >
                   Template
-                </a>
+                </button>
               )}
               <button
                 onClick={() => onDelete(d.id, d.name)}
@@ -1002,21 +1004,21 @@ function SupplementarySection({
                 </div>
               </div>
               {isPreviewable(f.mime_type) && (
-                <a
-                  href={dossierSupplementaryService.getFileUrl(f.id)}
-                  target="_blank"
-                  rel="noreferrer"
+                <button
+                  onClick={() => dossierSupplementaryService.openFilePreview(f.id, f.original_filename)
+                    .catch((e: any) => toast.error(e.message || 'Aperçu impossible'))}
                   className="inline-flex items-center gap-1 rounded-lg border border-blue-300 px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-50"
                 >
                   <PiEyeDuotone className="h-3.5 w-3.5" /> Prévisualiser
-                </a>
+                </button>
               )}
-              <a
-                href={dossierSupplementaryService.getFileUrl(f.id, true)}
+              <button
+                onClick={() => dossierSupplementaryService.downloadFile(f.id, f.original_filename)
+                  .catch((e: any) => toast.error(e.message || 'Téléchargement impossible'))}
                 className="inline-flex items-center gap-1 rounded-lg border border-emerald-300 px-2 py-1 text-xs font-medium text-emerald-700 hover:bg-emerald-50"
               >
                 <PiDownloadDuotone className="h-3.5 w-3.5" /> Télécharger
-              </a>
+              </button>
               <button
                 onClick={() => onDelete(f.id, f.label)}
                 className="rounded-lg border border-red-300 px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50"

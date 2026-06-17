@@ -71,6 +71,60 @@ export const dossierSupplementaryService = {
   getFileUrl(id: number, download = false): string {
     return `${getApiUrl()}/admin/dossier-supplementary-files/${id}${download ? '?download=1' : ''}`;
   },
+
+  /**
+   * Ouvre un fichier supplémentaire en prévisualisation (nouvel onglet) en passant
+   * par un blob URL temporaire. Nécessaire en prod car les <a target="_blank"> ne
+   * transmettent pas le header Authorization (cookie cross-site bloqué par SameSite).
+   */
+  async openFilePreview(id: number, filename: string): Promise<void> {
+    const token = getAuthToken();
+    const headers: HeadersInit = { Accept: 'application/octet-stream' };
+    if (token) (headers as any).Authorization = `Bearer ${token}`;
+    const res = await fetch(`${getApiUrl()}/admin/dossier-supplementary-files/${id}`, {
+      credentials: 'include',
+      headers,
+    });
+    if (!res.ok) throw new Error('Fichier indisponible (HTTP ' + res.status + ')');
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    // Pas de target="_blank" sur a.click() — on ouvre via window.open après création du blob
+    const win = window.open(url, '_blank');
+    if (!win) {
+      // Popup bloqué — on tombe sur un téléchargement
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+    // Libère le blob après 60s pour laisser le temps au nouvel onglet de charger
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  },
+
+  /**
+   * Télécharge un fichier supplémentaire (force le téléchargement) avec authentification Bearer.
+   */
+  async downloadFile(id: number, filename: string): Promise<void> {
+    const token = getAuthToken();
+    const headers: HeadersInit = { Accept: 'application/octet-stream' };
+    if (token) (headers as any).Authorization = `Bearer ${token}`;
+    const res = await fetch(`${getApiUrl()}/admin/dossier-supplementary-files/${id}?download=1`, {
+      credentials: 'include',
+      headers,
+    });
+    if (!res.ok) throw new Error('Fichier indisponible (HTTP ' + res.status + ')');
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10_000);
+  },
   async exportCatalog(dossierId: number): Promise<ExportCatalog> {
     const res = await authFetch(`/admin/dossiers/${dossierId}/export-catalog`);
     return res.data;

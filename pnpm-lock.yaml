@@ -146,6 +146,9 @@ importers:
       dayjs:
         specifier: ^1.11.13
         version: 1.11.13
+      driver.js:
+        specifier: ^1.4.0
+        version: 1.4.0
       eslint:
         specifier: 9.23.0
         version: 9.23.0(jiti@2.4.2)
@@ -4104,6 +4107,9 @@ packages:
 
   dot-case@2.1.1:
     resolution: {integrity: sha512-HnM6ZlFqcajLsyudHq7LeeLDr2rFAVYtDv/hV5qchQEidSck8j9OPUsXY9KwJv/lHMtYlX4DjRQqwFYa+0r8Ug==}
+
+  driver.js@1.4.0:
+    resolution: {integrity: sha512-Gm64jm6PmcU+si21sQhBrTAM1JvUrR0QhNmjkprNLxohOBzul9+pNHXgQaT9lW84gwg9GMLB3NZGuGolsz5uew==}
 
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
@@ -10053,6 +10059,8 @@ snapshots:
   dot-case@2.1.1:
     dependencies:
       no-case: 2.3.2
+
+  driver.js@1.4.0: {}
 
   dunder-proto@1.0.1:
     dependencies:
