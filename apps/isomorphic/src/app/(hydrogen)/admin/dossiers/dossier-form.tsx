@@ -6,7 +6,8 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { PiArrowLeftBold, PiFloppyDiskDuotone } from 'react-icons/pi';
 import { apiService } from '@/services/api';
-import { servicesList } from '@/data/services-immigration';
+import { IMMIGRATION_SERVICES_REFRESH_EVENT } from '@/data/services-immigration';
+import { immigrationServicesService, ImmigrationServiceItem } from '@/services/immigration-services';
 import { collaboratorsService, Collaborator } from '@/services/collaborators';
 import { dossierDocumentsService, DossierDocument } from '@/services/dossier-documents';
 import { documentService, DocumentTemplate } from '@/services/documents';
@@ -72,6 +73,21 @@ export default function DossierForm({ mode, dossierId }: DossierFormProps) {
   });
 
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
+  const [services, setServices] = useState<ImmigrationServiceItem[]>([]);
+
+  useEffect(() => {
+    const loadServices = () => {
+      immigrationServicesService.list(true)
+        .then(setServices)
+        .catch(() => setServices([]));
+    };
+    loadServices();
+    const handler = () => loadServices();
+    if (typeof window !== 'undefined') {
+      window.addEventListener(IMMIGRATION_SERVICES_REFRESH_EVENT, handler);
+      return () => window.removeEventListener(IMMIGRATION_SERVICES_REFRESH_EVENT, handler);
+    }
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -326,9 +342,9 @@ export default function DossierForm({ mode, dossierId }: DossierFormProps) {
                   required
                 >
                   <option value="">{t('dossiers.pick_service')}</option>
-                  {servicesList.filter((s) => s.status === 'active').map((s) => (
+                  {services.map((s) => (
                     <option key={s.id} value={s.name}>
-                      {s.name} ({s.category})
+                      {s.name}{s.category ? ` (${s.category})` : ''}
                     </option>
                   ))}
                 </select>

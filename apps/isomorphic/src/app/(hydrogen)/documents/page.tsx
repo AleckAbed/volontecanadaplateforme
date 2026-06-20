@@ -9,7 +9,8 @@ import {
   PiCaretDownBold, PiCaretRightBold,
 } from 'react-icons/pi';
 import { documentService, DocumentTemplate } from '@/services/documents';
-import { servicesList } from '@/data/services-immigration';
+import { immigrationServicesService, ImmigrationServiceItem } from '@/services/immigration-services';
+import { IMMIGRATION_SERVICES_REFRESH_EVENT } from '@/data/services-immigration';
 import TourButton from '@/components/TourButton';
 
 const DOCUMENTS_TOUR = [
@@ -51,6 +52,21 @@ export default function DocumentTemplatesPage() {
   // Filtres
   const [serviceFilter, setServiceFilter] = useState<string>('');
   const [search, setSearch] = useState<string>('');
+  const [services, setServices] = useState<ImmigrationServiceItem[]>([]);
+
+  useEffect(() => {
+    const loadServices = () => {
+      immigrationServicesService.list(true)
+        .then(setServices)
+        .catch(() => setServices([]));
+    };
+    loadServices();
+    const handler = () => loadServices();
+    if (typeof window !== 'undefined') {
+      window.addEventListener(IMMIGRATION_SERVICES_REFRESH_EVENT, handler);
+      return () => window.removeEventListener(IMMIGRATION_SERVICES_REFRESH_EVENT, handler);
+    }
+  }, []);
 
   useEffect(() => {
     try {
@@ -152,7 +168,7 @@ export default function DocumentTemplatesPage() {
           >
             <option value="">Tout afficher</option>
             <optgroup label="Services d'immigration">
-              {servicesList.filter((s) => s.status === 'active').map((s) => (
+              {services.map((s) => (
                 <option key={s.id} value={s.name}>{s.name}</option>
               ))}
             </optgroup>
@@ -517,6 +533,13 @@ function EditTemplateModal({
   );
   const [docType, setDocType] = useState<'ircc' | 'fo'>((template as any).doc_type ?? 'ircc');
   const [saving, setSaving] = useState(false);
+  const [services, setServices] = useState<ImmigrationServiceItem[]>([]);
+
+  useEffect(() => {
+    immigrationServicesService.list(true)
+      .then(setServices)
+      .catch(() => setServices([]));
+  }, []);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -566,8 +589,10 @@ function EditTemplateModal({
             >
               <option value="">— Aucun (modèle général) —</option>
               <optgroup label="Services d'immigration">
-                {servicesList.filter((s) => s.status === 'active').map((s) => (
-                  <option key={s.id} value={s.name}>{s.name} ({s.category})</option>
+                {services.map((s) => (
+                  <option key={s.id} value={s.name}>
+                    {s.name}{s.category ? ` (${s.category})` : ''}
+                  </option>
                 ))}
               </optgroup>
               <optgroup label="Types généraux">

@@ -7,7 +7,8 @@ import { useTranslation } from 'react-i18next';
 import { invitationsService, FormType, Category, FamilyMember, Dossier } from '@/services/invitations';
 import { documentService, DocumentTemplate } from '@/services/documents';
 import { apiService } from '@/services/api';
-import { servicesList } from '@/data/services-immigration';
+import { IMMIGRATION_SERVICES_REFRESH_EVENT } from '@/data/services-immigration';
+import { immigrationServicesService, ImmigrationServiceItem } from '@/services/immigration-services';
 import TourButton from '@/components/TourButton';
 
 const ENVOI_NEW_TOUR = [
@@ -299,10 +300,22 @@ export default function NouvelEnvoiPage() {
     });
   }, [docTemplates, baseDocTemplateIds, docServiceFilter]);
 
-  // Liste complète des services d'immigration actifs (source de vérité = servicesList).
-  const docServiceOptions = useMemo(() => {
-    return servicesList.filter((s) => s.status === 'active').map((s) => s.name);
+  // Liste complète des services d'immigration actifs depuis la BD.
+  const [services, setServices] = useState<ImmigrationServiceItem[]>([]);
+  useEffect(() => {
+    const loadServices = () => {
+      immigrationServicesService.list(true)
+        .then(setServices)
+        .catch(() => setServices([]));
+    };
+    loadServices();
+    const handler = () => loadServices();
+    if (typeof window !== 'undefined') {
+      window.addEventListener(IMMIGRATION_SERVICES_REFRESH_EVENT, handler);
+      return () => window.removeEventListener(IMMIGRATION_SERVICES_REFRESH_EVENT, handler);
+    }
   }, []);
+  const docServiceOptions = useMemo(() => services.map((s) => s.name), [services]);
 
   // Catégories générales (enum côté DB) — pour piocher des modèles transverses
   // (Cabinet, IRCC, Contrat, Autres) qui ne sont pas rattachés à un service précis.

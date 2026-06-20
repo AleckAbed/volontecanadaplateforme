@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { documentService } from '@/services/documents';
-import { servicesList } from '@/data/services-immigration';
+import { immigrationServicesService, ImmigrationServiceItem } from '@/services/immigration-services';
+import { IMMIGRATION_SERVICES_REFRESH_EVENT } from '@/data/services-immigration';
 
 export default function NouveauModelePage() {
   const router = useRouter();
@@ -18,6 +19,22 @@ export default function NouveauModelePage() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [services, setServices] = useState<ImmigrationServiceItem[]>([]);
+
+  useEffect(() => {
+    const loadServices = () => {
+      immigrationServicesService.list(true) // active_only=true
+        .then(setServices)
+        .catch(() => setServices([]));
+    };
+    loadServices();
+    // Recharge automatique si on crée/modifie un service dans un autre onglet/page
+    const handler = () => loadServices();
+    if (typeof window !== 'undefined') {
+      window.addEventListener(IMMIGRATION_SERVICES_REFRESH_EVENT, handler);
+      return () => window.removeEventListener(IMMIGRATION_SERVICES_REFRESH_EVENT, handler);
+    }
+  }, []);
 
   const handleFile = (f: File) => {
     if (f.type !== 'application/pdf') {
@@ -133,8 +150,10 @@ export default function NouveauModelePage() {
           >
             <option value="">— Aucun (modèle général) —</option>
             <optgroup label="Services d'immigration">
-              {servicesList.filter((s) => s.status === 'active').map((s) => (
-                <option key={s.id} value={s.name}>{s.name} ({s.category})</option>
+              {services.map((s) => (
+                <option key={s.id} value={s.name}>
+                  {s.name}{s.category ? ` (${s.category})` : ''}
+                </option>
               ))}
             </optgroup>
             <optgroup label="Types généraux">
