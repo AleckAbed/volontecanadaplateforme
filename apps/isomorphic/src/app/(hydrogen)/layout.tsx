@@ -12,6 +12,7 @@ import LockScreen from '@/layouts/lock-screen';
 import { useAuth } from '@/hooks/useAuth';
 import { LAYOUT_OPTIONS } from '@/config/enums';
 import { useEffect } from 'react';
+import ChatbotWidget from '@/components/ChatbotWidget';
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -29,8 +30,15 @@ export default function DefaultLayout({ children }: LayoutProps) {
     <>
       <LayoutProvider>{children}</LayoutProvider>
       <LockScreen />
+      <AdminChatbot />
     </>
   );
+}
+
+function AdminChatbot() {
+  // Note : on retire la condition userType car useAuth() peut renvoyer null
+  // pendant l'hydratation initiale. Le widget gère lui-même le check du token.
+  return <ChatbotWidget audience="admin" />;
 }
 
 function LayoutProvider({ children }: LayoutProps) {

@@ -13,6 +13,7 @@ import {
   PiNewspaper,
   PiFileText,
   PiBookOpen,
+  PiSparkle,
 } from 'react-icons/pi';
 
 /**
@@ -70,6 +71,9 @@ export function useAdminMenuItems() {
     { name: t('menu.section_admin') },
     { name: t('menu.settings_profile'), href: routes.forms.profileSettings, icon: <PiGear /> },
     { name: t('menu.tutorials'), href: '/tutoriels', icon: <PiBookOpen /> },
+
+    { name: 'Assistant' },
+    { name: 'Volo — Assistant IA', href: '/assistant', icon: <PiSparkle />, target: '_blank' },
   ];
 }
 
