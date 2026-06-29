@@ -133,6 +133,14 @@ export interface PublicInvitationItem {
   last_saved_at?: string;
 }
 
+export interface PublicInvitationAttachment {
+  id: number;
+  label?: string;
+  original_filename?: string;
+  mime_type?: string;
+  size?: number;
+}
+
 export interface PublicInvitation {
   unique_code: string;
   client_name?: string;
@@ -144,6 +152,7 @@ export interface PublicInvitation {
   is_expired: boolean;
   items: PublicInvitationItem[];
   uploads?: InvitationUpload[];
+  attachments?: PublicInvitationAttachment[];
 }
 
 // ─── Service ──────────────────────────────────────────────────────────────────
@@ -228,6 +237,19 @@ export const invitationsService = {
     return res.data;
   },
 
+  /**
+   * Documents + pièces jointes d'un dossier à pré-cocher dans une invitation.
+   * Renvoie une liste vide si le dossier n'a pas le flag send_base_docs_to_client.
+   */
+  async getDossierInvitationPayload(dossierId: number): Promise<{
+    send_base_docs_to_client: boolean;
+    documents: { id: number; name: string; doc_type: 'ircc' | 'fo'; document_template_id: number | null; status?: string }[];
+    supplementary_files: { id: number; label?: string; original_filename?: string; mime_type?: string; size?: number }[];
+  }> {
+    const res = await authFetch(`/admin/dossiers/${dossierId}/invitation-payload`);
+    return res.data;
+  },
+
   async createInvitation(payload: {
     client_type: 'existing' | 'custom';
     client_id?: number;
@@ -239,7 +261,14 @@ export const invitationsService = {
     message?: string;
     allow_uploads?: boolean;
     expires_days?: number;
-    items: { kind: 'form' | 'document'; form_type_id?: number; document_template_id?: number }[];
+    items: {
+      kind: 'form' | 'document';
+      form_type_id?: number;
+      document_template_id?: number;
+      dossier_document_id?: number;
+    }[];
+    /** IDs des fichiers supplémentaires du dossier joints en lecture seule */
+    attachments?: number[];
   }): Promise<{ data: Invitation; email_sent: boolean }> {
     const res = await authFetch('/admin/invitations', {
       method: 'POST',
@@ -289,6 +318,11 @@ export const invitationsService = {
     const res = await fetch(`${getApiUrl()}/invitations/${code}/items/${itemId}/pdf`);
     if (!res.ok) throw new Error('Impossible de charger le PDF');
     return res.arrayBuffer();
+  },
+
+  /** URL de consultation/téléchargement d'une pièce jointe (lecture seule). */
+  getAttachmentUrl(code: string, attachmentId: number): string {
+    return `${getApiUrl()}/invitations/${code}/attachments/${attachmentId}`;
   },
 
   async saveFormItem(code: string, itemId: number, formData: any): Promise<void> {

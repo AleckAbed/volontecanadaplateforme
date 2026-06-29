@@ -202,6 +202,37 @@ export default function PublicInvitationPage({ params }: { params: Promise<{ cod
           })}
         </div>
 
+        {/* Pièces jointes du dossier (lecture seule) */}
+        {(invitation.attachments?.length ?? 0) > 0 && (
+          <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50/50 p-5">
+            <div className="mb-1 flex items-center gap-2">
+              <span className="text-xl">📎</span>
+              <h2 className="text-lg font-semibold text-gray-900">Documents fournis par votre conseiller</h2>
+            </div>
+            <p className="mb-3 text-xs text-gray-600">
+              Ces fichiers sont mis à votre disposition pour consultation et téléchargement.
+            </p>
+            <ul className="space-y-2">
+              {invitation.attachments!.map((a) => (
+                <li key={a.id} className="flex items-center justify-between rounded-lg border border-amber-200 bg-white px-3 py-2">
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-medium text-gray-900">{a.label || a.original_filename || `Fichier #${a.id}`}</div>
+                    {a.original_filename && <div className="truncate text-xs text-gray-500">{a.original_filename}</div>}
+                  </div>
+                  <a
+                    href={invitationsService.getAttachmentUrl(code, a.id)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-3 shrink-0 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-700"
+                  >
+                    Consulter
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {/* Documents complémentaires (uploads libres) */}
         {invitation.allow_uploads && (
           <UploadsSection code={code} uploads={invitation.uploads ?? []} onChange={load} />

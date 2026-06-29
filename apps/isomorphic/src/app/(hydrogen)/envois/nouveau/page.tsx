@@ -51,7 +51,23 @@ const ENVOI_NEW_TOUR = [
 
 type SelectedItem =
   | { kind: 'form'; form_type_id: number }
-  | { kind: 'document'; document_template_id: number };
+  | { kind: 'document'; document_template_id: number }
+  | { kind: 'document'; dossier_document_id: number };
+
+type DossierDocPayload = {
+  id: number;
+  name: string;
+  doc_type: 'ircc' | 'fo';
+  document_template_id: number | null;
+  status?: string;
+};
+type DossierFilePayload = {
+  id: number;
+  label?: string;
+  original_filename?: string;
+  mime_type?: string;
+  size?: number;
+};
 
 export default function NouvelEnvoiPage() {
   const { t } = useTranslation();
@@ -86,8 +102,12 @@ export default function NouvelEnvoiPage() {
   const [selectedForms, setSelectedForms] = useState<Set<number>>(new Set());
   const [selectedDocs, setSelectedDocs] = useState<Set<number>>(new Set());
 
-  // Documents de base du dossier sélectionné (template_ids) — affichés en section dédiée
-  const [baseDocTemplateIds, setBaseDocTemplateIds] = useState<Set<number>>(new Set());
+  // Documents du dossier sélectionné (instance partagée) — par dossier_document_id
+  const [dossierDocs, setDossierDocs] = useState<DossierDocPayload[]>([]);
+  const [selectedDossierDocIds, setSelectedDossierDocIds] = useState<Set<number>>(new Set());
+  // Fichiers supplémentaires du dossier joints en lecture seule
+  const [dossierFiles, setDossierFiles] = useState<DossierFilePayload[]>([]);
+  const [selectedAttachmentIds, setSelectedAttachmentIds] = useState<Set<number>>(new Set());
 
   // Filtre par service d'immigration sur la liste « Autres modèles »
   const [docServiceFilter, setDocServiceFilter] = useState<string>('');
@@ -159,38 +179,36 @@ export default function NouvelEnvoiPage() {
     return () => { cancelled = true; };
   }, [clientType, clientId]);
 
-  // Lorsqu'un dossier est sélectionné, si le flag « envoyer les documents de base au client »
-  // est coché côté dossier, on charge ses documents de base et on les pré-coche.
-  // Si le flag n'est pas coché, on n'affiche AUCUNE section dédiée (baseDocTemplateIds reste vide).
+  // Lorsqu'un dossier est sélectionné : si le flag « envoyer les documents au client »
+  // est coché, on charge les documents du dossier (instance partagée, modèle ou non)
+  // + ses fichiers supplémentaires, et on les pré-coche.
   useEffect(() => {
     if (!dossierId) {
-      setBaseDocTemplateIds(new Set());
+      setDossierDocs([]); setSelectedDossierDocIds(new Set());
+      setDossierFiles([]); setSelectedAttachmentIds(new Set());
       return;
     }
     let cancelled = false;
     (async () => {
       try {
-        const res = await apiService.getDossier(dossierId);
+        const payload = await invitationsService.getDossierInvitationPayload(dossierId);
         if (cancelled) return;
-        const d = res?.data as any;
-        if (!d?.send_base_docs_to_client) {
-          // Flag désactivé → on ignore les docs de base sur cette page d'envoi
-          setBaseDocTemplateIds(new Set());
+        if (!payload.send_base_docs_to_client) {
+          setDossierDocs([]); setSelectedDossierDocIds(new Set());
+          setDossierFiles([]); setSelectedAttachmentIds(new Set());
           return;
         }
-        const templateIds: number[] = (d?.documents ?? [])
-          .map((doc: any) => doc?.document_template_id)
-          .filter((v: any): v is number => typeof v === 'number');
-        setBaseDocTemplateIds(new Set(templateIds));
-        if (templateIds.length > 0) {
-          setSelectedDocs((prev) => {
-            const next = new Set(prev);
-            templateIds.forEach((id) => next.add(id));
-            return next;
-          });
-        }
+        const docs = payload.documents ?? [];
+        const files = payload.supplementary_files ?? [];
+        setDossierDocs(docs);
+        setSelectedDossierDocIds(new Set(docs.map((d) => d.id)));
+        setDossierFiles(files);
+        setSelectedAttachmentIds(new Set(files.map((f) => f.id)));
       } catch {
-        if (!cancelled) setBaseDocTemplateIds(new Set());
+        if (!cancelled) {
+          setDossierDocs([]); setSelectedDossierDocIds(new Set());
+          setDossierFiles([]); setSelectedAttachmentIds(new Set());
+        }
       }
     })();
     return () => { cancelled = true; };
@@ -268,7 +286,23 @@ export default function NouvelEnvoiPage() {
     });
   };
 
-  const totalSelected = selectedForms.size + selectedDocs.size;
+  const totalSelected = selectedForms.size + selectedDocs.size + selectedDossierDocIds.size;
+
+  // Toggles pour les documents du dossier (instance partagée) et les pièces jointes
+  const toggleDossierDoc = (id: number) => {
+    setSelectedDossierDocIds((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+  const toggleAttachment = (id: number) => {
+    setSelectedAttachmentIds((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
 
   // Group form types by category
   const formsByCategory = useMemo(() => {
@@ -281,24 +315,25 @@ export default function NouvelEnvoiPage() {
     return map;
   }, [formTypes]);
 
-  // Documents de base du dossier (résolus depuis docTemplates par template_id)
-  const baseDocs = useMemo(() => {
-    if (baseDocTemplateIds.size === 0) return [] as DocumentTemplate[];
-    return docTemplates.filter((d) => baseDocTemplateIds.has(d.id));
-  }, [docTemplates, baseDocTemplateIds]);
+  // Ensemble des template_id déjà couverts par les documents du dossier (pour
+  // éviter d'afficher en doublon un modèle déjà présent comme instance partagée).
+  const dossierTemplateIds = useMemo(
+    () => new Set(dossierDocs.map((d) => d.document_template_id).filter((v): v is number => typeof v === 'number')),
+    [dossierDocs]
+  );
 
-  // Autres modèles (hors docs de base du dossier), filtrés par service OU catégorie.
+  // Autres modèles (hors documents déjà rattachés au dossier), filtrés par service OU catégorie.
   // Le filtre est encodé "service:<nom>" ou "cat:<enum>".
   const otherDocs = useMemo(() => {
     const [kind, value] = docServiceFilter ? docServiceFilter.split(':', 2) : [null, null];
     return docTemplates.filter((d) => {
-      if (baseDocTemplateIds.has(d.id)) return false;
+      if (dossierTemplateIds.has(d.id)) return false;
       if (!kind || !value) return true;
       if (kind === 'service') return (d.service_name || '') === value;
       if (kind === 'cat') return (d.category || '') === value;
       return true;
     });
-  }, [docTemplates, baseDocTemplateIds, docServiceFilter]);
+  }, [docTemplates, dossierTemplateIds, docServiceFilter]);
 
   // Liste complète des services d'immigration actifs depuis la BD.
   const [services, setServices] = useState<ImmigrationServiceItem[]>([]);
@@ -335,10 +370,15 @@ export default function NouvelEnvoiPage() {
     if (clientType === 'existing' && !clientId) { toast.error(t('envois.select_client_required')); return; }
     if (clientType === 'custom' && !customName.trim()) { toast.error(t('envois.custom_name_required')); return; }
 
+    // Items remplissables (formulaires + documents). Les documents du dossier
+    // passent par dossier_document_id (instance partagée, modèle ou non).
     const items: SelectedItem[] = [
       ...Array.from(selectedForms).map((id) => ({ kind: 'form' as const, form_type_id: id })),
       ...Array.from(selectedDocs).map((id) => ({ kind: 'document' as const, document_template_id: id })),
+      ...Array.from(selectedDossierDocIds).map((id) => ({ kind: 'document' as const, dossier_document_id: id })),
     ];
+    // Pièces jointes en lecture seule (tableau séparé côté API)
+    const attachments = Array.from(selectedAttachmentIds);
 
     try {
       setSubmitting(true);
@@ -354,6 +394,7 @@ export default function NouvelEnvoiPage() {
         allow_uploads: allowUploads,
         expires_days: expiresDays,
         items,
+        attachments,
       });
 
       if (res.email_sent) {
@@ -580,25 +621,54 @@ export default function NouvelEnvoiPage() {
           )}
         </div>
 
-        {/* === DOCUMENTS DE BASE DU DOSSIER === */}
-        {baseDocs.length > 0 && (
+        {/* === DOCUMENTS DU DOSSIER (instance partagée) === */}
+        {dossierDocs.length > 0 && (
           <div id="tour-envoi-base-docs" className="rounded-xl border-2 border-blue-200 bg-blue-50/50 p-5">
             <div className="mb-1 flex items-center gap-2">
               <span className="text-xl">📋</span>
               <h2 className="text-lg font-semibold text-gray-900">
-                {t('envois.base_docs_title')}{' '}
-                <span className="text-sm font-normal text-gray-500">({baseDocs.length})</span>
+                Documents du dossier (Fédéraux / Provinciaux){' '}
+                <span className="text-sm font-normal text-gray-500">({selectedDossierDocIds.size}/{dossierDocs.length})</span>
               </h2>
             </div>
-            <p className="mb-3 text-xs text-gray-600">{t('envois.base_docs_hint')}</p>
+            <p className="mb-3 text-xs text-gray-600">
+              Ces documents sont l&apos;instance partagée du dossier. Ce que le client remplit reste visible côté admin et collaborateur.
+            </p>
             <div className="space-y-2">
-              {baseDocs.map((d) => (
+              {dossierDocs.map((d) => (
                 <CheckItem
-                  key={`base-d-${d.id}`}
-                  checked={selectedDocs.has(d.id)}
-                  onToggle={() => toggleDoc(d.id)}
+                  key={`dossier-d-${d.id}`}
+                  checked={selectedDossierDocIds.has(d.id)}
+                  onToggle={() => toggleDossierDoc(d.id)}
                   title={d.name}
-                  subtitle={d.service_name ? `${d.description ?? ''}${d.description ? ' · ' : ''}${d.service_name}` : d.description}
+                  subtitle={d.doc_type === 'fo' ? 'Provincial (MIFI)' : 'Fédéral (IRCC)'}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* === PIÈCES JOINTES DU DOSSIER (lecture seule) === */}
+        {dossierFiles.length > 0 && (
+          <div className="rounded-xl border-2 border-amber-200 bg-amber-50/50 p-5">
+            <div className="mb-1 flex items-center gap-2">
+              <span className="text-xl">📎</span>
+              <h2 className="text-lg font-semibold text-gray-900">
+                Pièces jointes du dossier{' '}
+                <span className="text-sm font-normal text-gray-500">({selectedAttachmentIds.size}/{dossierFiles.length})</span>
+              </h2>
+            </div>
+            <p className="mb-3 text-xs text-gray-600">
+              Fichiers consultables/téléchargeables par le client (non remplissables).
+            </p>
+            <div className="space-y-2">
+              {dossierFiles.map((f) => (
+                <CheckItem
+                  key={`dossier-f-${f.id}`}
+                  checked={selectedAttachmentIds.has(f.id)}
+                  onToggle={() => toggleAttachment(f.id)}
+                  title={f.label || f.original_filename || `Fichier #${f.id}`}
+                  subtitle={f.original_filename}
                 />
               ))}
             </div>
@@ -609,7 +679,7 @@ export default function NouvelEnvoiPage() {
         <div id="tour-envoi-docs" className="rounded-xl border border-gray-200 bg-white p-5">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-semibold text-gray-900">
-              {baseDocs.length > 0 ? t('envois.other_docs_title') : t('envois.step3_documents')}{' '}
+              {dossierDocs.length > 0 ? t('envois.other_docs_title') : t('envois.step3_documents')}{' '}
               <span className="text-sm font-normal text-gray-500">({t(selectedDocs.size > 1 ? 'envois.selected_count_other' : 'envois.selected_count_one', { count: selectedDocs.size })})</span>
             </h2>
             <div className="flex items-center gap-2">
