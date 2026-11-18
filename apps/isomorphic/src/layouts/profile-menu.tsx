@@ -85,9 +85,7 @@ function ProfileMenuPopover({ children }: React.PropsWithChildren<{}>) {
 function useMenuItems() {
   const { t } = useTranslation();
   return [
-    { name: t('profile_menu.my_profile'), href: routes.profile },
     { name: t('profile_menu.account_settings'), href: routes.forms.profileSettings },
-    { name: t('profile_menu.activity_log'), href: '#' },
   ];
 }
 

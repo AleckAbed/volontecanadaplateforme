@@ -9,9 +9,15 @@ enum MODE {
   LIGHT = 'light',
 }
 
+// Nom commercial du produit — à confirmer (voir ROADMAP_SAAS.md, décision 2).
+// Surchargeable par NEXT_PUBLIC_APP_NAME.
+const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME?.trim() || 'Volonté Canada';
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL?.trim() || undefined;
+
 export const siteConfig = {
-  title: 'Isomorphic - React Typescript Admin Dashboard Template',
-  description: `Isomorphic the ultimate React TypeScript Admin Template. Streamline your admin dashboard development with our feature-rich, responsive, and highly customizable solution. Boost productivity and create stunning admin interfaces effortlessly.`,
+  appName: APP_NAME,
+  title: `${APP_NAME} — Gestion de cabinet d'immigration`,
+  description: `${APP_NAME} : dossiers d'immigration, portail client, formulaires et documents pour les cabinets d'immigration canadiens.`,
   logo: logoImg,
   icon: logoIconImg,
   mode: MODE.LIGHT,
@@ -25,19 +31,14 @@ export const metaObject = (
   description: string = siteConfig.description
 ): Metadata => {
   return {
-    title: title ? `${title} - Isomorphic Furyroad` : siteConfig.title,
+    title: title ? `${title} — ${APP_NAME}` : siteConfig.title,
     description,
     openGraph: openGraph ?? {
-      title: title ? `${title} - Isomorphic Furyroad` : title,
+      title: title ? `${title} — ${APP_NAME}` : siteConfig.title,
       description,
-      url: 'https://isomorphic-furyroad.vercel.app',
-      siteName: 'Isomorphic Furyroad', // https://developers.google.com/search/docs/appearance/site-names
-      images: {
-        url: 'https://s3.amazonaws.com/redqteam.com/isomorphic-furyroad/itemdep/isobanner.png',
-        width: 1200,
-        height: 630,
-      },
-      locale: 'en_US',
+      url: APP_URL,
+      siteName: APP_NAME,
+      locale: 'fr_CA',
       type: 'website',
     },
   };

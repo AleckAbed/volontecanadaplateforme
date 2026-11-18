@@ -75,12 +75,6 @@ export default function AdminSignInForm() {
                 className="[&>label>span]:font-medium"
                 disabled={isLoading}
               />
-              <Link
-                href={routes.auth.forgotPassword2}
-                className="h-auto p-0 text-sm font-semibold text-blue underline transition-colors hover:text-gray-900 hover:no-underline"
-              >
-                Mot de passe oublié ?
-              </Link>
             </div>
             <Button
               className="border-primary-light w-full border-2 text-base font-bold"

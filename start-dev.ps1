@@ -9,5 +9,5 @@ Write-Host "Port: 3001" -ForegroundColor Yellow
 Write-Host "API URL: $env:NEXT_PUBLIC_API_URL" -ForegroundColor Yellow
 
 cd apps\isomorphic
-pnpm dev
+npx -y pnpm@9.1.4 dev
 

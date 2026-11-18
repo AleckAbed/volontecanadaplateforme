@@ -147,47 +147,6 @@ export function useAuth() {
   );
 
   /**
-   * Inscription client
-   */
-  const registerClient = useCallback(
-    async (data: RegisterData) => {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        const response = await api.clientRegister(data);
-
-        if (response.success && response.data) {
-          setClient(response.data.client);
-          setUserType('client');
-          setAuthState({
-            isAuthenticated: true,
-            userType: 'client',
-            admin: null,
-            client: response.data.client,
-            isLoading: false,
-            error: null,
-          });
-
-          // Forcer le layout Lithium pour les clients
-          localStorage.setItem('isomorphic-layout', 'lithium');
-
-          toast.success(response.message || 'Inscription réussie');
-          router.push('/');
-        }
-      } catch (err: any) {
-        const errorMessage =
-          err.message || "Une erreur est survenue lors de l'inscription";
-        setError(errorMessage);
-        toast.error(errorMessage);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [router, setClient, setAuthState, setError, setIsLoading, setUserType]
-  );
-
-  /**
    * Déconnexion
    */
   const logout = useCallback(async () => {
@@ -329,7 +288,6 @@ export function useAuth() {
     // Actions
     loginAdmin,
     loginClient,
-    registerClient,
     logout,
     loadUserProfile,
   };

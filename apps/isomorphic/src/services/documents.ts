@@ -1,15 +1,6 @@
 import { getAuthToken } from '@/lib/auth-storage';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-
-function getApiUrl(): string {
-  if (typeof window !== 'undefined') {
-    const fromEnv = process.env.NEXT_PUBLIC_API_URL;
-    if (fromEnv?.trim()) return fromEnv.trim().replace(/\/+$/, '');
-    return `${window.location.protocol}//${window.location.hostname}:8000/api`;
-  }
-  return API_BASE_URL;
-}
+import { getApiUrl } from '@/lib/api-client';
 
 async function authFetch(endpoint: string, options: RequestInit = {}) {
   const token = getAuthToken();
