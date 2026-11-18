@@ -99,6 +99,32 @@ export interface AdminAppointment {
   meeting_mode: MeetingMode;
   meeting_url: string | null;
   in_google: boolean;
+  dossier_id: number | null;
+  outcome: AppointmentOutcome | null;
+  staff_notes: string | null;
+  reschedule_count: number;
+}
+
+/** Issue d'un rendez-vous passé (3.11). */
+export type AppointmentOutcome = 'held' | 'no_show';
+export const APPOINTMENT_OUTCOME: Record<AppointmentOutcome, { label: string; className: string }> = {
+  held: { label: 'A eu lieu', className: 'bg-emerald-50 text-emerald-700' },
+  no_show: { label: 'Client absent', className: 'bg-amber-50 text-amber-800' },
+};
+
+export interface DossierAppointment {
+  id: number;
+  service: string | null;
+  host: string | null;
+  local_label: string;
+  starts_at: string;
+  is_past: boolean;
+  status: string;
+  outcome: AppointmentOutcome | null;
+  staff_notes: string | null;
+  client_notes: string | null;
+  linked: boolean;
+  dossier_id: number | null;
 }
 
 export const bookingAdminService = {
@@ -125,6 +151,22 @@ export const bookingAdminService = {
   },
   async appointments(scope: 'upcoming' | 'past', mine: boolean): Promise<AdminAppointment[]> {
     return (await authFetch(`/admin/booking/appointments?scope=${scope}${mine ? '&mine=1' : ''}`)).data;
+  },
+  async rescheduleSlots(id: number, from: string, days = 7): Promise<SlotsResponse> {
+    return (await authFetch(`/admin/booking/appointments/${id}/slots?from=${from}&days=${days}`)).data;
+  },
+  async reschedule(id: number, start: string): Promise<string> {
+    return (await authFetch(`/admin/booking/appointments/${id}/reschedule`, { method: 'POST', body: JSON.stringify({ start }) })).message;
+  },
+  async followUp(id: number, input: { outcome?: AppointmentOutcome | null; staff_notes?: string | null; dossier_id?: number | null }): Promise<string> {
+    return (await authFetch(`/admin/booking/appointments/${id}/follow-up`, { method: 'PUT', body: JSON.stringify(input) })).message;
+  },
+  async forDossier(dossierId: number): Promise<DossierAppointment[]> {
+    return (await authFetch(`/admin/dossiers/${dossierId}/appointments`)).data;
+  },
+  async clientDossiers(clientId: number): Promise<{ id: number; name: string }[]> {
+    const res = await authFetch(`/admin/dossiers?client_id=${clientId}&per_page=100`);
+    return (res.data?.data ?? res.data ?? []).map((d: any) => ({ id: d.id, name: d.name }));
   },
   async cancel(id: number): Promise<string> {
     return (await authFetch(`/admin/booking/appointments/${id}/cancel`, { method: 'POST' })).message;
@@ -179,6 +221,8 @@ export interface PublicAppointment {
   invoice: { status: string; total: number; url: string } | null;
   can_cancel: boolean;
   cancel_notice_hours: number;
+  can_reschedule: boolean;
+  reschedules_left: number;
 }
 
 export const publicBookingService = {
@@ -196,6 +240,12 @@ export const publicBookingService = {
   },
   async cancel(token: string): Promise<string> {
     return (await publicFetch(`/appointments/public/${encodeURIComponent(token)}/cancel`, { method: 'POST' })).message;
+  },
+  async rescheduleSlots(token: string, from: string, days = 7): Promise<SlotsResponse> {
+    return (await publicFetch(`/appointments/public/${encodeURIComponent(token)}/slots?from=${from}&days=${days}`)).data;
+  },
+  async reschedule(token: string, start: string): Promise<string> {
+    return (await publicFetch(`/appointments/public/${encodeURIComponent(token)}/reschedule`, { method: 'POST', body: JSON.stringify({ start }) })).message;
   },
 };
 

@@ -33,6 +33,7 @@ import TourButton from '@/components/TourButton';
 import { getAuthToken } from '@/lib/auth-storage';
 import { useCurrentAdmin } from '@/hooks/use-current-admin';
 import { PiClockCounterClockwiseDuotone } from 'react-icons/pi';
+import AppointmentsCard from './appointments-card';
 
 const XfaPdfViewer = dynamic(() => import('@/components/XfaPdfViewer'), { ssr: false });
 
@@ -503,6 +504,9 @@ export default function DossierDetailPage({ params }: { params: Promise<{ id: st
         onDelete={handleDeleteSupp}
         fileInputRef={suppFileRef}
       />
+
+      {/* Rendez-vous du client (3.11) */}
+      <AppointmentsCard dossierId={dossier.id} />
 
       {/* Notes inline éditable */}
       <NotesEditor
