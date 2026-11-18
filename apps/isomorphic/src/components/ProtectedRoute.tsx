@@ -22,6 +22,10 @@ const publicRoutes = [
   '/signin/client',
   '/auth/admin-signin',
   '/auth/client-signin',
+  '/auth/inscription',
+  '/auth/mot-de-passe-oublie',
+  '/auth/definir-mot-de-passe',
+  '/plateforme', // console de l'éditeur : gère sa propre session (cookie platform_token)
   '/questionnaire',
   '/client-form',
   '/sponsor-form',
