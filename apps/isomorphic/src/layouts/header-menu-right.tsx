@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import ProfileMenu from '@/layouts/profile-menu';
 import SettingsButton from '@/layouts/settings-button';
 import LanguageSwitcher from '@/layouts/language-switcher';
+import NotificationBell from '@/layouts/notification-bell';
 import RingBellSolidIcon from '@core/components/icons/ring-bell-solid';
 import { lockApp } from '@/layouts/lock-screen';
 
@@ -13,6 +14,7 @@ export default function HeaderMenuRight() {
   const { t } = useTranslation();
   return (
     <div className="ms-auto grid shrink-0 grid-cols-5 items-center gap-2 text-gray-700 xs:gap-3 xl:gap-4">
+      <NotificationBell />
       <LanguageSwitcher />
 
       <SettingsButton />

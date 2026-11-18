@@ -7,6 +7,7 @@ import Image from 'next/image';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { invitationsService, Invitation, InvitationItemSummary } from '@/services/invitations';
+import { actionFeedService } from '@/services/actions';
 
 const XfaPdfViewer = dynamic(() => import('@/components/XfaPdfViewer'), { ssr: false });
 
@@ -79,6 +80,20 @@ export default function EnvoiDetailsPage({ params }: { params: Promise<{ id: str
     toast.success(t('envois.link_copied'));
   };
 
+  const [reviewing, setReviewing] = useState(false);
+  const toggleReviewed = async () => {
+    if (!inv) return;
+    try {
+      setReviewing(true);
+      toast.success(await actionFeedService.markReviewed(inv.id, !(inv as any).reviewed_at));
+      await load();
+    } catch (e: any) {
+      toast.error(e.message || 'Action impossible.');
+    } finally {
+      setReviewing(false);
+    }
+  };
+
   const handleResend = async () => {
     if (!inv) return;
     if (!confirm(t('envois.resend_confirm', { email: inv.email }))) return;
@@ -131,8 +146,22 @@ export default function EnvoiDetailsPage({ params }: { params: Promise<{ id: str
             </p>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
           <span className={`rounded-full px-3 py-1 text-sm font-medium ${statusClassName}`}>{statusLabel}</span>
+          {inv.status === 'completed' && (
+            <button
+              onClick={toggleReviewed}
+              disabled={reviewing}
+              className={`rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 ${
+                (inv as any).reviewed_at
+                  ? 'border border-emerald-300 text-emerald-700 hover:bg-emerald-50'
+                  : 'bg-emerald-600 text-white hover:bg-emerald-700'
+              }`}
+              title={(inv as any).reviewed_at ? `Révisé le ${(inv as any).reviewed_at}` : 'Retire cet envoi de « à réviser » dans le tableau de bord'}
+            >
+              {(inv as any).reviewed_at ? '✓ Révisé' : 'Marquer comme révisé'}
+            </button>
+          )}
           <button
             onClick={copyLink}
             className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"

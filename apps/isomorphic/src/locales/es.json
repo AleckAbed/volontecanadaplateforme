@@ -136,7 +136,8 @@
     "settings_security": "Seguridad",
     "tutorials": "Tutoriales",
     "team": "Equipo",
-    "platform_console": "Consola de plataforma"
+    "platform_console": "Consola de plataforma",
+    "deadlines": "Plazos"
   },
   "header": {
     "lock_session": "Bloquear sesión",

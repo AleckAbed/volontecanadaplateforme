@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import ClientDashboard from '@/app/client/dashboard/client-dashboard';
 import CabinetDashboard from '@/app/shared/cabinet-dashboard';
+import ActionRequired from '@/app/shared/action-required';
 import { PiHouseDuotone } from 'react-icons/pi';
 
 /**
@@ -39,6 +40,7 @@ export default function HomePage() {
           </p>
         </div>
       </div>
+      <ActionRequired />
       <CabinetDashboard />
     </div>
   );
