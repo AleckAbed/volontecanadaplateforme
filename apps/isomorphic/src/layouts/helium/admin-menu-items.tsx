@@ -18,6 +18,7 @@ import {
   PiCalendarCheck,
   PiReceipt,
   PiCreditCard,
+  PiCalendarPlus,
 } from 'react-icons/pi';
 import { useCurrentAdmin } from '@/hooks/use-current-admin';
 
@@ -48,6 +49,7 @@ export function useAdminMenuItems() {
     { name: t('menu.clients'), href: '/admin/clients', icon: <PiUsers /> },
     { name: t('menu.dossiers'), href: '/admin/dossiers', icon: <PiFolderUser /> },
     { name: t('menu.deadlines'), href: '/admin/echeances', icon: <PiCalendarCheck /> },
+    { name: t('menu.appointments'), href: '/admin/rendez-vous', icon: <PiCalendarPlus /> },
     { name: t('menu.invoices'), href: '/facturation', icon: <PiReceipt /> },
     { name: t('menu.collaborators'), href: '/admin/collaborators', icon: <PiUsers /> },
 

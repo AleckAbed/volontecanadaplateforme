@@ -27,6 +27,9 @@ const publicRoutes = [
   '/auth/definir-mot-de-passe',
   '/client/acces',
   '/facture/', // facture vue par le client via son lien
+  '/reserver/', // page publique de réservation d'un cabinet
+  '/rendez-vous/', // rendez-vous géré par le client via son lien
+  '/mandat/', // mandat de représentation à signer
 
   '/client/mot-de-passe-oublie',
   '/plateforme', // console de l'éditeur : gère sa propre session (cookie platform_token)
