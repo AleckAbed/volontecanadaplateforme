@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import { invitationsService, PublicInvitation, PublicInvitationItem } from '@/services/invitations';
+import { mergePrefill } from '@/services/dossier-documents';
 
 const SmartPdfViewer = dynamic(() => import('@/components/SmartPdfViewer'), { ssr: false });
 
@@ -435,7 +436,7 @@ function DocumentFillView({
           filePromise={filePromiseRef.current}
           fileName={`${item.name}.pdf`}
           readOnly={false}
-          initialFormData={item.form_data || undefined}
+          initialFormData={mergePrefill((item as any).prefill, item.form_data)}
           onSave={handleSave}
         />
       </div>

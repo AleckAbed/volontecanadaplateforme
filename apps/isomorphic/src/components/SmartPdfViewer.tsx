@@ -61,7 +61,11 @@ export default function SmartPdfViewer(props: SmartPdfViewerProps) {
       setIsXfa(xfa);
       // Si on a une clé Adobe ET que c'est du XFA → Adobe (meilleur sur XFA)
       // Sinon → pdf.js (Adobe ne supporte pas toutes les fonctions sans clé)
-      const chosen: Engine = xfa && hasAdobeKey ? 'adobe' : 'xfa';
+      // Exception : s'il y a des valeurs à injecter (préremplissage depuis le
+      // profil client, saisie précédente), pdf.js — Adobe n'applique pas
+      // initialFormData. L'utilisateur peut toujours basculer à la main.
+      const hasInitialValues = !!rest.initialFormData && Object.keys(rest.initialFormData).length > 0;
+      const chosen: Engine = xfa && hasAdobeKey && !hasInitialValues ? 'adobe' : 'xfa';
       setEngine(chosen);
     });
     return () => { cancelled = true; };

@@ -12,7 +12,7 @@ import { useModal } from '@/app/shared/modal-views/use-modal';
 import { apiService } from '@/services/api';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { validateEmail, validatePassword } from '@/validators/common-rules';
+import { validateEmail } from '@/validators/common-rules';
 import { messages } from '@/config/messages';
 import {
   clientFormDataAtom,
@@ -28,7 +28,8 @@ const demandeurSchema = z.object({
   first_name: z.string().min(1, { message: messages.firstNameRequired }),
   last_name: z.string().min(1, { message: messages.lastNameRequired }),
   email: validateEmail,
-  password: validatePassword,
+  // Facultatif : sans mot de passe, le cabinet envoie plutôt un lien « Inviter au portail ».
+  password: z.union([z.literal(''), z.string().min(8, { message: 'Au moins 8 caractères.' })]).optional(),
   phone: z.string().optional(),
   date_of_birth: z.string().optional(),
   nationality: z.string().optional(),

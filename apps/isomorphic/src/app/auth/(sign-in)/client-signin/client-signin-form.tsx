@@ -67,6 +67,12 @@ export default function ClientSignInForm() {
                 className="[&>label>span]:font-medium"
                 disabled={isLoading}
               />
+              <Link
+                href="/client/mot-de-passe-oublie"
+                className="text-sm font-semibold text-blue underline transition-colors hover:text-gray-900 hover:no-underline"
+              >
+                Mot de passe oublié ?
+              </Link>
             </div>
             <Button
               className="border-primary-light w-full border-2 text-base font-bold"
