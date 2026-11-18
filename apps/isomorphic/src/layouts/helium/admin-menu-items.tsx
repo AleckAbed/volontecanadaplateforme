@@ -14,7 +14,9 @@ import {
   PiFileText,
   PiBookOpen,
   PiSparkle,
+  PiUsersThree,
 } from 'react-icons/pi';
+import { useCurrentAdmin } from '@/hooks/use-current-admin';
 
 /**
  * Menu admin actif (Helium layout).
@@ -28,8 +30,12 @@ import {
  */
 export function useAdminMenuItems() {
   const { t } = useTranslation();
+  const admin = useCurrentAdmin();
+  // Tant que le rôle n'est pas chargé, on n'affiche pas les entrées réservées.
+  const canManage = !!admin?.permissions?.manage_settings;
+  const canManageTeam = !!admin?.permissions?.manage_team;
 
-  return [
+  const items = [
     { name: t('menu.section_dashboard') },
     { name: t('menu.dashboard'), href: '/', icon: <PiChartBar /> },
     { name: t('menu.analytics'), href: routes.analytics, icon: <PiChartBar /> },
@@ -46,15 +52,17 @@ export function useAdminMenuItems() {
     { name: t('menu.section_forms') },
     { name: t('menu.envois'), href: routes.invitations.list, icon: <PiFileText /> },
     { name: t('menu.document_templates'), href: routes.configuration.documents, icon: <PiFileText /> },
-    {
-      name: t('menu.configuration'),
-      href: '#',
-      icon: <PiClipboardText />,
-      dropdownItems: [
-        { name: t('menu.categories'), href: routes.configuration.categories },
-        { name: t('menu.form_types'), href: routes.configuration.formTypes },
-      ],
-    },
+    ...(canManage
+      ? [{
+          name: t('menu.configuration'),
+          href: '#',
+          icon: <PiClipboardText />,
+          dropdownItems: [
+            { name: t('menu.categories'), href: routes.configuration.categories },
+            { name: t('menu.form_types'), href: routes.configuration.formTypes },
+          ],
+        }]
+      : []),
     { name: t('menu.questionnaires_legacy'), href: routes.questionnaires.list, icon: <PiClipboardText /> },
 
     { name: t('menu.section_communication') },
@@ -69,12 +77,15 @@ export function useAdminMenuItems() {
     },
 
     { name: t('menu.section_admin') },
+    ...(canManageTeam ? [{ name: t('menu.team'), href: '/admin/equipe', icon: <PiUsersThree /> }] : []),
     { name: t('menu.settings_profile'), href: routes.forms.profileSettings, icon: <PiGear /> },
     { name: t('menu.tutorials'), href: '/tutoriels', icon: <PiBookOpen /> },
 
     { name: 'Assistant' },
     { name: 'Volo — Assistant IA', href: '/assistant', icon: <PiSparkle />, target: '_blank' },
   ];
+
+  return items;
 }
 
 export const adminMenuItems = [] as ReturnType<typeof useAdminMenuItems>;

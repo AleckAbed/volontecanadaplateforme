@@ -75,6 +75,12 @@ export default function AdminSignInForm() {
                 className="[&>label>span]:font-medium"
                 disabled={isLoading}
               />
+              <Link
+                href="/auth/mot-de-passe-oublie"
+                className="text-sm font-semibold text-blue underline transition-colors hover:text-gray-900 hover:no-underline"
+              >
+                Mot de passe oublié ?
+              </Link>
             </div>
             <Button
               className="border-primary-light w-full border-2 text-base font-bold"
@@ -90,6 +96,15 @@ export default function AdminSignInForm() {
         )}
       </Form>
       <Text className="mt-5 text-center text-[15px] leading-loose text-gray-500 lg:text-start xl:mt-7 xl:text-base">
+        Nouveau cabinet ?{' '}
+        <Link
+          href="/auth/inscription"
+          className="font-semibold text-gray-700 transition-colors hover:text-blue"
+        >
+          Créer votre espace
+        </Link>
+      </Text>
+      <Text className="mt-1 text-center text-[15px] leading-loose text-gray-500 lg:text-start xl:text-base">
         Vous êtes un client ?{' '}
         <Link
           href="/auth/client-signin"

@@ -134,7 +134,9 @@
     "settings_general": "Général",
     "settings_profile": "Mon profil",
     "settings_security": "Sécurité",
-    "tutorials": "Tutoriels"
+    "tutorials": "Tutoriels",
+    "team": "Équipe",
+    "platform_console": "Console plateforme"
   },
   "header": {
     "lock_session": "Verrouiller la session",
