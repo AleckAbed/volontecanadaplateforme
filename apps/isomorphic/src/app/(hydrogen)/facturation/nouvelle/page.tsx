@@ -7,6 +7,7 @@ import { Suspense } from 'react';
 import toast from 'react-hot-toast';
 import { PiArrowLeftBold, PiPlusBold, PiTrashDuotone } from 'react-icons/pi';
 import { invoicesService, InvoiceLineInput, formatMoney } from '@/services/billing';
+import { companyService } from '@/services/companies';
 
 const EMPTY_LINE: InvoiceLineInput = { description: '', quantity: 1, unit_price: 0, taxable: true };
 
@@ -16,12 +17,19 @@ function NewInvoiceForm() {
   const [clients, setClients] = useState<{ id: number; name: string }[]>([]);
   const [clientId, setClientId] = useState<number | ''>(params?.get('client') ? Number(params.get('client')) : '');
   const [dueDate, setDueDate] = useState('');
+  const [companies, setCompanies] = useState<{ id: number; name: string; ended_at: string | null }[]>([]);
+  const [companyId, setCompanyId] = useState<number | ''>('');
   const [notes, setNotes] = useState('');
   const [lines, setLines] = useState<InvoiceLineInput[]>([{ ...EMPTY_LINE }]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => { invoicesService.clientOptions().then(setClients).catch(() => {}); }, []);
+  useEffect(() => {
+    setCompanyId('');
+    setCompanies([]);
+    if (clientId) companyService.forClient(Number(clientId)).then(setCompanies).catch(() => setCompanies([]));
+  }, [clientId]);
 
   const subtotal = useMemo(() => lines.reduce((s, l) => s + Math.round((Number(l.quantity) || 0) * (Number(l.unit_price) || 0) * 100), 0), [lines]);
 
@@ -36,6 +44,7 @@ function NewInvoiceForm() {
       setSaving(true);
       const { id, message } = await invoicesService.create({
         client_id: Number(clientId),
+        company_id: companyId ? Number(companyId) : null,
         due_date: dueDate || null,
         notes: notes || null,
         lines: lines.filter((l) => l.description.trim() !== '').map((l) => ({ ...l, quantity: Number(l.quantity), unit_price: Number(l.unit_price) })),
@@ -68,6 +77,15 @@ function NewInvoiceForm() {
               {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
           </div>
+          {companies.length > 0 && (
+            <div className="sm:col-span-2">
+              <label htmlFor="billto" className="mb-1 block text-sm font-medium text-gray-700">Facturer à</label>
+              <select id="billto" value={companyId} onChange={(e) => setCompanyId(e.target.value ? Number(e.target.value) : '')} className={input}>
+                <option value="">Le client</option>
+                {companies.map((c) => <option key={c.id} value={c.id}>L’entreprise : {c.name}{c.ended_at ? ' (ancien employeur)' : ''}</option>)}
+              </select>
+            </div>
+          )}
           <div>
             <label htmlFor="due" className="mb-1 block text-sm font-medium text-gray-700">Payable au plus tard le (facultatif)</label>
             <input id="due" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className={input} />

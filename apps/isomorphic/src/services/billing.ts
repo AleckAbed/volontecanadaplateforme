@@ -52,6 +52,7 @@ export interface InvoiceDetail extends InvoiceSummary {
   dossier: { id: number; name: string } | null;
   client: { id: number; name: string; email: string; address: string | null } | null;
   lines: { description: string; quantity: number; unit_price_cents: number; taxable: boolean; amount_cents: number }[];
+  company?: { id: number; name: string; email: string | null; address: string | null; business_number: string | null } | null;
   cabinet: { name: string; province: string | null; phone: string | null; gst_number: string | null; qst_number: string | null; website?: string | null; branding?: CabinetBranding } | null;
   public_url: string;
   online_payment_available?: boolean;
@@ -68,6 +69,8 @@ export interface InvoiceLineInput {
 export interface InvoiceInput {
   client_id: number;
   dossier_id?: number | null;
+  /** Facture adressée à l'entreprise du client. */
+  company_id?: number | null;
   due_date?: string | null;
   notes?: string | null;
   lines: InvoiceLineInput[];

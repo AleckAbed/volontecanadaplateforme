@@ -138,6 +138,13 @@ export default function ClientDashboard() {
                   <div><dt className="text-gray-500">Ouvert le</dt><dd className="text-gray-800">{formatDate(d.opened_at)}</dd></div>
                   {d.deadline_at && <div className="col-span-2"><dt className="text-gray-500">Échéance</dt><dd className="font-medium text-gray-900">{formatDate(d.deadline_at)}</dd></div>}
                 </dl>
+                {d.company && (
+                  <p className="mt-3 rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-800">
+                    Dossier suivi par votre employeur <strong>{d.company.name}</strong> : {d.company.visibility === 'full'
+                      ? 'il voit l’avancement, les formulaires et les documents de ce dossier (sans pouvoir les ouvrir).'
+                      : 'il voit seulement l’avancement (statut, étapes, échéances).'}
+                  </p>
+                )}
               </div>
             ))}
           </div>

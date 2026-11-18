@@ -71,6 +71,7 @@ export interface PortalOverview {
     service_name: string | null;
     status: string | null;
     status_label?: string | null;
+    company?: { name: string; visibility: 'progress' | 'full' } | null;
     opened_at: string | null;
     deadline_at: string | null;
     for: string;
