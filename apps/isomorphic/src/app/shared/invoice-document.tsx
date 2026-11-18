@@ -1,6 +1,7 @@
 'use client';
 
 import { InvoiceDetail, INVOICE_STATUS, formatMoney } from '@/services/billing';
+import CabinetLogo from '@/components/cabinet-logo';
 
 function qty(n: number): string {
   return Number.isInteger(n) ? String(n) : n.toLocaleString('fr-CA', { maximumFractionDigits: 2 });
@@ -14,7 +15,9 @@ export default function InvoiceDocument({ invoice }: { invoice: InvoiceDetail })
     <article className="invoice-document rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-800 shadow-sm print:border-0 print:p-0 print:shadow-none sm:p-8">
       <header className="flex flex-col gap-4 border-b border-gray-200 pb-5 sm:flex-row sm:items-start sm:justify-between">
         <div>
+          {invoice.cabinet?.branding?.logo_url && <CabinetLogo branding={invoice.cabinet.branding} className="mb-2" />}
           <div className="text-lg font-bold text-gray-900">{invoice.cabinet?.name}</div>
+          {invoice.cabinet?.website && <div className="text-gray-600">{invoice.cabinet.website}</div>}
           {invoice.cabinet?.phone && <div className="text-gray-600">{invoice.cabinet.phone}</div>}
           {invoice.cabinet?.gst_number && <div className="text-xs text-gray-500">TPS/TVH : {invoice.cabinet.gst_number}</div>}
           {invoice.cabinet?.qst_number && <div className="text-xs text-gray-500">TVQ : {invoice.cabinet.qst_number}</div>}

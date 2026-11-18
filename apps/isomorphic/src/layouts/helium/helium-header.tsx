@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { Badge } from 'rizzui/badge';
 import { ActionIcon } from 'rizzui/action-icon';
@@ -13,7 +12,8 @@ import SettingsButton from '@/layouts/settings-button';
 import LanguageSwitcher from '@/layouts/language-switcher';
 import NotificationBell from '@/layouts/notification-bell';
 import HamburgerButton from '@/layouts/hamburger-button';
-import Logo from '@core/components/logo';
+import CabinetLogo from '@/components/cabinet-logo';
+import { useCabinetBranding } from '@/hooks/use-cabinet-branding';
 import { lockApp } from '@/layouts/lock-screen';
 import {
   PiChatCircleDotsFill,
@@ -48,8 +48,7 @@ function HeaderMenuRight() {
 }
 
 export default function Header() {
-  const pathname = usePathname();
-  const isQuestionnaires = pathname?.startsWith('/questionnaires');
+  const branding = useCabinetBranding();
 
   return (
     <header
@@ -63,23 +62,13 @@ export default function Header() {
             <Sidebar className="static w-full xl:p-0 2xl:w-full [&>div]:xl:rounded-none" />
           }
         />
-        {isQuestionnaires ? (
-          <a
-            href="https://volontecanada.ca"
-            aria-label="Volonté Canada"
-            className="me-4 w-9 shrink-0 text-gray-800 hover:text-gray-900 lg:me-5 xl:hidden"
-          >
-            <Logo iconOnly={true} />
-          </a>
-        ) : (
-          <Link
-            href="/"
-            aria-label="Site Logo"
-            className="me-4 w-9 shrink-0 text-gray-800 hover:text-gray-900 lg:me-5 xl:hidden"
-          >
-            <Logo iconOnly={true} />
-          </Link>
-        )}
+        <Link
+          href="/"
+          aria-label={branding?.name ?? 'Accueil'}
+          className="me-4 shrink-0 lg:me-5 xl:hidden"
+        >
+          <CabinetLogo branding={branding} compact />
+        </Link>
         <SearchWidget />
       </div>
       <HeaderMenuRight />

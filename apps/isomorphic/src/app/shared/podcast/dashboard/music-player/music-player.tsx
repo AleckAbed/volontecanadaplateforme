@@ -21,7 +21,7 @@ export default function MusicPlayer({ className }: { className?: string }) {
   const article = useAtomValue(currentArticleAtom);
 
   const title = article?.title ?? 'Sélectionnez un article';
-  const sourceName = article?.source?.name ?? 'Volonté Canada';
+  const sourceName = article?.source?.name ?? 'Actualités';
   const thumb = article?.thumbnail
     ?? 'https://isomorphic-furyroad.s3.amazonaws.com/public/podcast/recent-played-image-2.webp';
   const summary = article?.summary

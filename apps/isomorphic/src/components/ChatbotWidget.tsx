@@ -109,7 +109,7 @@ export default function ChatbotWidget({ audience }: Props) {
               </div>
               <div>
                 <div className="text-sm font-semibold">Volo</div>
-                <div className="text-xs text-red-100">Assistant Volonté Canada</div>
+                <div className="text-xs text-red-100">Assistant IA du cabinet</div>
               </div>
             </div>
             <button

@@ -340,9 +340,9 @@ export default function VoloAssistantPage() {
             </button>
             <div>
               <div className="text-sm font-bold text-gray-900">
-                {activeConv ? activeConv.title : 'Volo — Assistant Volonté Canada'}
+                {activeConv ? activeConv.title : 'Volo — Assistant IA'}
               </div>
-              <div className="text-[11px] text-gray-500">Système IA interne · Volonté Canada</div>
+              <div className="text-[11px] text-gray-500">Assistant IA du cabinet</div>
             </div>
           </div>
           <button
@@ -510,7 +510,7 @@ function Welcome({ onPick }: { onPick: (s: string) => void }) {
       </div>
       <h1 className="text-2xl font-bold text-gray-900">Bonjour, je suis Volo</h1>
       <p className="mt-2 max-w-md text-center text-sm text-gray-500">
-        Je suis là pour vous aider à utiliser la plateforme Volonté Canada.
+        Je suis là pour vous aider à utiliser la plateforme.
         Posez-moi n&apos;importe quelle question sur son fonctionnement !
       </p>
       <div className="mt-8 grid w-full max-w-2xl gap-3 sm:grid-cols-2">

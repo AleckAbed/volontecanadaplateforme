@@ -57,7 +57,7 @@ export default function MiniMusicPlayer({ className }: { className?: string }) {
             </Title>
             <Flex gap="0" className="line-clamp-1 text-gray-400">
               <Text as="span" className="text-xs">
-                {article.source?.name ?? 'Volonté Canada'}
+                {article.source?.name ?? 'Actualités'}
               </Text>
             </Flex>
           </button>

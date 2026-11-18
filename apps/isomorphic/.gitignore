@@ -51,3 +51,5 @@ next-env.d.ts
 .vscode
 
 tsconfig.tsbuildinfo
+# build de vérification (NEXT_DIST_DIR)
+/.next-verif/

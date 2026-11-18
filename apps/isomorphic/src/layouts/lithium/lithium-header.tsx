@@ -8,7 +8,8 @@ import SearchWidget from '@/app/shared/search/search';
 import ProfileMenu from '@/layouts/profile-menu';
 import SettingsButton from '@/layouts/settings-button';
 import HamburgerButton from '@/layouts/hamburger-button';
-import Logo from '@core/components/logo';
+import CabinetLogo from '@/components/cabinet-logo';
+import { useCabinetBranding } from '@/hooks/use-cabinet-branding';
 import {
   PiBellSimpleRingingDuotone,
   PiChatsCircleDuotone,
@@ -16,7 +17,7 @@ import {
   PiMagnifyingGlassDuotone,
 } from 'react-icons/pi';
 import HeaderMenuLeft from '@/layouts/lithium/lithium-menu';
-import Sidebar from '@/layouts/hydrogen/sidebar';
+import LithiumMobileSidebar from '@/layouts/lithium/lithium-mobile-sidebar';
 import StickyHeader from '@/layouts/sticky-header';
 
 function HeaderMenuRight() {
@@ -34,31 +35,32 @@ function HeaderMenuRight() {
 }
 
 export default function Header() {
+  const branding = useCabinetBranding();
   return (
     <StickyHeader
       className={'z-[990] justify-between 2xl:py-5 2xl:pl-6 3xl:px-8'}
     >
       <div className="hidden items-center gap-3 xl:flex">
         <Link
-          aria-label="Site Logo"
+          aria-label={branding?.name ?? 'Accueil'}
           href={'/'}
-          className="me-4 hidden w-[155px] shrink-0 text-gray-800 hover:text-gray-900 lg:me-5 xl:block"
+          className="me-4 hidden max-w-[200px] shrink-0 lg:me-5 xl:block"
         >
-          <Logo className="max-w-[155px]" />
+          <CabinetLogo branding={branding} />
         </Link>
         <HeaderMenuLeft />
       </div>
       <div className="flex w-full items-center gap-5 xl:w-auto 3xl:gap-6">
         <div className="flex w-full max-w-2xl items-center xl:w-auto">
           <HamburgerButton
-            view={<Sidebar className="static w-full 2xl:w-full" />}
+            view={<LithiumMobileSidebar />}
           />
           <Link
-            aria-label="Site Logo"
+            aria-label={branding?.name ?? 'Accueil'}
             href={'/'}
-            className="me-4 w-9 shrink-0 text-gray-800 hover:text-gray-900 lg:me-5 xl:hidden"
+            className="me-4 shrink-0 lg:me-5 xl:hidden"
           >
-            <Logo iconOnly={true} />
+            <CabinetLogo branding={branding} compact />
           </Link>
           <SearchWidget
             icon={<PiMagnifyingGlassDuotone className="h-[20px] w-[20px]" />}

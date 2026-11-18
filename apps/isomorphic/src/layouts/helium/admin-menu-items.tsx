@@ -19,6 +19,7 @@ import {
   PiReceipt,
   PiCreditCard,
   PiShieldCheck,
+  PiBuildings,
   PiCalendarPlus,
 } from 'react-icons/pi';
 import { useCurrentAdmin } from '@/hooks/use-current-admin';
@@ -85,6 +86,7 @@ export function useAdminMenuItems() {
     },
 
     { name: t('menu.section_admin') },
+    ...(canManageTeam ? [{ name: t('menu.cabinet_profile'), href: '/admin/cabinet', icon: <PiBuildings /> }] : []),
     ...(canManageTeam ? [{ name: t('menu.team'), href: '/admin/equipe', icon: <PiUsersThree /> }] : []),
     ...(canManageTeam ? [{ name: t('menu.billing'), href: '/admin/abonnement', icon: <PiCreditCard /> }] : []),
     ...(canManageTeam ? [{ name: t('menu.compliance'), href: '/admin/conformite', icon: <PiShieldCheck /> }] : []),

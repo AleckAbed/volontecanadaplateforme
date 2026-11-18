@@ -2,6 +2,7 @@
  * S7 — Réservation en ligne, Google Agenda, mandat de représentation.
  */
 import { authFetch as rawAuthFetch, publicFetch as rawPublicFetch } from '@/lib/api-client';
+import type { CabinetBranding } from '@/services/cabinet-profile';
 
 const authFetch = rawAuthFetch as (...args: Parameters<typeof rawAuthFetch>) => Promise<any>;
 const publicFetch = rawPublicFetch as (...args: Parameters<typeof rawPublicFetch>) => Promise<any>;
@@ -137,7 +138,7 @@ export const bookingAdminService = {
 };
 
 export interface PublicBookingPage {
-  cabinet: { name: string; intro: string | null; timezone: string };
+  cabinet: { name: string; intro: string | null; timezone: string; branding?: CabinetBranding };
   services: {
     id: number;
     name: string;
@@ -162,6 +163,7 @@ export interface SlotsResponse {
 
 export interface PublicAppointment {
   cabinet: string | null;
+  branding?: CabinetBranding | null;
   booking_url: string | null;
   service: string | null;
   name: string;
@@ -215,6 +217,7 @@ export interface MandateItem {
 
 export interface PublicMandate {
   cabinet: string | null;
+  branding?: CabinetBranding | null;
   client_name: string;
   title: string;
   body: string;

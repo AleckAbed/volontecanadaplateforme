@@ -4,6 +4,7 @@ import { useEffect, useState, use, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import { documentService, PublicDocumentData } from '@/services/documents';
+import PublicCabinetLogo from '@/components/public-cabinet-logo';
 
 const XfaPdfViewer = dynamic(() => import('@/components/XfaPdfViewer'), { ssr: false });
 
@@ -104,7 +105,7 @@ export default function ClientFillDocumentPage({ params }: { params: Promise<{ t
       <header className="border-b border-gray-200 bg-white px-6 py-4 shadow-sm">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase text-blue-600">Volonte Canada</p>
+            <PublicCabinetLogo type="document" code={token} className="mb-1" />
             <h1 className="text-lg font-bold text-gray-900">{docData?.template_name}</h1>
             {docData?.client_name && (
               <p className="text-sm text-gray-500">Bonjour, {docData.client_name}</p>
@@ -143,7 +144,7 @@ export default function ClientFillDocumentPage({ params }: { params: Promise<{ t
       {/* Pied de page */}
       <footer className="border-t border-gray-200 bg-white px-6 py-2 text-center text-xs text-gray-400">
         {docData?.expires_at && `Ce document expire le ${docData.expires_at}. `}
-        Ce lien est personnel et confidentiel — Volonte Canada
+        Ce lien est personnel et confidentiel.
       </footer>
     </div>
   );
@@ -158,7 +159,6 @@ function FullPageMessage({
         <div className="mb-4 text-6xl">{icon}</div>
         <h1 className={`mb-2 text-2xl font-bold ${color}`}>{title}</h1>
         <p className="max-w-md text-gray-500">{message}</p>
-        <p className="mt-6 text-xs text-gray-400">Volonte Canada — Cabinet d&apos;immigration</p>
       </div>
     </div>
   );

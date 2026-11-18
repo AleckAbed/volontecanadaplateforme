@@ -12,7 +12,7 @@ export interface CurrentAdmin {
   role: TeamRole;
   role_label: string;
   permissions: AdminPermissions;
-  cabinet: { id: number; name: string } | null;
+  cabinet: { id: number; name: string; slug?: string; branding?: import('@/services/cabinet-profile').CabinetBranding } | null;
 }
 
 const currentAdminAtom = atom<CurrentAdmin | null>(null);

@@ -2,6 +2,7 @@
  * S6 — Factures clients, encaissement Stripe Connect, abonnement du cabinet.
  */
 import { authFetch as rawAuthFetch, publicFetch as rawPublicFetch } from '@/lib/api-client';
+import type { CabinetBranding } from '@/services/cabinet-profile';
 
 const authFetch = rawAuthFetch as (...args: Parameters<typeof rawAuthFetch>) => Promise<any>;
 const publicFetch = rawPublicFetch as (...args: Parameters<typeof rawPublicFetch>) => Promise<any>;
@@ -51,7 +52,7 @@ export interface InvoiceDetail extends InvoiceSummary {
   dossier: { id: number; name: string } | null;
   client: { id: number; name: string; email: string; address: string | null } | null;
   lines: { description: string; quantity: number; unit_price_cents: number; taxable: boolean; amount_cents: number }[];
-  cabinet: { name: string; province: string | null; phone: string | null; gst_number: string | null; qst_number: string | null } | null;
+  cabinet: { name: string; province: string | null; phone: string | null; gst_number: string | null; qst_number: string | null; website?: string | null; branding?: CabinetBranding } | null;
   public_url: string;
   online_payment_available?: boolean;
   can_pay_online?: boolean;

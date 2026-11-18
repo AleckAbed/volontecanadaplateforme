@@ -10,8 +10,6 @@ import NextProgress from '@core/components/next-progress';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 // styles
-import 'swiper/css';
-import 'swiper/css/navigation';
 import '@/app/globals.css';
 
 export const metadata = {

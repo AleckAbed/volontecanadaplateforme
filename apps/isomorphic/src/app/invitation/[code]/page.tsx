@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import { invitationsService, PublicInvitation, PublicInvitationItem } from '@/services/invitations';
 import { mergePrefill } from '@/services/dossier-documents';
+import PublicCabinetLogo from '@/components/public-cabinet-logo';
 
 const SmartPdfViewer = dynamic(() => import('@/components/SmartPdfViewer'), { ssr: false });
 
@@ -133,7 +134,7 @@ export default function PublicInvitationPage({ params }: { params: Promise<{ cod
       {/* Header */}
       <header className="border-b border-gray-200 bg-white px-6 py-5 shadow-sm">
         <div className="mx-auto max-w-3xl">
-          <p className="text-xs font-semibold uppercase text-blue-600">Volonté Canada</p>
+          <PublicCabinetLogo type="invitation" code={code} className="mb-2" />
           <h1 className="mt-1 text-2xl font-bold text-gray-900">Votre invitation</h1>
           {invitation.client_name && (
             <p className="mt-1 text-gray-600">Bonjour, <strong>{invitation.client_name}</strong></p>
@@ -256,9 +257,6 @@ export default function PublicInvitationPage({ params }: { params: Promise<{ cod
         </div>
       </main>
 
-      <footer className="border-t border-gray-200 bg-white px-6 py-4 text-center text-xs text-gray-400">
-        Volonté Canada — Cabinet d&apos;immigration
-      </footer>
     </div>
   );
 }
@@ -467,7 +465,6 @@ function FullPageMessage({
         <div className="mb-4 text-6xl">{icon}</div>
         <h1 className={`mb-2 text-2xl font-bold ${color}`}>{title}</h1>
         <p className="max-w-md text-gray-500">{message}</p>
-        <p className="mt-6 text-xs text-gray-400">Volonté Canada — Cabinet d&apos;immigration</p>
       </div>
     </div>
   );
