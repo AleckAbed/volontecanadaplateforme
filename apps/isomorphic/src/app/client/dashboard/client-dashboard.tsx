@@ -131,7 +131,7 @@ export default function ClientDashboard() {
                     <div className="font-medium text-gray-900">{d.name}</div>
                     {d.service_name && <div className="text-sm text-gray-600">{d.service_name}</div>}
                   </div>
-                  {d.status && <span className="shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700">{d.status}</span>}
+                  {d.status && <span className="shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700">{d.status_label ?? d.status}</span>}
                 </div>
                 <dl className="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-600">
                   <div><dt className="text-gray-500">Pour</dt><dd className="text-gray-800">{d.for}</dd></div>

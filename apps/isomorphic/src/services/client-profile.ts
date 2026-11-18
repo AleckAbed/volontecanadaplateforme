@@ -70,6 +70,7 @@ export interface PortalOverview {
     name: string;
     service_name: string | null;
     status: string | null;
+    status_label?: string | null;
     opened_at: string | null;
     deadline_at: string | null;
     for: string;
