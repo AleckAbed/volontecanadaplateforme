@@ -14,6 +14,7 @@ import {
 } from 'react-icons/pi';
 import { clientPortalService, PortalOverview, PortalTask } from '@/services/client-profile';
 import { publicInvoiceService, InvoiceSummary, INVOICE_STATUS, formatMoney } from '@/services/billing';
+import MyDataCard from './my-data-card';
 
 function formatDate(d: string | null): string {
   if (!d) return '—';
@@ -182,6 +183,8 @@ export default function ClientDashboard() {
           </ul>
         </section>
       )}
+
+      <MyDataCard />
     </div>
   );
 }

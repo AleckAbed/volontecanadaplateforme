@@ -23,6 +23,7 @@ import {
   groupConversationsByDate,
 } from '@/lib/chatbot-storage';
 import { getAuthToken } from '@/lib/auth-storage';
+import { chatbotSettingsService } from '@/services/chatbot-settings';
 
 const SUGGESTIONS = [
   "Comment créer un nouveau dossier ?",
@@ -41,11 +42,18 @@ export default function VoloAssistantPage() {
   const [error, setError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  // 2.3 : l'assistant est désactivé tant qu'un gestionnaire ne l'a pas activé.
+  const [aiEnabled, setAiEnabled] = useState<boolean | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [voiceSupported, setVoiceSupported] = useState(false);
   const recognitionRef = useRef<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (settingsOpen) return;
+    chatbotSettingsService.get().then((s) => setAiEnabled(!!s.enabled)).catch(() => setAiEnabled(null));
+  }, [settingsOpen]);
 
   // Récupère l'identité utilisateur pour namespacer le storage
   useEffect(() => {
@@ -347,6 +355,14 @@ export default function VoloAssistantPage() {
             <span className="hidden sm:inline">Paramètres</span>
           </button>
         </div>
+
+        {aiEnabled === false && (
+          <div role="status" className="border-b border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            L’assistant IA est désactivé pour votre cabinet : vos questions et vos données ne sont envoyées à aucun service externe.
+            Un propriétaire ou un administrateur peut l’activer dans{' '}
+            <button type="button" onClick={() => setSettingsOpen(true)} className="font-semibold underline">Paramètres</button>.
+          </div>
+        )}
 
         <div ref={scrollRef} className="flex-1 overflow-y-auto">
           {!userKey ? (

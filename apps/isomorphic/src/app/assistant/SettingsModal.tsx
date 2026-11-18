@@ -18,26 +18,40 @@ export default function SettingsModal({ open, onClose }: Props) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [initiallyEnabled, setInitiallyEnabled] = useState(false);
+  const [accept, setAccept] = useState(false);
 
   useEffect(() => {
     if (!open) return;
     setError(null);
     setSuccess(false);
+    setAccept(false);
     setLoading(true);
     chatbotSettingsService
       .get()
-      .then(setSettings)
+      .then((s) => {
+        setSettings(s);
+        setInitiallyEnabled(!!s.enabled);
+      })
       .catch((e) => setError(e.message || 'Erreur de chargement'))
       .finally(() => setLoading(false));
   }, [open]);
 
   const save = async () => {
     if (!settings) return;
+    if (settings.enabled && !initiallyEnabled && !accept) {
+      setError('Cochez la case de consentement pour activer l’assistant.');
+      return;
+    }
     setSaving(true);
     setError(null);
     try {
-      const updated = await chatbotSettingsService.update(settings);
+      const updated = await chatbotSettingsService.update({
+        ...settings,
+        ...(settings.enabled && !initiallyEnabled ? { accept_foreign_processing: true } : {}),
+      });
       setSettings(updated);
+      setInitiallyEnabled(!!updated.enabled);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 2500);
     } catch (e: any) {
@@ -77,6 +91,28 @@ export default function SettingsModal({ open, onClose }: Props) {
             </div>
           ) : (
             <div className="space-y-6">
+              {/* Section 0 — Activation (2.3 : données traitées hors Canada) */}
+              <Section title="Activation">
+                <Toggle
+                  title="Activer l'assistant IA pour le cabinet"
+                  description="Désactivé par défaut. Une fois activé, les questions posées à Volo, et les données de dossier ou de client qu'il consulte, sont envoyées à Google (Gemini) pour être traitées hors du Canada."
+                  checked={settings.enabled}
+                  onChange={(v) => {
+                    setSettings({ ...settings, enabled: v });
+                    setAccept(false);
+                  }}
+                />
+                {settings.enabled && !initiallyEnabled && (
+                  <label className="ml-12 flex items-start gap-2 rounded-lg bg-amber-50 p-3 text-xs text-amber-900">
+                    <input type="checkbox" checked={accept} onChange={(e) => setAccept(e.target.checked)} className="mt-0.5" />
+                    <span>
+                      J&apos;ai compris que ces données seront communiquées à un fournisseur situé hors du Canada. Le cabinet
+                      a évalué ce transfert (Loi 25, art. 17) et en informe ses clients.
+                    </span>
+                  </label>
+                )}
+              </Section>
+
               {/* Section 1 — Périmètre toujours actif */}
               <Section title="Périmètre de base">
                 <Row
