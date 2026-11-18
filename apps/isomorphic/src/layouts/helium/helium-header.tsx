@@ -11,6 +11,7 @@ import SearchWidget from '@/app/shared/search/search';
 import ProfileMenu from '@/layouts/profile-menu';
 import SettingsButton from '@/layouts/settings-button';
 import LanguageSwitcher from '@/layouts/language-switcher';
+import NotificationBell from '@/layouts/notification-bell';
 import HamburgerButton from '@/layouts/hamburger-button';
 import Logo from '@core/components/logo';
 import { lockApp } from '@/layouts/lock-screen';
@@ -26,6 +27,7 @@ function HeaderMenuRight() {
   const { t } = useTranslation();
   return (
     <div className="ms-auto flex shrink-0 items-center gap-2 text-gray-700 xs:gap-3 xl:gap-4">
+      <NotificationBell />
       <LanguageSwitcher />
       <SettingsButton className="rounded-full before:absolute before:h-full before:w-full before:-rotate-45 before:rounded-full before:bg-gradient-to-l before:from-green-dark/25 before:via-green-dark/0 before:to-green-dark/0 3xl:h-10 3xl:w-10">
         <PiGearFill className="h-[22px] w-auto animate-spin-slow" />

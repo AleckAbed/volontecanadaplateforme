@@ -136,7 +136,8 @@
     "settings_security": "Security",
     "tutorials": "Tutorials",
     "team": "Team",
-    "platform_console": "Platform console"
+    "platform_console": "Platform console",
+    "deadlines": "Deadlines"
   },
   "header": {
     "lock_session": "Lock session",
