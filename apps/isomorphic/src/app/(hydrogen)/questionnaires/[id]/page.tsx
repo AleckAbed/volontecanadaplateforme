@@ -88,6 +88,11 @@ export default function QuestionnaireDetailsPage() {
     try {
       const response = await apiService.getQuestionnaire(Number(params.id));
       if (response.success && response.data) {
+        // (2.16) Chaque questionnaire appartient maintenant à un envoi : on l'y affiche.
+        if ((response.data as any).invitation_id) {
+          router.replace(`/envois/${(response.data as any).invitation_id}`);
+          return;
+        }
         setQuestionnaire(response.data);
         
         // Si c'est un formulaire PSTQ, calculer le score
@@ -101,12 +106,12 @@ export default function QuestionnaireDetailsPage() {
         }
       } else {
         toast.error('Questionnaire introuvable');
-        router.push(routes.questionnaires.list);
+        router.push('/envois');
       }
     } catch (error) {
       console.error('Erreur:', error);
       toast.error('Erreur lors du chargement du questionnaire');
-      router.push(routes.questionnaires.list);
+      router.push('/envois');
     } finally {
       setIsLoading(false);
     }
@@ -203,7 +208,7 @@ export default function QuestionnaireDetailsPage() {
         name: 'Dashboard',
       },
       {
-        href: routes.questionnaires.list,
+        href: '/envois',
         name: 'Questionnaires',
       },
       {
@@ -283,7 +288,7 @@ export default function QuestionnaireDetailsPage() {
             </>
           )}
           <Button
-            onClick={() => router.push(routes.questionnaires.list)}
+            onClick={() => router.push('/envois')}
             variant="outline"
           >
             Retour à la liste

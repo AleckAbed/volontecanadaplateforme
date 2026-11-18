@@ -120,12 +120,6 @@ export const pageLinks: PageLink[] = [
     keywords: ['nouvel envoi', 'créer envoi', 'new send', 'nouvelle invitation'],
   },
   {
-    name: 'Questionnaires (legacy)',
-    href: '/questionnaires',
-    section: 'Envois & Formulaires',
-    keywords: ['questionnaire', 'formulaire', 'form', 'survey', 'enquête', 'legacy'],
-  },
-  {
     name: 'Catégories de formulaires',
     href: '/configuration/categories',
     section: 'Envois & Formulaires',

@@ -74,7 +74,6 @@ export function useAdminMenuItems() {
           ],
         }]
       : []),
-    { name: t('menu.questionnaires_legacy'), href: routes.questionnaires.list, icon: <PiClipboardText /> },
 
     { name: t('menu.section_communication') },
     {
