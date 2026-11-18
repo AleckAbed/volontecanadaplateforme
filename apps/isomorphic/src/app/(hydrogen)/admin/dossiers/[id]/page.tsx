@@ -31,6 +31,8 @@ import { documentService, DocumentTemplate } from '@/services/documents';
 import { dossierSupplementaryService, SupplementaryFile, ExportCatalog } from '@/services/dossier-supplementary';
 import TourButton from '@/components/TourButton';
 import { getAuthToken } from '@/lib/auth-storage';
+import { useCurrentAdmin } from '@/hooks/use-current-admin';
+import { PiClockCounterClockwiseDuotone } from 'react-icons/pi';
 
 const XfaPdfViewer = dynamic(() => import('@/components/XfaPdfViewer'), { ssr: false });
 
@@ -173,6 +175,7 @@ const STATUS_COLOR: Record<string, 'warning' | 'info' | 'success' | 'danger' | '
 };
 
 export default function DossierDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const admin = useCurrentAdmin();
   const { t } = useTranslation();
   const { id } = use(params);
   const router = useRouter();
@@ -352,6 +355,11 @@ export default function DossierDetailPage({ params }: { params: Promise<{ id: st
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-2xl font-bold text-gray-900">{dossier.name}</h1>
               <Badge variant="flat" color={color} rounded="lg">{t(`dossiers.status.${dossier.status}`, { defaultValue: dossier.status })}</Badge>
+              {admin?.permissions?.manage_team && (
+                <Link href={`/admin/journal?dossier_id=${dossier.id}`} className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-2 py-0.5 text-xs font-medium text-gray-600 hover:bg-gray-50">
+                  <PiClockCounterClockwiseDuotone className="h-3.5 w-3.5" /> Historique
+                </Link>
+              )}
             </div>
             {dossier.service_name && (
               <p className="mt-1 text-sm font-medium text-blue-700">

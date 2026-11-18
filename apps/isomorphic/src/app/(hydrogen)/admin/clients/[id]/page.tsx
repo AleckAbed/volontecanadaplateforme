@@ -23,6 +23,7 @@ import { apiService } from '@/services/api';
 import { inviteClientToPortal } from '@/services/client-profile';
 import { useCurrentAdmin } from '@/hooks/use-current-admin';
 import MandatesCard from './mandates-card';
+import { PiClockCounterClockwiseDuotone } from 'react-icons/pi';
 
 interface FamilyMember {
   id: number;
@@ -171,6 +172,11 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
           <div className="flex-1">
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-bold text-gray-900">{fullName}</h1>
+              {admin?.permissions?.manage_team && (
+                <Link href={`/admin/journal?client_id=${client.id}`} className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-2 py-0.5 text-xs font-medium text-gray-600 hover:bg-gray-50">
+                  <PiClockCounterClockwiseDuotone className="h-3.5 w-3.5" /> Historique
+                </Link>
+              )}
               <Badge
                 variant="flat"
                 color={client.client_type === 'family' ? 'primary' : 'secondary'}

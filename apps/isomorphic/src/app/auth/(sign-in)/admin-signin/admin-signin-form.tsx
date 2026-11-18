@@ -8,6 +8,7 @@ import { Form } from '@core/ui/form';
 import { routes } from '@/config/routes';
 import { loginSchema, LoginSchema } from '@/validators/login.schema';
 import { useAuth } from '@/hooks/useAuth';
+import TwoFactorStep, { TwoFactorChallenge } from './two-factor-step';
 
 const initialValues: LoginSchema = {
   email: '',
@@ -26,13 +27,19 @@ export default function AdminSignInForm() {
     return () => m.removeEventListener('change', listener);
   }, []);
   const { loginAdmin, isLoading } = useAuth();
+  const [challenge, setChallenge] = useState<TwoFactorChallenge | null>(null);
 
   const onSubmit: SubmitHandler<LoginSchema> = async (data) => {
-    await loginAdmin({
+    const pending = await loginAdmin({
       email: data.email,
       password: data.password,
     });
+    if (pending) setChallenge(pending);
   };
+
+  if (challenge) {
+    return <TwoFactorStep challenge={challenge} onCancel={() => setChallenge(null)} />;
+  }
 
   return (
     <>

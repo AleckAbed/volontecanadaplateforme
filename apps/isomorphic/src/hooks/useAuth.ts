@@ -44,45 +44,56 @@ export function useAuth() {
     if (!userType) setUserType(ut);
   }, [setAuthState, setUserType, userType]);
 
+  /** Ouvre la session admin après une connexion réussie (mot de passe, puis code si 2FA). */
+  const finishAdminLogin = useCallback(
+    (response: any) => {
+      // Cookie HttpOnly posé par Laravel. On ne stocke plus le token côté JS.
+      // user_type sert juste à savoir quel /me appeler au refresh.
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('user_type', 'admin');
+      }
+      setAdmin(response.data.admin);
+      setUserType('admin');
+      setAuthState({
+        isAuthenticated: true,
+        userType: 'admin',
+        admin: response.data.admin,
+        client: null,
+        isLoading: false,
+        error: null,
+      });
+      localStorage.setItem('isomorphic-layout', 'helium');
+
+      const left = response.data.recovery_codes_left;
+      toast.success(response.message || 'Connexion réussie');
+      if (typeof left === 'number' && left <= 2) {
+        toast(`Il vous reste ${left} code(s) de secours. Créez-en de nouveaux dans Sécurité.`, { icon: '⚠️', duration: 8000 });
+      }
+
+      const searchParams = new URLSearchParams(window.location.search);
+      const redirectUrl = searchParams.get('redirect') || '/';
+      router.push(redirectUrl);
+    },
+    [router, setAdmin, setAuthState, setUserType]
+  );
+
   /**
-   * Connexion administrateur
+   * Connexion administrateur. Si la double authentification est activée, renvoie le
+   * défi à présenter (aucune session n'est ouverte avant le code).
    */
   const loginAdmin = useCallback(
-    async (credentials: LoginCredentials) => {
+    async (credentials: LoginCredentials): Promise<{ challenge: string; method: 'totp' | 'email'; email_hint: string | null } | null> => {
       try {
         setIsLoading(true);
         setError(null);
 
-        const response = await api.adminLogin(
-          credentials.email,
-          credentials.password
-        );
+        const response: any = await api.adminLogin(credentials.email, credentials.password);
 
+        if (response.success && response.data?.two_factor_required) {
+          return { challenge: response.data.challenge, method: response.data.method, email_hint: response.data.email_hint };
+        }
         if (response.success && response.data) {
-          // Cookie HttpOnly posé par Laravel. On ne stocke plus le token côté JS.
-          // user_type sert juste à savoir quel /me appeler au refresh.
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('user_type', 'admin');
-          }
-          setAdmin(response.data.admin);
-          setUserType('admin');
-          setAuthState({
-            isAuthenticated: true,
-            userType: 'admin',
-            admin: response.data.admin,
-            client: null,
-            isLoading: false,
-            error: null,
-          });
-
-          // Forcer le layout selon le type d'utilisateur
-          localStorage.setItem('isomorphic-layout', 'helium');
-          
-          toast.success(response.message || 'Connexion réussie');
-
-          const searchParams = new URLSearchParams(window.location.search);
-          const redirectUrl = searchParams.get('redirect') || '/';
-          router.push(redirectUrl);
+          finishAdminLogin(response);
         }
       } catch (err: any) {
         const errorMessage =
@@ -92,8 +103,30 @@ export function useAuth() {
       } finally {
         setIsLoading(false);
       }
+      return null;
     },
-    [router, setAdmin, setAuthState, setError, setIsLoading, setUserType]
+    [finishAdminLogin, setError, setIsLoading]
+  );
+
+  /** Second temps de la connexion : code de l'application, du courriel ou de secours. */
+  const verifyAdminTwoFactor = useCallback(
+    async (challenge: string, input: { code?: string; recovery_code?: string }): Promise<{ ok: boolean; expired?: boolean; message?: string }> => {
+      try {
+        setIsLoading(true);
+        const response: any = await api.adminTwoFactorLogin(challenge, input);
+        if (response.success && response.data) {
+          finishAdminLogin(response);
+          return { ok: true };
+        }
+        return { ok: false, message: response.message };
+      } catch (err: any) {
+        const message = err.message || 'Code incorrect.';
+        return { ok: false, message, expired: /expiré|Trop d/.test(message) };
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [finishAdminLogin, setIsLoading]
   );
 
   /**
@@ -287,6 +320,7 @@ export function useAuth() {
 
     // Actions
     loginAdmin,
+    verifyAdminTwoFactor,
     loginClient,
     logout,
     loadUserProfile,

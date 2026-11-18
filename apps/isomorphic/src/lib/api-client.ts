@@ -8,6 +8,7 @@
  */
 
 import { getAuthToken } from '@/lib/auth-storage';
+import { redirectIfTwoFactorRequired } from '@/lib/two-factor-guard';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -45,7 +46,10 @@ export async function authFetch(endpoint: string, options: RequestInit = {}, asJ
   }
   const res = await fetch(`${getApiUrl()}${endpoint}`, { ...options, credentials: 'include', headers });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error((data as any)?.message || 'Une erreur est survenue');
+  if (!res.ok) {
+    redirectIfTwoFactorRequired(res.status, data);
+    throw new Error((data as any)?.message || 'Une erreur est survenue');
+  }
   return data;
 }
 
