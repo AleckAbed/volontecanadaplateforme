@@ -40,6 +40,7 @@ const publicRoutes = [
   '/invitation',
   '/document',
   '/collab',
+  '/entreprise', // espace entreprise : gère sa propre session (garde company)
   '/maintenance',
   '/not-found',
 ];

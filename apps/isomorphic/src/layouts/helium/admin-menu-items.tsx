@@ -23,6 +23,7 @@ import {
   PiLockKey,
   PiBellRinging,
   PiBuildings,
+  PiBuildingOffice,
   PiCalendarPlus,
 } from 'react-icons/pi';
 import { useCurrentAdmin } from '@/hooks/use-current-admin';
@@ -52,6 +53,7 @@ export function useAdminMenuItems() {
 
     { name: t('menu.section_clients') },
     { name: t('menu.clients'), href: '/admin/clients', icon: <PiUsers /> },
+    { name: t('menu.companies'), href: '/admin/entreprises', icon: <PiBuildingOffice /> },
     { name: t('menu.dossiers'), href: '/admin/dossiers', icon: <PiFolderUser /> },
     { name: t('menu.deadlines'), href: '/admin/echeances', icon: <PiCalendarCheck /> },
     { name: t('menu.appointments'), href: '/admin/rendez-vous', icon: <PiCalendarPlus /> },

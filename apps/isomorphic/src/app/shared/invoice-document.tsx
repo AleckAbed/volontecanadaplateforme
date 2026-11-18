@@ -35,9 +35,21 @@ export default function InvoiceDocument({ invoice }: { invoice: InvoiceDetail })
 
       <section className="py-4">
         <div className="text-xs font-semibold uppercase tracking-wider text-gray-500">Facturé à</div>
-        <div className="font-medium text-gray-900">{invoice.client?.name}</div>
-        {invoice.client?.email && <div className="text-gray-600">{invoice.client.email}</div>}
-        {invoice.client?.address && <div className="whitespace-pre-line text-gray-600">{invoice.client.address}</div>}
+        {invoice.company ? (
+          <>
+            <div className="font-medium text-gray-900">{invoice.company.name}</div>
+            {invoice.company.business_number && <div className="text-xs text-gray-500">NEQ/NE : {invoice.company.business_number}</div>}
+            {invoice.company.address && <div className="whitespace-pre-line text-gray-600">{invoice.company.address}</div>}
+            {invoice.company.email && <div className="text-gray-600">{invoice.company.email}</div>}
+            <div className="mt-1 text-xs text-gray-500">Pour : {invoice.client?.name}</div>
+          </>
+        ) : (
+          <>
+            <div className="font-medium text-gray-900">{invoice.client?.name}</div>
+            {invoice.client?.email && <div className="text-gray-600">{invoice.client.email}</div>}
+            {invoice.client?.address && <div className="whitespace-pre-line text-gray-600">{invoice.client.address}</div>}
+          </>
+        )}
         {invoice.dossier && <div className="mt-1 text-xs text-gray-500">Dossier : {invoice.dossier.name}</div>}
       </section>
 

@@ -34,6 +34,7 @@ import { getAuthToken } from '@/lib/auth-storage';
 import { useCurrentAdmin } from '@/hooks/use-current-admin';
 import { PiClockCounterClockwiseDuotone } from 'react-icons/pi';
 import AppointmentsCard from './appointments-card';
+import CompanyCard from './company-card';
 
 const XfaPdfViewer = dynamic(() => import('@/components/XfaPdfViewer'), { ssr: false });
 
@@ -148,6 +149,8 @@ interface DossierDetail {
   send_base_docs_to_client?: boolean;
   collab_access_revoked?: boolean;
   client_id: number;
+  company_id?: number | null;
+  company_visibility?: 'progress' | 'full' | null;
   family_member_id?: number;
   collaborator_id?: number | null;
   client?: { id: number; first_name: string; last_name: string; email: string; client_type: string };
@@ -506,6 +509,7 @@ export default function DossierDetailPage({ params }: { params: Promise<{ id: st
       />
 
       {/* Rendez-vous du client (3.11) */}
+      <CompanyCard dossierId={dossier.id} clientId={dossier.client_id} companyId={dossier.company_id ?? null} visibility={dossier.company_visibility ?? null} />
       <AppointmentsCard dossierId={dossier.id} />
 
       {/* Notes inline éditable */}

@@ -24,6 +24,7 @@ import { inviteClientToPortal } from '@/services/client-profile';
 import { useCurrentAdmin } from '@/hooks/use-current-admin';
 import MandatesCard from './mandates-card';
 import { PiClockCounterClockwiseDuotone } from 'react-icons/pi';
+import EmployersCard from './employers-card';
 
 interface FamilyMember {
   id: number;
@@ -316,6 +317,7 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
           )}
         </div>
 
+        <EmployersCard clientId={client.id} />
         <MandatesCard clientId={client.id} hasEmail={!!client.email} dossiers={client.dossiers ?? []} />
       </div>
     </div>
