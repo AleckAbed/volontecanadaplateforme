@@ -10,6 +10,7 @@ import { invitationsService, Invitation, InvitationItemSummary } from '@/service
 import { actionFeedService } from '@/services/actions';
 import CabinetLogo from '@/components/cabinet-logo';
 import { useCabinetBranding } from '@/hooks/use-cabinet-branding';
+import { calculatePSTQScore } from '@/services/pstq-scoring';
 
 const XfaPdfViewer = dynamic(() => import('@/components/XfaPdfViewer'), { ssr: false });
 
@@ -410,6 +411,9 @@ export default function EnvoiDetailsPage({ params }: { params: Promise<{ id: str
               </div>
             </div>
             <div className="flex-1 overflow-auto bg-gray-50 p-6">
+              {viewingFormItem.form_type?.code === 'questionnaire_pstq_pointage' && viewingFormItem.form_data && (
+                <PstqScore data={viewingFormItem.form_data} />
+              )}
               <FormResponsesView
                 item={viewingFormItem}
                 recipient={inv?.client?.name || inv?.custom_name || inv?.email}
@@ -794,6 +798,35 @@ function Stat({ label, value, valueClassName = '' }: { label: string; value: str
     <div className="rounded-lg border border-gray-200 bg-white p-3">
       <div className="text-xs uppercase text-gray-500">{label}</div>
       <div className={`mt-1 font-medium text-gray-900 ${valueClassName}`}>{value}</div>
+    </div>
+  );
+}
+
+/** Score PSTQ (Québec) calculé à partir des réponses du questionnaire de pointage. */
+function PstqScore({ data }: { data: any }) {
+  let score: ReturnType<typeof calculatePSTQScore> | null = null;
+  try {
+    score = calculatePSTQScore(data);
+  } catch {
+    return null;
+  }
+  const blocks: [string, number, number][] = [
+    ['Score total', score.total, 950],
+    ['Bloc A', score.blocA.total, 520],
+    ['Bloc B', score.blocB.total, 700],
+    ['Bloc C', score.blocC.total, 180],
+  ];
+  return (
+    <div className="mx-auto mb-6 max-w-4xl rounded-xl border border-blue-200 bg-blue-50 p-5">
+      <h3 className="mb-3 text-base font-semibold text-gray-900">Score PSTQ</h3>
+      <div className="grid gap-4 sm:grid-cols-4">
+        {blocks.map(([label, value, max], i) => (
+          <div key={label}>
+            <p className="text-sm text-gray-600">{label}</p>
+            <p className={i === 0 ? 'text-2xl font-bold text-blue-700' : 'text-xl font-semibold text-gray-900'}>{value} / {max}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

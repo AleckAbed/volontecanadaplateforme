@@ -270,32 +270,6 @@ class ApiService {
   // ==================== QUESTIONNAIRES ====================
 
   /**
-   * Envoyer un formulaire à un client (Admin)
-   */
-  async sendQuestionnaire(data: {
-    client_type: 'existing' | 'custom';
-    client_id?: number;
-    custom_name?: string;
-    email: string;
-    phone?: string;
-    form_type: string;
-  }): Promise<ApiResponse> {
-    return this.request<ApiResponse>('/admin/questionnaires/send', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
-
-  /**
-   * Lister les questionnaires envoyés (Admin)
-   */
-  async listQuestionnaires(page: number = 1): Promise<ApiResponse> {
-    return this.request<ApiResponse>(`/admin/questionnaires?page=${page}`, {
-      method: 'GET',
-    });
-  }
-
-  /**
    * Obtenir les détails d'un questionnaire (Admin)
    */
   async getQuestionnaire(id: number): Promise<ApiResponse> {
