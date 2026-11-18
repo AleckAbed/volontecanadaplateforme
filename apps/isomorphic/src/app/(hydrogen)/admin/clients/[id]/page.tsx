@@ -22,6 +22,7 @@ import { Avatar, Badge } from 'rizzui';
 import { apiService } from '@/services/api';
 import { inviteClientToPortal } from '@/services/client-profile';
 import { useCurrentAdmin } from '@/hooks/use-current-admin';
+import MandatesCard from './mandates-card';
 
 interface FamilyMember {
   id: number;
@@ -308,6 +309,8 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
             </ul>
           )}
         </div>
+
+        <MandatesCard clientId={client.id} hasEmail={!!client.email} dossiers={client.dossiers ?? []} />
       </div>
     </div>
   );
