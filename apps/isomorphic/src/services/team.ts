@@ -33,6 +33,8 @@ export interface TeamMember {
   status: 'active' | 'invited' | 'inactive';
   invitation_expires_at: string | null;
   last_login_at: string | null;
+  /** Double authentification activée (2.7). */
+  two_factor?: boolean;
   is_me: boolean;
 }
 

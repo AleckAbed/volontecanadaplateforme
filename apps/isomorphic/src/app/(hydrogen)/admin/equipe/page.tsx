@@ -18,6 +18,7 @@ import {
   ROLE_LABELS,
   ROLE_DESCRIPTIONS,
 } from '@/services/team';
+import { twoFactorService } from '@/services/security';
 
 const ROLES: TeamRole[] = ['owner', 'admin', 'advisor', 'assistant'];
 
@@ -166,7 +167,14 @@ export default function TeamPage() {
                         <div className="mt-0.5 text-xs text-gray-500">Lien valable jusqu’au {formatDate(m.invitation_expires_at)}</div>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-gray-600">{formatDate(m.last_login_at)}</td>
+                    <td className="px-4 py-3 text-gray-600">
+                      {formatDate(m.last_login_at)}
+                      {m.status !== 'invited' && (
+                        <div className={`mt-0.5 text-xs ${m.two_factor ? 'text-emerald-700' : 'text-gray-500'}`}>
+                          {m.two_factor ? 'Double authentification activée' : 'Sans double authentification'}
+                        </div>
+                      )}
+                    </td>
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-2">
                         {m.status === 'invited' && (
@@ -176,6 +184,19 @@ export default function TeamPage() {
                             className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                           >
                             <PiPaperPlaneTiltDuotone className="h-4 w-4" /> Renvoyer
+                          </button>
+                        )}
+                        {editable && m.two_factor && (
+                          <button
+                            onClick={() => {
+                              if (window.confirm(`Réinitialiser la double authentification de ${m.name} ? Ses sessions seront fermées et il devra la réactiver.`)) {
+                                run(m.id, () => twoFactorService.resetMember(m.id), 'Double authentification réinitialisée.');
+                              }
+                            }}
+                            disabled={busy}
+                            className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                          >
+                            Réinitialiser la 2FA
                           </button>
                         )}
                         {editable && (

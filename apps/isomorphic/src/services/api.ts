@@ -5,6 +5,7 @@
 
 import { getAuthToken, setAuthToken as setAuthTokenStorage, removeAuthToken } from '@/lib/auth-storage';
 import { getApiUrl as getApiBaseUrl } from '@/lib/api-client';
+import { redirectIfTwoFactorRequired } from '@/lib/two-factor-guard';
 
 interface ApiResponse<T = any> {
   success: boolean;
@@ -91,6 +92,7 @@ class ApiService {
       }
 
       if (!response.ok) {
+        redirectIfTwoFactorRequired(response.status, data);
         const message = data.message || `Erreur ${response.status}: ${response.statusText}`;
         if (response.status === 401) {
           throw new Error(`Unauthorized (401): ${message}`);
@@ -166,6 +168,19 @@ class ApiService {
       try { localStorage.setItem('user_type', 'admin'); } catch {}
     }
     return response;
+  }
+
+  /** Second temps de la connexion (double authentification, 2.7). */
+  async adminTwoFactorLogin(challenge: string, input: { code?: string; recovery_code?: string }) {
+    const response = await this.post<any>('/admin/login/two-factor', { challenge, ...input });
+    if (response.success && typeof window !== 'undefined') {
+      try { localStorage.setItem('user_type', 'admin'); } catch {}
+    }
+    return response;
+  }
+
+  async adminTwoFactorResend(challenge: string) {
+    return this.post<any>('/admin/login/two-factor/resend', { challenge });
   }
 
   /**
