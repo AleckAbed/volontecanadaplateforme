@@ -19,7 +19,8 @@ export function useFilterControls<StateType, ActionType>(
 ) {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
+  // Next 15.5 type useSearchParams() comme possiblement null (rendu hors App Router).
+  const searchParams = useSearchParams() ?? new URLSearchParams();
 
   const createQueryString = useCallback(
     (name: string | string[], value: string | string[]) => {
