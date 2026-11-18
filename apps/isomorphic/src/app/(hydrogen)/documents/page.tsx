@@ -298,6 +298,13 @@ function GridView({ templates, onEdit, onDelete, deleting }: ViewProps) {
             >
               Tester
             </Link>
+            <Link
+              href={`/documents/correspondance/${t.id}`}
+              className="flex-1 rounded-lg border border-violet-600 px-3 py-1.5 text-center text-sm font-medium text-violet-600 hover:bg-violet-50"
+              title="Relier les champs du PDF au profil client"
+            >
+              Préremplissage
+            </Link>
             <button
               onClick={() => onEdit(t)}
               className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
@@ -375,6 +382,13 @@ function ListView({ templates, onEdit, onDelete, deleting }: ViewProps) {
                     className="rounded-lg border border-green-300 px-2.5 py-1 text-xs font-medium text-green-700 hover:bg-green-50"
                   >
                     Tester
+                  </Link>
+                  <Link
+                    href={`/documents/correspondance/${t.id}`}
+                    className="rounded-lg border border-violet-300 px-2.5 py-1 text-xs font-medium text-violet-700 hover:bg-violet-50"
+                    title="Relier les champs du PDF au profil client"
+                  >
+                    Préremplissage
                   </Link>
                   <button
                     onClick={() => onEdit(t)}
@@ -487,6 +501,13 @@ function ExplorerView({ templates, onEdit, onDelete, deleting }: ViewProps) {
                         className="rounded-lg border border-green-300 px-2.5 py-1 text-xs font-medium text-green-700 hover:bg-green-50"
                       >
                         Tester
+                      </Link>
+                      <Link
+                        href={`/documents/correspondance/${t.id}`}
+                        className="rounded-lg border border-violet-300 px-2.5 py-1 text-xs font-medium text-violet-700 hover:bg-violet-50"
+                        title="Relier les champs du PDF au profil client"
+                      >
+                        Préremplissage
                       </Link>
                       <button
                         onClick={() => onEdit(t)}

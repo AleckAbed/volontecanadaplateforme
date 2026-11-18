@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import { collabWorkspaceService } from '@/services/collaborators';
+import { mergePrefill } from '@/services/dossier-documents';
 import CollabHeader from '../../../_components/collab-header';
 
 const SmartPdfViewer = dynamic(() => import('@/components/SmartPdfViewer'), { ssr: false });
@@ -40,7 +41,8 @@ export default function CollabFillDocumentPage({ params }: { params: Promise<{ i
       try {
         const meta = await collabWorkspaceService.getDocumentMeta(docId);
         setDocName(meta.name || 'Document');
-        if (meta.form_data) setInitialFormData(meta.form_data);
+        // Profil du client sous les valeurs déjà saisies.
+        setInitialFormData(mergePrefill((meta as any).prefill, meta.form_data));
       } catch (e: any) {
         toast.error(e.message || 'Erreur de chargement');
         router.replace('/collab/dossiers');

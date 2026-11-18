@@ -26,7 +26,23 @@ export interface DossierDocument {
   created_at?: string;
 }
 
+/**
+ * Valeurs initiales d'un PDF : préremplissage tiré du profil client, recouvert
+ * par ce qui a déjà été saisi (une saisie n'est jamais écrasée).
+ */
+export function mergePrefill(
+  prefill?: Record<string, any> | null,
+  formData?: Record<string, any> | null,
+): Record<string, any> | undefined {
+  const merged = { ...(prefill || {}), ...(formData || {}) };
+  return Object.keys(merged).length > 0 ? merged : undefined;
+}
+
 export const dossierDocumentsService = {
+  async get(id: number): Promise<DossierDocument & { form_data?: Record<string, any> | null; prefill?: Record<string, any> }> {
+    const res: any = await authFetch(`/admin/dossier-documents/${id}`);
+    return res.data;
+  },
   async list(dossierId: number): Promise<DossierDocument[]> {
     const res = await authFetch(`/admin/dossiers/${dossierId}/documents`);
     return res.data;

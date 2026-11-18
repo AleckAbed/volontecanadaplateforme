@@ -16,9 +16,12 @@ import {
   PiMapPinDuotone,
   PiCalendarDuotone,
   PiIdentificationCardDuotone,
+  PiPaperPlaneTiltDuotone,
 } from 'react-icons/pi';
 import { Avatar, Badge } from 'rizzui';
 import { apiService } from '@/services/api';
+import { inviteClientToPortal } from '@/services/client-profile';
+import { useCurrentAdmin } from '@/hooks/use-current-admin';
 
 interface FamilyMember {
   id: number;
@@ -68,6 +71,23 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
   const [client, setClient] = useState<ClientDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
+  const [inviting, setInviting] = useState(false);
+  const admin = useCurrentAdmin();
+  // Tant que le rôle n'est pas chargé, on n'affiche pas l'action (l'API la contrôle de toute façon).
+  const canDelete = !!admin?.permissions?.delete_records;
+
+  const handlePortalInvite = async () => {
+    if (!client) return;
+    if (!confirm(`Envoyer à ${client.email} un lien pour accéder à son portail client ?`)) return;
+    try {
+      setInviting(true);
+      toast.success(await inviteClientToPortal(client.id));
+    } catch (e: any) {
+      toast.error(e.message || 'Envoi impossible.');
+    } finally {
+      setInviting(false);
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -117,20 +137,30 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
         >
           <PiArrowLeftBold className="h-4 w-4" /> {t('clients.back_to_list')}
         </button>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <button
+            onClick={handlePortalInvite}
+            disabled={inviting || !client.email}
+            title="Envoie au client un lien pour choisir son mot de passe et accéder à son portail"
+            className="inline-flex items-center gap-2 rounded-lg border border-blue-300 px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50 disabled:opacity-50"
+          >
+            <PiPaperPlaneTiltDuotone className="h-4 w-4" /> {inviting ? 'Envoi…' : 'Inviter au portail'}
+          </button>
           <Link
             href={`/admin/clients/${client.id}/edit`}
             className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
           >
             <PiPencilDuotone className="h-4 w-4" /> {t('common.edit')}
           </Link>
-          <button
-            onClick={handleDelete}
-            disabled={deleting}
-            className="inline-flex items-center gap-2 rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
-          >
-            <PiTrashDuotone className="h-4 w-4" /> {t('common.delete')}
-          </button>
+          {canDelete && (
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="inline-flex items-center gap-2 rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
+            >
+              <PiTrashDuotone className="h-4 w-4" /> {t('common.delete')}
+            </button>
+          )}
         </div>
       </div>
 

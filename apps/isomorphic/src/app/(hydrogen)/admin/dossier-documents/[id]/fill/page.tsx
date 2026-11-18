@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import { PiArrowLeftBold, PiCheckCircleDuotone } from 'react-icons/pi';
-import { dossierDocumentsService } from '@/services/dossier-documents';
+import { dossierDocumentsService, mergePrefill } from '@/services/dossier-documents';
 
 const SmartPdfViewer = dynamic(() => import('@/components/SmartPdfViewer'), { ssr: false });
 
@@ -29,15 +29,24 @@ export default function AdminDossierDocFillPage({ params }: { params: Promise<{ 
   const filePromiseRef = useRef<Promise<ArrayBuffer> | null>(null);
   const [docName, setDocName] = useState<string>('Document');
   const [loadedMeta, setLoadedMeta] = useState(false);
+  const [initialFormData, setInitialFormData] = useState<Record<string, any> | undefined>(undefined);
 
   if (!filePromiseRef.current) {
     filePromiseRef.current = dossierDocumentsService.fetchEditPdf(docId);
   }
 
   useEffect(() => {
-    // Pas d'endpoint meta pour l'admin sur ce doc — le nom sera dans l'URL ou pas critique
-    setDocName('Document du dossier');
-    setLoadedMeta(true);
+    let cancelled = false;
+    dossierDocumentsService.get(docId)
+      .then((doc) => {
+        if (cancelled) return;
+        setDocName(doc.name || 'Document du dossier');
+        // Profil du client sous les valeurs déjà saisies.
+        setInitialFormData(mergePrefill(doc.prefill, doc.form_data));
+      })
+      .catch(() => { if (!cancelled) setDocName('Document du dossier'); })
+      .finally(() => { if (!cancelled) setLoadedMeta(true); });
+    return () => { cancelled = true; };
   }, [docId]);
 
   const handleSave = async (pdfBytes: Uint8Array, formData: Record<string, any>) => {
@@ -88,6 +97,7 @@ export default function AdminDossierDocFillPage({ params }: { params: Promise<{ 
             filePromise={filePromiseRef.current!}
             fileName={`${docName}.pdf`}
             readOnly={false}
+            initialFormData={initialFormData}
             onSave={handleSave}
           />
         )}
