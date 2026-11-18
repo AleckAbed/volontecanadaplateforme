@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { PiCheckCircleFill, PiVideoCameraDuotone, PiReceiptDuotone } from 'react-icons/pi';
 import { publicBookingService, PublicAppointment, APPOINTMENT_STATUS, formatPrice, tzCity } from '@/services/booking';
 import CabinetLogo from '@/components/cabinet-logo';
+import SlotPicker from '@/components/booking/slot-picker';
 
 /** Rendez-vous consulté (et annulable) depuis le lien reçu par courriel. */
 function ManageAppointment({ token }: { token: string }) {
@@ -17,6 +18,8 @@ function ManageAppointment({ token }: { token: string }) {
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [moving, setMoving] = useState(false);
+  const [movingBusy, setMovingBusy] = useState(false);
 
   const load = () => publicBookingService.appointment(token).then(setA).catch((e: any) => setError(e.message || 'Rendez-vous introuvable.'));
 
@@ -41,6 +44,19 @@ function ManageAppointment({ token }: { token: string }) {
       setMessage(e.message);
     } finally {
       setBusy(false);
+    }
+  };
+
+  const move = async (start: string) => {
+    setMovingBusy(true);
+    try {
+      setMessage(await publicBookingService.reschedule(token, start));
+      setMoving(false);
+      await load();
+    } catch (e: any) {
+      setMessage(e.message);
+    } finally {
+      setMovingBusy(false);
     }
   };
 
@@ -103,7 +119,24 @@ function ManageAppointment({ token }: { token: string }) {
 
         {message && <p role="status" className="rounded-lg bg-gray-100 px-4 py-3 text-sm text-gray-800">{message}</p>}
 
-        {a.can_cancel && !confirming && (
+        {a.can_reschedule && !confirming && !moving && (
+          <button onClick={() => { setMoving(true); setMessage(null); }} className="w-full rounded-lg border border-blue-200 bg-white px-4 py-2.5 text-sm font-medium text-blue-700 hover:bg-blue-50">
+            Déplacer ce rendez-vous
+          </button>
+        )}
+        {moving && (
+          <div className="rounded-xl border border-blue-200 bg-white p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-gray-900">Choisissez un nouveau créneau</h2>
+              <button onClick={() => setMoving(false)} className="text-sm text-gray-500 hover:text-gray-800">Fermer</button>
+            </div>
+            <p className="mb-3 text-xs text-gray-600">
+              Heure de {tzCity(a.timezone)}. {a.reschedules_left === 1 ? 'C’est votre dernier déplacement en ligne possible.' : `Vous pouvez encore déplacer ce rendez-vous ${a.reschedules_left} fois en ligne.`}
+            </p>
+            <SlotPicker load={(from) => publicBookingService.rescheduleSlots(token, from)} current={a.starts_at} onPick={move} busy={movingBusy} />
+          </div>
+        )}
+        {a.can_cancel && !confirming && !moving && (
           <button onClick={() => setConfirming(true)} className="w-full rounded-lg border border-red-200 bg-white px-4 py-2.5 text-sm font-medium text-red-700 hover:bg-red-50">
             Annuler ce rendez-vous
           </button>
@@ -118,7 +151,7 @@ function ManageAppointment({ token }: { token: string }) {
           </div>
         )}
         {!a.can_cancel && ['confirmed', 'pending_payment'].includes(a.status) && (
-          <p className="text-center text-xs text-gray-500">L’annulation en ligne est possible jusqu’à {a.cancel_notice_hours} h avant le rendez-vous. Ensuite, contactez le cabinet.</p>
+          <p className="text-center text-xs text-gray-500">L’annulation et le déplacement en ligne sont possibles jusqu’à {a.cancel_notice_hours} h avant le rendez-vous. Ensuite, contactez le cabinet.</p>
         )}
         {a.booking_url && ['cancelled', 'expired'].includes(a.status) && (
           <Link href={a.booking_url} className="block text-center text-sm font-medium text-blue-700 hover:underline">Réserver un autre rendez-vous</Link>
