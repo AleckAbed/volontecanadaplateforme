@@ -78,15 +78,15 @@ export default function QuestionnaireDetailsPage() {
   useEffect(() => {
     if (isAuthenticated === false || userType !== 'admin') {
       router.push('/auth/admin-signin');
-    } else if (params.id) {
+    } else if (params?.id) {
       loadQuestionnaire();
     }
-  }, [isAuthenticated, userType, router, params.id]);
+  }, [isAuthenticated, userType, router, params?.id]);
 
   const loadQuestionnaire = async () => {
     setIsLoading(true);
     try {
-      const response = await apiService.getQuestionnaire(Number(params.id));
+      const response = await apiService.getQuestionnaire(Number(params?.id));
       if (response.success && response.data) {
         // (2.16) Chaque questionnaire appartient maintenant à un envoi : on l'y affiche.
         if ((response.data as any).invitation_id) {

@@ -104,7 +104,7 @@ function rememberUnlock(folderId: number, code: string) {
 export default function FileManagerList() {
   const router = useRouter();
   const params = useSearchParams();
-  const folderId = params.get('folder') ? Number(params.get('folder')) : null;
+  const folderId = params?.get('folder') ? Number(params?.get('folder')) : null;
 
   const [listing, setListing] = useState<FolderListing | null>(null);
   const [loading, setLoading] = useState(true);

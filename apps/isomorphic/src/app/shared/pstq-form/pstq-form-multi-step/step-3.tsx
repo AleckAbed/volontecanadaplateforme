@@ -370,7 +370,7 @@ export default function StepThree() {
                     placeholder={l.select}
                     options={familleLienOptions}
                     value={value}
-                    onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
+                    onChange={(selected) => onChange(typeof selected === 'string' ? selected : (selected as any)?.value || '')}
                     getOptionValue={(option) => option.value}
                     displayValue={(selected) => {
                       const option = familleLienOptions.find((opt) => opt.value === selected);
@@ -406,7 +406,7 @@ export default function StepThree() {
                             placeholder={l.select}
                             options={niveauFrancaisOptions}
                             value={value?.toString()}
-                            onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : selected?.value || '1'))}
+                            onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : (selected as any)?.value || '1'))}
                             getOptionValue={(option) => option.value}
                             displayValue={(selected) => {
                               const option = niveauFrancaisOptions.find((opt) => opt.value === selected?.toString());
@@ -429,7 +429,7 @@ export default function StepThree() {
                             placeholder={l.select}
                             options={niveauFrancaisOptions}
                             value={value?.toString()}
-                            onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : selected?.value || '1'))}
+                            onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : (selected as any)?.value || '1'))}
                             getOptionValue={(option) => option.value}
                             displayValue={(selected) => {
                               const option = niveauFrancaisOptions.find((opt) => opt.value === selected?.toString());
@@ -452,7 +452,7 @@ export default function StepThree() {
                             placeholder={l.select}
                             options={niveauFrancaisOptions}
                             value={value?.toString()}
-                            onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : selected?.value || '1'))}
+                            onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : (selected as any)?.value || '1'))}
                             getOptionValue={(option) => option.value}
                             displayValue={(selected) => {
                               const option = niveauFrancaisOptions.find((opt) => opt.value === selected?.toString());
@@ -475,7 +475,7 @@ export default function StepThree() {
                             placeholder={l.select}
                             options={niveauFrancaisOptions}
                             value={value?.toString()}
-                            onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : selected?.value || '1'))}
+                            onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : (selected as any)?.value || '1'))}
                             getOptionValue={(option) => option.value}
                             displayValue={(selected) => {
                               const option = niveauFrancaisOptions.find((opt) => opt.value === selected?.toString());
@@ -519,7 +519,7 @@ export default function StepThree() {
                           placeholder={l.select}
                           options={scolariteOptions}
                           value={value}
-                          onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
+                          onChange={(selected) => onChange(typeof selected === 'string' ? selected : (selected as any)?.value || '')}
                           getOptionValue={(option) => option.value}
                           displayValue={(selected) => {
                             const option = scolariteOptions.find((opt) => opt.value === selected);
@@ -540,7 +540,7 @@ export default function StepThree() {
                           placeholder={l.select}
                           options={diplomeQuebecOptions}
                           value={value}
-                          onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
+                          onChange={(selected) => onChange(typeof selected === 'string' ? selected : (selected as any)?.value || '')}
                           getOptionValue={(option) => option.value}
                           displayValue={(selected) => {
                             const option = diplomeQuebecOptions.find((opt) => opt.value === selected);

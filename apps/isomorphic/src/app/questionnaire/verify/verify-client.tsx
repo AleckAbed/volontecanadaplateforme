@@ -35,8 +35,8 @@ export default function VerifyQuestionnaireClient() {
 
   // Remplir le formulaire depuis l’URL après le montage (évite problèmes SSR / error boundary)
   useEffect(() => {
-    const email = searchParams.get('email') ?? '';
-    const code = searchParams.get('code') ?? '';
+    const email = searchParams?.get('email') ?? '';
+    const code = searchParams?.get('code') ?? '';
     if (email || code) {
       reset({ email, code });
     }

@@ -91,7 +91,7 @@ export const clientDataService = {
   async download(): Promise<void> {
     const res = await fetch(`${getApiUrl()}/client/my-data/export`, { headers: authHeaders(), credentials: 'include' });
     if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
+      const data: any = await res.json().catch(() => ({}));
       throw new Error((data as any)?.message || 'Téléchargement impossible.');
     }
     const blob = await res.blob();

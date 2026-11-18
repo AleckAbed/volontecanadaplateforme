@@ -57,8 +57,10 @@ export default function ChatbotWidget({ audience }: Props) {
     setInput('');
     setLoading(true);
     try {
-      const answer = await chatbotService.ask(audience, text, messages);
-      setMessages([...next, { role: 'assistant', content: answer }]);
+      const result = await chatbotService.ask(audience, text, messages);
+      setMessages([...next, result.kind === 'answer'
+        ? { role: 'assistant', content: result.answer }
+        : { role: 'assistant', content: result.disambiguation.message, disambiguation: result.disambiguation }]);
     } catch (e: any) {
       setError(e.message || 'Erreur de communication');
     } finally {

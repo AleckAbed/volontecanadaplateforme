@@ -393,7 +393,7 @@ export default function StepOne() {
                         value: `${i + 1}`,
                       }))}
                       value={value}
-                      onChange={(selected: string | { value: string } | null) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
+                      onChange={(selected: string | { value: string } | null) => onChange(typeof selected === 'string' ? selected : (selected as any)?.value || '')}
                       getOptionValue={(option) => option.value}
                       displayValue={(selected) => {
                         const option = Array.from({ length: 10 }, (_, i) => ({
@@ -423,7 +423,7 @@ export default function StepOne() {
                           placeholder={t.selectPlaceholder}
                           options={languageOptions}
                           value={value}
-                          onChange={(selected: string | { value: string } | null) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
+                          onChange={(selected: string | { value: string } | null) => onChange(typeof selected === 'string' ? selected : (selected as any)?.value || '')}
                           getOptionValue={(option) => option.value}
                           displayValue={(selected) => {
                             const option = languageOptions.find((opt) => opt.value === selected);
@@ -444,7 +444,7 @@ export default function StepOne() {
                           placeholder={t.selectPlaceholder}
                           options={languageOptions}
                           value={value}
-                          onChange={(selected: string | { value: string } | null) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
+                          onChange={(selected: string | { value: string } | null) => onChange(typeof selected === 'string' ? selected : (selected as any)?.value || '')}
                           getOptionValue={(option) => option.value}
                           displayValue={(selected) => {
                             const option = languageOptions.find((opt) => opt.value === selected);
@@ -546,7 +546,7 @@ export default function StepOne() {
                     placeholder={t.selectPlaceholder}
                     options={sexOptions}
                     value={value}
-                    onChange={(selected: string | { value: string } | null) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
+                    onChange={(selected: string | { value: string } | null) => onChange(typeof selected === 'string' ? selected : (selected as any)?.value || '')}
                     getOptionValue={(option) => option.value}
                     displayValue={(selected) => {
                       const option = sexOptions.find((opt) => opt.value === selected);
@@ -565,7 +565,7 @@ export default function StepOne() {
                     placeholder={t.selectPlaceholder}
                     options={eyeColorOptions}
                     value={value}
-                    onChange={(selected: string | { value: string } | null) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
+                    onChange={(selected: string | { value: string } | null) => onChange(typeof selected === 'string' ? selected : (selected as any)?.value || '')}
                     getOptionValue={(option) => option.value}
                     displayValue={(selected) => {
                       const option = eyeColorOptions.find((opt) => opt.value === selected);

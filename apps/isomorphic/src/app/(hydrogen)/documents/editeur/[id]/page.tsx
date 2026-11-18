@@ -22,7 +22,7 @@ export default function PreviewTemplatePage({ params }: { params: Promise<{ id: 
         setTemplate(t);
         filePromiseRef.current = documentService.fetchTemplatePdf(Number(id));
       })
-      .catch((e) => toast.error(e.message))
+      .catch((e: any) => toast.error(e.message))
       .finally(() => setLoading(false));
   }, [id]);
 

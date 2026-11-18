@@ -505,7 +505,7 @@ export async function buildClientFormPdf(
   const showMarriageDate = maritalStatus === 'married' || maritalStatus === 'common-law';
   const section2Entries: [string, string][] = [
     [locale === 'fr' ? 'Nombre de citoyennetés' : 'Number of citizenships', val(d.numberOfCitizenships)],
-    ...Array.from({ length: numCitizenships }, (_, i) => [citizenshipLabels[i], val(citizenshipValues[i])]),
+    ...Array.from({ length: numCitizenships }, (_, i): [string, string] => [citizenshipLabels[i], val(citizenshipValues[i])]),
     [locale === 'fr' ? 'Dernière entrée Canada' : 'Last entry Canada', val(d.lastEntryDate)],
     [locale === 'fr' ? 'Lieu dernière entrée' : 'Place last entry', val(d.lastEntryPlace)],
     [locale === 'fr' ? 'Résidence antérieure' : 'Previous residence', translateYesNo(d.hasPreviousResidence, locale)],

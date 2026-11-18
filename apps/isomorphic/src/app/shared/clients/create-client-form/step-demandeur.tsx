@@ -5,7 +5,7 @@ import { useAtom } from 'jotai';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ActionIcon, Input, Title, Text } from 'rizzui';
+import { ActionIcon, Input, Title, Text, Password } from 'rizzui';
 import { PiXBold } from 'react-icons/pi';
 import { Controller } from 'react-hook-form';
 import { useModal } from '@/app/shared/modal-views/use-modal';
@@ -187,9 +187,8 @@ export default function StepDemandeur() {
           className="md:col-span-2"
           error={errors.email?.message}
         />
-        <Input
+        <Password
           label={t('clients.create_modal.password')}
-          type="password"
           placeholder={t('clients.create_modal.password_hint')}
           {...register('password')}
           error={errors.password?.message}

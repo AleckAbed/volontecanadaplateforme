@@ -339,7 +339,7 @@ export default function StepTwo() {
                       placeholder={l.select}
                       options={diagnosticOptions}
                       value={value}
-                      onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
+                      onChange={(selected) => onChange(typeof selected === 'string' ? selected : (selected as any)?.value || '')}
                       getOptionValue={(option) => option.value}
                       displayValue={(selected) => {
                         const option = diagnosticOptions.find((opt) => opt.value === selected);
@@ -374,7 +374,7 @@ export default function StepTwo() {
                   placeholder={l.select}
                   options={diplomeQuebecOptions}
                   value={value}
-                  onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
+                  onChange={(selected) => onChange(typeof selected === 'string' ? selected : (selected as any)?.value || '')}
                   getOptionValue={(option) => option.value}
                   displayValue={(selected) => {
                     const option = diplomeQuebecOptions.find((opt) => opt.value === selected);
@@ -455,7 +455,7 @@ export default function StepTwo() {
                     placeholder={l.select}
                     options={offreEmploiLieuOptions}
                     value={value}
-                    onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
+                    onChange={(selected) => onChange(typeof selected === 'string' ? selected : (selected as any)?.value || '')}
                     getOptionValue={(option) => option.value}
                     displayValue={(selected) => {
                       const option = offreEmploiLieuOptions.find((opt) => opt.value === selected);

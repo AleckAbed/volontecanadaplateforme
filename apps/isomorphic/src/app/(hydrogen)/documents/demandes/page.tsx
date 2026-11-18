@@ -21,7 +21,7 @@ export default function DemandesDocumentsPage() {
   useEffect(() => {
     documentService.getRequests()
       .then(setRequests)
-      .catch((e) => toast.error(e.message))
+      .catch((e: any) => toast.error(e.message))
       .finally(() => setLoading(false));
   }, []);
 

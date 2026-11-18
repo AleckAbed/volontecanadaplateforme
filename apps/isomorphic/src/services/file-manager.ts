@@ -2,7 +2,7 @@ import { getAuthToken } from '@/lib/auth-storage';
 
 import { getApiUrl } from '@/lib/api-client';
 
-async function authFetch(endpoint: string, options: RequestInit = {}, asJson = true) {
+async function authFetch(endpoint: string, options: RequestInit = {}, asJson = true): Promise<any> {
   const token = getAuthToken();
   const headers: Record<string, string> = {
     Accept: 'application/json',
@@ -13,7 +13,7 @@ async function authFetch(endpoint: string, options: RequestInit = {}, asJson = t
   }
   if (token) headers.Authorization = `Bearer ${token}`;
   const res = await fetch(`${getApiUrl()}${endpoint}`, { ...options, credentials: 'include', headers });
-  const data = await res.json().catch(() => ({}));
+  const data: any = await res.json().catch(() => ({}));
   if (!res.ok && res.status !== 423) {
     throw new Error((data as any).message || 'Une erreur est survenue');
   }

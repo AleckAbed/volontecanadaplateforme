@@ -2,12 +2,12 @@ import { getAuthToken } from '@/lib/auth-storage';
 
 import { getApiUrl } from '@/lib/api-client';
 
-async function authFetch(endpoint: string, options: RequestInit = {}) {
+async function authFetch(endpoint: string, options: RequestInit = {}): Promise<any> {
   const token = getAuthToken();
   const headers: HeadersInit = { Accept: 'application/json', ...options.headers };
   if (token) (headers as any).Authorization = `Bearer ${token}`;
   const res = await fetch(`${getApiUrl()}${endpoint}`, { ...options, credentials: 'include', headers });
-  const data = await res.json();
+  const data: any = await res.json();
   if (!res.ok) throw new Error(data.message || 'Une erreur est survenue');
   return data;
 }

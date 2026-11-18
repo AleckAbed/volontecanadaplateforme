@@ -33,7 +33,7 @@ export default function SettingsModal({ open, onClose }: Props) {
         setSettings(s);
         setInitiallyEnabled(!!s.enabled);
       })
-      .catch((e) => setError(e.message || 'Erreur de chargement'))
+      .catch((e: any) => setError(e.message || 'Erreur de chargement'))
       .finally(() => setLoading(false));
   }, [open]);
 

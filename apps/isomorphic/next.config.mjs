@@ -73,8 +73,9 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // 2.9b : les erreurs TypeScript bloquent de nouveau la compilation (0 erreur au 18 nov 2026).
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
 };
 

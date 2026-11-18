@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Input, Button, Avatar, Title, Text, Loader } from 'rizzui';
+import { Input, Button, Avatar, Title, Text, Loader, Password } from 'rizzui';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import {
@@ -162,9 +162,9 @@ function PasswordSection() {
       description={t('profile_settings.password_desc')}
     >
       <div className="grid gap-4 @md:grid-cols-3">
-        <Input type="password" label={t('profile_settings.current_password')} value={current} onChange={(e) => setCurrent(e.target.value)} />
-        <Input type="password" label={t('profile_settings.new_password')} value={pwd} onChange={(e) => setPwd(e.target.value)} />
-        <Input type="password" label={t('profile_settings.confirm_password')} value={pwd2} onChange={(e) => setPwd2(e.target.value)} />
+        <Password label={t('profile_settings.current_password')} value={current} onChange={(e) => setCurrent(e.target.value)} />
+        <Password label={t('profile_settings.new_password')} value={pwd} onChange={(e) => setPwd(e.target.value)} />
+        <Password label={t('profile_settings.confirm_password')} value={pwd2} onChange={(e) => setPwd2(e.target.value)} />
       </div>
       <div className="mt-5 flex justify-end">
         <Button onClick={submit} isLoading={saving}>{t('profile_settings.change_password_btn')}</Button>

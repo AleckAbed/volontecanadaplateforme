@@ -154,14 +154,14 @@ export default function PSTQFormMultiStep() {
         return;
       }
 
-      let loadedData: PSTQFormDataType = {};
+      let loadedData = {} as PSTQFormDataType;
 
       try {
         // D'abord, charger depuis localStorage (venant de la vérification)
         const savedData = localStorage.getItem('pstqMultiStepForm');
         if (savedData) {
           try {
-            const parsedData = JSON.parse(savedData);
+            const parsedData = JSON.parse(savedData) as Partial<PSTQFormDataType>;
             loadedData = { ...loadedData, ...parsedData };
             localStorage.removeItem('pstqMultiStepForm');
             console.log('Données chargées depuis localStorage:', Object.keys(parsedData).length, 'champs');

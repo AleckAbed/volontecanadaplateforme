@@ -286,5 +286,5 @@ export const messages = new Proxy({} as MessagesShape, {
 
 /** Helper pour accéder à une langue spécifique (utile pour les tests ou usage avancé). */
 export function getMessages(locale: Locale): MessagesShape {
-  return messagesByLocale[locale] || messagesByLocale.fr;
+  return (messagesByLocale[locale] || messagesByLocale.fr) as MessagesShape;
 }
