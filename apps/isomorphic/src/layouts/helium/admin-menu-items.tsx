@@ -16,6 +16,8 @@ import {
   PiSparkle,
   PiUsersThree,
   PiCalendarCheck,
+  PiReceipt,
+  PiCreditCard,
 } from 'react-icons/pi';
 import { useCurrentAdmin } from '@/hooks/use-current-admin';
 
@@ -46,6 +48,7 @@ export function useAdminMenuItems() {
     { name: t('menu.clients'), href: '/admin/clients', icon: <PiUsers /> },
     { name: t('menu.dossiers'), href: '/admin/dossiers', icon: <PiFolderUser /> },
     { name: t('menu.deadlines'), href: '/admin/echeances', icon: <PiCalendarCheck /> },
+    { name: t('menu.invoices'), href: '/facturation', icon: <PiReceipt /> },
     { name: t('menu.collaborators'), href: '/admin/collaborators', icon: <PiUsers /> },
 
     { name: t('menu.section_services') },
@@ -80,6 +83,7 @@ export function useAdminMenuItems() {
 
     { name: t('menu.section_admin') },
     ...(canManageTeam ? [{ name: t('menu.team'), href: '/admin/equipe', icon: <PiUsersThree /> }] : []),
+    ...(canManageTeam ? [{ name: t('menu.billing'), href: '/admin/abonnement', icon: <PiCreditCard /> }] : []),
     { name: t('menu.settings_profile'), href: routes.forms.profileSettings, icon: <PiGear /> },
     { name: t('menu.tutorials'), href: '/tutoriels', icon: <PiBookOpen /> },
 

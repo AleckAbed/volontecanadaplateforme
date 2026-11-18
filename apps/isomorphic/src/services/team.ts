@@ -128,6 +128,10 @@ export interface PlatformCabinet {
   clients_count: number;
   dossiers_count: number;
   last_login_at: string | null;
+  subscription_status: 'trialing' | 'active' | 'past_due' | 'canceled' | 'unpaid';
+  trial_ends_at: string | null;
+  subscribed_seats: number | null;
+  payments_enabled: boolean;
 }
 
 export const platformService = {
