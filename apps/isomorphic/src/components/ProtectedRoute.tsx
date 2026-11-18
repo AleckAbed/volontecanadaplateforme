@@ -20,13 +20,8 @@ import { removeAuthToken } from '@/lib/auth-storage';
 const publicRoutes = [
   '/signin',
   '/signin/client',
-  '/signup',
-  '/forgot-password',
   '/auth/admin-signin',
   '/auth/client-signin',
-  '/auth/client-signup',
-  '/auth/sign-in-2',
-  '/auth/sign-up-2',
   '/questionnaire',
   '/client-form',
   '/sponsor-form',
@@ -41,10 +36,8 @@ const publicRoutes = [
 const authRoutes = [
   '/signin',
   '/signin/client',
-  '/signup',
   '/auth/admin-signin',
   '/auth/client-signin',
-  '/auth/client-signup',
 ];
 
 function isPublicPath(path: string | null): boolean {

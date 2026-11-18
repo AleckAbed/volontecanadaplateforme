@@ -4,18 +4,7 @@
  */
 
 import { getAuthToken, setAuthToken as setAuthTokenStorage, removeAuthToken } from '@/lib/auth-storage';
-
-const API_BASE_URL_DEFAULT = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-
-/** URL de l'API : NEXT_PUBLIC_API_URL si défini, sinon même host que la page sur le port 8000. */
-function getApiBaseUrl(): string {
-  if (typeof window !== 'undefined') {
-    const fromEnv = process.env.NEXT_PUBLIC_API_URL;
-    if (fromEnv && fromEnv.trim()) return fromEnv.trim().replace(/\/+$/, '');
-    return `${window.location.protocol}//${window.location.hostname}:8000/api`;
-  }
-  return API_BASE_URL_DEFAULT;
-}
+import { getApiUrl as getApiBaseUrl } from '@/lib/api-client';
 
 interface ApiResponse<T = any> {
   success: boolean;
@@ -27,7 +16,7 @@ interface ApiResponse<T = any> {
 class ApiService {
   private baseUrl: string;
 
-  constructor(baseUrl: string = API_BASE_URL_DEFAULT) {
+  constructor(baseUrl: string = getApiBaseUrl()) {
     this.baseUrl = baseUrl;
   }
 
@@ -204,28 +193,6 @@ class ApiService {
   }
 
   // ============ AUTHENTIFICATION CLIENT ============
-
-  /**
-   * Inscription client
-   */
-  async clientRegister(data: {
-    first_name: string;
-    last_name: string;
-    email: string;
-    password: string;
-    password_confirmation: string;
-    phone?: string;
-  }) {
-    const response = await this.post<{
-      client: any;
-      token: string;
-    }>('/client/register', data);
-
-    if (response.success && typeof window !== 'undefined') {
-      try { localStorage.setItem('user_type', 'client'); } catch {}
-    }
-    return response;
-  }
 
   /**
    * Connexion client
