@@ -179,13 +179,22 @@ export const collabActivationService = {
 // ─── Collaborator workspace (own login + their dossiers) ──────────────────────
 
 export const collabWorkspaceService = {
-  async login(email: string, password: string): Promise<{ collaborator: Collaborator; token: string }> {
+  async login(email: string, password: string): Promise<{ collaborator: Collaborator; token: string; two_factor_required?: boolean; challenge?: string; email_hint?: string }> {
     const res = await publicFetch('/collaborator/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
     return res.data;
+  },
+  /** Code reçu par courriel quand le cabinet l'exige (2.7). */
+  async verifyTwoFactor(challenge: string, code: string): Promise<{ collaborator: Collaborator; token: string }> {
+    const res: any = await publicFetch('/collaborator/login/two-factor', { method: 'POST', body: JSON.stringify({ challenge, code }) });
+    return res.data;
+  },
+  async resendTwoFactor(challenge: string): Promise<string> {
+    const res: any = await publicFetch('/collaborator/login/two-factor/resend', { method: 'POST', body: JSON.stringify({ challenge }) });
+    return res.message;
   },
   async me(): Promise<Collaborator> {
     const res = await authFetch('/collaborator/me');

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AuthCard, { inputClass, primaryButtonClass } from '@/components/auth/auth-card';
 import { platformService } from '@/services/team';
+import CodeStep from '@/components/auth/code-step';
 
 export default function PlatformLoginPage() {
   const router = useRouter();
@@ -11,13 +12,18 @@ export default function PlatformLoginPage() {
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [challenge, setChallenge] = useState<string | null>(null);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     try {
       setSubmitting(true);
-      await platformService.login(email.trim(), password);
+      const res: any = await platformService.login(email.trim(), password);
+      if (res?.data?.two_factor_required) {
+        setChallenge(res.data.challenge);
+        return;
+      }
       router.replace('/plateforme');
     } catch (err: any) {
       setError(err.message || 'Connexion impossible.');
@@ -28,6 +34,23 @@ export default function PlatformLoginPage() {
 
   return (
     <AuthCard eyebrow="Éditeur de la plateforme" title="Console plateforme" subtitle="Accès réservé à l'équipe de l'éditeur.">
+      {challenge ? (
+        <CodeStep
+          hint="Entrez le code à 6 chiffres de votre application d’authentification."
+          allowRecovery
+          onCancel={() => setChallenge(null)}
+          onSubmit={async (value, isRecovery) => {
+            try {
+              await platformService.verifyTwoFactor(challenge, isRecovery ? { recovery_code: value } : { code: value });
+              router.replace('/plateforme');
+              return null;
+            } catch (e: any) {
+              if (/expiré|Trop d/.test(e.message ?? '')) setChallenge(null);
+              return e.message || 'Code incorrect.';
+            }
+          }}
+        />
+      ) : (
       <form onSubmit={submit} className="space-y-5">
         <div>
           <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">Courriel</label>
@@ -42,6 +65,7 @@ export default function PlatformLoginPage() {
           {submitting ? 'Connexion…' : 'Se connecter'}
         </button>
       </form>
+      )}
     </AuthCard>
   );
 }

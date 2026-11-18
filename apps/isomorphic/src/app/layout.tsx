@@ -8,6 +8,7 @@ import { inter, lexendDeca } from '@/app/fonts';
 import cn from '@core/utils/class-names';
 import NextProgress from '@core/components/next-progress';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import Monitoring from '@/components/monitoring';
 
 // styles
 import '@/app/globals.css';
@@ -34,6 +35,7 @@ export default function RootLayout({
         suppressHydrationWarning
         className={cn(inter.variable, lexendDeca.variable, 'font-inter')}
       >
+        <Monitoring />
         <ThemeProvider>
           <NextProgress />
           <JotaiProvider>
