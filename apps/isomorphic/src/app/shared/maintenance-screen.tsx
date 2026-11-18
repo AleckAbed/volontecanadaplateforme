@@ -37,16 +37,6 @@ export default function MaintenanceScreen({
     <div className="flex min-h-screen grow items-center bg-gradient-to-br from-red-50 via-white to-red-50 px-6 xl:px-10">
       <div className="mx-auto flex w-full max-w-[1520px] flex-col-reverse items-center justify-between gap-5 text-center lg:flex-row lg:text-start">
         <div className="lg:max-w-2xl">
-          <div className="mb-4 flex items-center justify-center gap-3 lg:justify-start">
-            <Image
-              src="/logo1.png"
-              alt="Volonté Canada"
-              width={140}
-              height={48}
-              style={{ height: 'auto', maxHeight: 48, width: 'auto' }}
-              priority
-            />
-          </div>
           <Title
             as="h1"
             className="mb-3 text-[22px] font-bold leading-snug text-gray-900 sm:text-2xl md:mb-5 md:text-3xl md:leading-snug xl:mb-7 xl:text-4xl xl:leading-normal 2xl:text-[40px] 3xl:text-5xl 3xl:leading-snug"
@@ -76,13 +66,7 @@ export default function MaintenanceScreen({
           </div>
 
           <Text className="mt-8 text-xs text-gray-400">
-            Volonté Canada — Cabinet d&apos;immigration · Une erreur persistante ?{' '}
-            <a
-              href="mailto:formulaire.volontecanada@querga.ca"
-              className="text-red-700 hover:underline"
-            >
-              Contactez-nous
-            </a>
+            Si le problème persiste, contactez votre cabinet.
           </Text>
         </div>
 

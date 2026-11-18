@@ -17,6 +17,7 @@ import { getCommonT } from '@/app/shared/form-translations';
 import { apiService } from '@/services/api';
 import toast from 'react-hot-toast';
 import { useState, useEffect } from 'react';
+import PublicCabinetLogo from '@/components/public-cabinet-logo';
 
 interface HeaderProps {
   className?: string;
@@ -91,16 +92,7 @@ export default function SponsorFormHeader({ className }: HeaderProps) {
         className
       )}
     >
-      <Link href="https://volontecanada.ca" target="_blank" rel="noopener noreferrer">
-        <Image
-          src="/logo2.png"
-          alt={siteConfig.title}
-          width={150}
-          height={50}
-          className="h-auto w-auto"
-          priority
-        />
-      </Link>
+      <div className="flex items-center"><PublicCabinetLogo type="questionnaire" code={questionnaireCode} /></div>
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2 rounded-lg border border-white/40 bg-white/10 px-4 py-2 backdrop-blur-sm">
           <span className="text-xs font-medium text-white/90">{t.language}</span>

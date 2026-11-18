@@ -3,6 +3,7 @@
 import { use, useEffect, useState } from 'react';
 import { PiCheckCircleFill, PiSealCheckDuotone } from 'react-icons/pi';
 import { mandateService, PublicMandate } from '@/services/booking';
+import CabinetLogo from '@/components/cabinet-logo';
 
 /** Mandat de représentation lu et signé par le client depuis son lien. */
 export default function MandatePage({ params }: { params: Promise<{ token: string }> }) {
@@ -42,6 +43,7 @@ export default function MandatePage({ params }: { params: Promise<{ token: strin
     <div className="min-h-screen bg-gray-50 px-4 py-10 print:bg-white print:p-0">
       <div className="mx-auto max-w-2xl space-y-4">
         <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
+          {m.branding?.logo_url && <CabinetLogo branding={m.branding} className="mb-2" />}
           <p className="text-sm text-gray-500">{m.cabinet}</p>
           <h1 className="mt-1 text-2xl font-bold text-gray-900">{m.title}</h1>
           <div className="mt-5 whitespace-pre-line text-[15px] leading-relaxed text-gray-800">{m.body}</div>

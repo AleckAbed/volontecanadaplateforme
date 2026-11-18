@@ -8,6 +8,8 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { invitationsService, Invitation, InvitationItemSummary } from '@/services/invitations';
 import { actionFeedService } from '@/services/actions';
+import CabinetLogo from '@/components/cabinet-logo';
+import { useCabinetBranding } from '@/hooks/use-cabinet-branding';
 
 const XfaPdfViewer = dynamic(() => import('@/components/XfaPdfViewer'), { ssr: false });
 
@@ -420,24 +422,12 @@ export default function EnvoiDetailsPage({ params }: { params: Promise<{ id: str
   );
 }
 
-/** Company branding for document headers/footers — adjust to your business. */
-const COMPANY_INFO = {
-  name: 'Volonté Canada',
-  tagline: 'Cabinet d\'immigration',
-  website: 'volontecanada.ca',
-  email: 'formulaire.volontecanada@querga.ca',
-  address: 'Montréal, Québec, Canada',
-  /** White logo — use on colored backgrounds */
-  logoSrcOnDark: '/logo2.png',
-  /** Red logo — use on white/light backgrounds */
-  logoSrcOnLight: '/logo1.png',
-};
-
 /** Form-style preview: labels + read-only input boxes grouped in sections. */
 function FormResponsesView({
   item, recipient,
 }: { item: InvitationItemSummary; recipient?: string }) {
   const { t, i18n } = useTranslation();
+  const branding = useCabinetBranding();
   const data = item.form_data || {};
   const localeMap: Record<string, string> = { fr: 'fr-CA', en: 'en-CA', es: 'es-CA' };
   const locale = localeMap[i18n.language] || 'fr-CA';
@@ -451,21 +441,12 @@ function FormResponsesView({
       {/* Document header — printable */}
       <div className="mb-6 overflow-hidden rounded-xl bg-white shadow-sm">
         {/* Top bar */}
-        <div className="bg-gradient-to-r from-red-700 to-red-900 px-8 py-5 text-white">
-          <div className="flex items-center justify-between">
-            <Image
-              src={COMPANY_INFO.logoSrcOnDark}
-              alt={COMPANY_INFO.name}
-              width={180}
-              height={64}
-              style={{ height: 'auto', maxHeight: 64, width: 'auto', maxWidth: 200 }}
-              priority
-            />
-            <div className="text-right text-xs text-red-100">
-              <p>{COMPANY_INFO.website}</p>
-              <p>{COMPANY_INFO.email}</p>
-              <p>{COMPANY_INFO.address}</p>
-            </div>
+        <div className="px-8 py-5 text-white" style={{ backgroundColor: branding?.color ?? '#2563eb' }}>
+          <div className="flex items-center justify-between gap-4">
+            <span className="rounded-lg bg-white px-3 py-2">
+              <CabinetLogo branding={branding} />
+            </span>
+            {branding?.website && <p className="text-right text-xs opacity-90">{branding.website}</p>}
           </div>
         </div>
         {/* Form metadata */}
@@ -498,20 +479,12 @@ function FormResponsesView({
       {/* Footer */}
       <div className="mt-8 rounded-xl bg-white px-8 py-5 shadow-sm">
         <div className="flex items-center justify-center gap-3 border-b border-gray-200 pb-3">
-          <Image
-            src={COMPANY_INFO.logoSrcOnLight}
-            alt={COMPANY_INFO.name}
-            width={32}
-            height={32}
-            style={{ height: 'auto', maxHeight: 28, width: 'auto', maxWidth: 80 }}
-          />
           <div className="text-sm">
-            <strong className="text-gray-900">{COMPANY_INFO.name}</strong>
-            <span className="text-gray-500"> — {COMPANY_INFO.tagline}</span>
+            <strong className="text-gray-900">{branding?.name}</strong>
           </div>
         </div>
         <p className="mt-3 text-center text-xs text-gray-500">
-          {t('envois.form_resp.footer_confidential', { date: generatedAt })} · {COMPANY_INFO.website} · {COMPANY_INFO.email}
+          {t('envois.form_resp.footer_confidential', { date: generatedAt })}{branding?.website ? ` · ${branding.website}` : ''}
         </p>
         <p className="mt-2 text-center text-[10px] text-gray-400">
           {t('envois.form_resp.footer_disclaimer')}

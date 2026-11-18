@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { FiSave, FiX } from 'react-icons/fi';
 import { Button, RadioGroup, AdvancedRadio } from 'rizzui';
@@ -14,6 +13,7 @@ import { apiService } from '@/services/api';
 import toast from 'react-hot-toast';
 import { useState, useEffect } from 'react';
 import { getCommonT } from '@/app/shared/form-translations';
+import PublicCabinetLogo from '@/components/public-cabinet-logo';
 
 interface HeaderProps {
   className?: string;
@@ -89,16 +89,7 @@ export default function Header({ className }: HeaderProps) {
         className
       )}
     >
-      <Link href="https://volontecanada.ca" target="_blank" rel="noopener noreferrer">
-        <Image
-          src="/logo2.png"
-          alt={siteConfig.title}
-          width={150}
-          height={50}
-          className="h-auto w-auto"
-          priority
-        />
-      </Link>
+      <div className="flex items-center"><PublicCabinetLogo type="questionnaire" code={questionnaireCode} /></div>
       <div className="flex items-center gap-3">
         {/* Sélecteur de langue du questionnaire (radio buttons) */}
         <div className="flex items-center gap-2 rounded-lg border border-white/40 bg-white/10 px-4 py-2 backdrop-blur-sm">

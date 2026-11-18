@@ -20,9 +20,6 @@ import FormGroup from '@/app/shared/form-group';
 import Link from 'next/link';
 import FormFooter from '@core/components/form-footer';
 import UploadZone from '@core/ui/file-upload/upload-zone';
-import { useLayout } from '@/layouts/use-layout';
-import { useBerylliumSidebars } from '@/layouts/beryllium/beryllium-utils';
-import { LAYOUT_OPTIONS } from '@/config/enums';
 const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
   ssr: false,
 });
@@ -210,16 +207,12 @@ export function ProfileHeader({
   description,
   children,
 }: React.PropsWithChildren<{ title: string; description?: string }>) {
-  const { layout } = useLayout();
-  const { expandedLeft } = useBerylliumSidebars();
 
   return (
     <div
       className={cn(
         'relative z-0 -mx-4 px-4 pt-28 before:absolute before:start-0 before:top-0 before:h-40 before:w-full before:bg-gradient-to-r before:from-[#F8E1AF] before:to-[#F6CFCF] @3xl:pt-[190px] @3xl:before:h-[calc(100%-120px)] dark:before:from-[#bca981] dark:before:to-[#cbb4b4] md:-mx-5 md:px-5 lg:-mx-8 lg:px-8 xl:-mx-6 xl:px-6 3xl:-mx-[33px] 3xl:px-[33px] 4xl:-mx-10 4xl:px-10',
-        layout === LAYOUT_OPTIONS.BERYLLIUM && expandedLeft
-          ? 'before:start-5 3xl:before:start-[25px]'
-          : 'xl:before:w-[calc(100%_+_10px)]'
+        'xl:before:w-[calc(100%_+_10px)]'
       )}
     >
       <div className="relative z-10 mx-auto flex w-full max-w-screen-2xl flex-wrap items-end justify-start gap-6 border-b border-dashed border-muted pb-10">

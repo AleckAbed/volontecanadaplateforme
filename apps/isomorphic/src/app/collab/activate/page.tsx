@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { PiCheckCircleDuotone, PiXCircleDuotone, PiEyeDuotone, PiEyeSlashDuotone } from 'react-icons/pi';
 import { collabActivationService } from '@/services/collaborators';
+import PublicCabinetLogo from '@/components/public-cabinet-logo';
 
 type Check = { key: string; label: string; test: (s: string) => boolean };
 
@@ -96,7 +97,7 @@ export default function CollabActivatePage() {
       <div className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-xl">
         {/* En-tête */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-7 py-6 text-white">
-          <p className="text-xs font-semibold uppercase tracking-wider opacity-80">Volonté Canada</p>
+          <span className="mb-2 inline-block rounded-lg bg-white px-2 py-1"><PublicCabinetLogo type="activation" code={token} /></span>
           <h1 className="mt-1 text-2xl font-bold">Activez votre compte</h1>
           {collab && (
             <p className="mt-1 text-sm opacity-90">

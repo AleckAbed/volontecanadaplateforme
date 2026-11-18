@@ -3,6 +3,9 @@ import './src/env.mjs';
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
+  // Dossier de compilation : NEXT_DIST_DIR permet un build de vérification sans toucher au serveur de dev.
+  // (next build ajoute alors ce dossier à tsconfig.json : ne pas commiter ce changement.)
+  distDir: process.env.NEXT_DIST_DIR || '.next',
   webpack: (config) => {
     // pdfjs-dist@3.11.174 référence canvas (module natif Node.js) dans son build.
     // On l'ignore côté browser — pdfjs utilise le canvas du DOM à la place.

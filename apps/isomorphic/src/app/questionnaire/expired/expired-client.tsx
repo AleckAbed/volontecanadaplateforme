@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { Button } from 'rizzui';
 import Image from 'next/image';
 import Link from 'next/link';
+import PublicCabinetLogo from '@/components/public-cabinet-logo';
 
 export default function QuestionnaireExpiredClient() {
   const searchParams = useSearchParams();
@@ -18,7 +19,7 @@ export default function QuestionnaireExpiredClient() {
         />
         <div className="fixed inset-0 bg-gradient-to-r from-red-600/70 to-red-800/70 -z-10" />
         <div className="relative bg-white rounded-lg shadow-xl p-8 text-center dark:bg-gray-0">
-          <Image src="/logo2.png" alt="Logo" width={150} height={50} className="mx-auto mb-6" />
+          <div className="mb-6 flex justify-center"><PublicCabinetLogo type="questionnaire" code={code} /></div>
           <div className="mb-6">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
               <svg className="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

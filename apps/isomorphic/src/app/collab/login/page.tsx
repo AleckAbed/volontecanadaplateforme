@@ -36,9 +36,6 @@ export default function CollaboratorLoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-sm">
-        <p className="text-center text-xs font-semibold uppercase tracking-wide text-red-700">
-          Volonté Canada
-        </p>
         <h1 className="mt-2 text-center text-2xl font-bold text-gray-900">Espace collaborateur</h1>
         <p className="mt-2 text-center text-sm text-gray-500">
           Connectez-vous pour accéder aux dossiers sur lesquels vous êtes assigné.

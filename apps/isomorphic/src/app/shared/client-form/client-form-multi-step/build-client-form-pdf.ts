@@ -49,14 +49,40 @@ const COL_GAP = 4;
 const FIELD_PADDING = 2;
 const FIELD_ROW_HEIGHT = 12; // hauteur d'une ligne de champ (label + zone valeur)
 
-/** Charge le logo en base64 (data URL) depuis le serveur. */
-async function fetchLogoDataUrl(): Promise<string | null> {
+/** Cabinet dont le PDF porte le nom et le logo (1.9). */
+type PdfBranding = { name: string; logo_url: string | null };
+
+/**
+ * Cabinet concerné : celui de l'admin connecté, sinon celui du questionnaire ouvert
+ * par le client (code du lien). Jamais le nom d'un autre cabinet.
+ */
+async function resolveBranding(): Promise<PdfBranding | null> {
   if (typeof window === 'undefined') return null;
   try {
-    const url = `${window.location.origin}/logo2.png`;
+    const { authFetch, publicFetch } = await import('@/lib/api-client');
+    if (localStorage.getItem('user_type') === 'admin') {
+      const res: any = await authFetch('/admin/cabinet/profile');
+      return res?.data?.branding ?? null;
+    }
+    const code = new URLSearchParams(window.location.search).get('code') || localStorage.getItem('questionnaire_code');
+    if (code) {
+      const res: any = await publicFetch(`/branding/questionnaire/${encodeURIComponent(code)}`);
+      return res?.data ?? null;
+    }
+  } catch {
+    // PDF sans logo plutôt qu'en échec
+  }
+  return null;
+}
+
+/** Charge le logo du cabinet en data URL (PNG ou JPEG) pour jsPDF. */
+async function fetchLogoDataUrl(url: string | null | undefined): Promise<string | null> {
+  if (typeof window === 'undefined' || !url) return null;
+  try {
     const res = await fetch(url);
     if (!res.ok) return null;
     const blob = await res.blob();
+    if (!/image\/(png|jpeg)/.test(blob.type)) return null; // jsPDF : PNG ou JPEG
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result as string);
@@ -68,13 +94,16 @@ async function fetchLogoDataUrl(): Promise<string | null> {
   }
 }
 
-function drawPageHeader(doc: jsPDF, pageNum: number, totalPages: number, logoDataUrl: string | null, locale: 'fr' | 'en') {
+function drawPageHeader(doc: jsPDF, pageNum: number, totalPages: number, logoDataUrl: string | null, locale: 'fr' | 'en', cabinetName: string) {
   doc.setFillColor(...HEADER_BG);
   doc.rect(0, 0, PAGE_WIDTH, HEADER_HEIGHT, 'F');
   // Logo à gauche (taille proportionnelle : largeur x hauteur pour éviter déformation)
   if (logoDataUrl) {
     try {
-      doc.addImage(logoDataUrl, 'PNG', MARGIN, 2, 40, 16);
+      const props = doc.getImageProperties(logoDataUrl);
+      const h = 16;
+      const w = Math.min(50, (props.width / props.height) * h);
+      doc.addImage(logoDataUrl, props.fileType, MARGIN, 2, w, h);
     } catch {
       // ignore
     }
@@ -83,7 +112,7 @@ function drawPageHeader(doc: jsPDF, pageNum: number, totalPages: number, logoDat
   doc.setTextColor(...HEADER_TEXT);
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
-  doc.text(locale === 'fr' ? 'Volonté Canada' : 'Volunteer Canada', PAGE_WIDTH - MARGIN, 10, { align: 'right' });
+  if (cabinetName) doc.text(cabinetName, PAGE_WIDTH - MARGIN, 10, { align: 'right' });
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
   doc.text(locale === 'fr' ? 'Formulaire client – Récapitulatif' : 'Client form – Summary', PAGE_WIDTH - MARGIN, 15, { align: 'right' });
@@ -423,7 +452,9 @@ export async function buildClientFormPdf(
   options?: BuildClientFormPdfOptions
 ): Promise<void> {
   try {
-    const logoDataUrl = await fetchLogoDataUrl();
+    const branding = await resolveBranding();
+    const logoDataUrl = await fetchLogoDataUrl(branding?.logo_url);
+    const cabinetName = branding?.name ?? '';
     const meta = options?.meta;
     const d = formData != null && typeof formData === 'object' ? formData : {};
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -700,7 +731,7 @@ export async function buildClientFormPdf(
   const totalPages = doc.getNumberOfPages();
   for (let p = 1; p <= totalPages; p++) {
     doc.setPage(p);
-    drawPageHeader(doc, p, totalPages, logoDataUrl, locale);
+    drawPageHeader(doc, p, totalPages, logoDataUrl, locale, cabinetName);
     drawPageFooter(doc, p, totalPages, locale);
   }
 

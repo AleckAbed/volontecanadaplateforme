@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { PiCheckCircleFill, PiVideoCameraDuotone, PiReceiptDuotone } from 'react-icons/pi';
 import { publicBookingService, PublicAppointment, APPOINTMENT_STATUS, formatPrice, tzCity } from '@/services/booking';
+import CabinetLogo from '@/components/cabinet-logo';
 
 /** Rendez-vous consulté (et annulable) depuis le lien reçu par courriel. */
 function ManageAppointment({ token }: { token: string }) {
@@ -73,7 +74,7 @@ function ManageAppointment({ token }: { token: string }) {
         )}
 
         <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-          <p className="text-sm text-gray-500">{a.cabinet}</p>
+          {a.branding?.logo_url ? <CabinetLogo branding={a.branding} className="mb-2" /> : <p className="text-sm text-gray-500">{a.cabinet}</p>}
           <h1 className="mt-1 text-xl font-bold text-gray-900">{a.service ?? 'Rendez-vous'}</h1>
           <span className={`mt-2 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${status.className}`}>{status.label}</span>
 

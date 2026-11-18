@@ -9,6 +9,7 @@ import { Input, Button } from 'rizzui';
 import { apiService } from '@/services/api';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
+import PublicCabinetLogo from '@/components/public-cabinet-logo';
 
 const verifySchema = z.object({
   email: z.string().email('Email invalide'),
@@ -102,13 +103,7 @@ export default function VerifyQuestionnaireClient() {
 
         <div className="relative bg-white rounded-lg shadow-xl p-8 dark:bg-gray-0">
           <div className="mb-6 text-center">
-            <Image
-              src="/logo2.png"
-              alt="Logo"
-              width={150}
-              height={50}
-              className="mx-auto mb-4"
-            />
+            <PublicCabinetLogo type="questionnaire" code={searchParams?.get('code')} className="mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               Accès au Formulaire
             </h1>

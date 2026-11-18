@@ -7,6 +7,7 @@ import {
   PiPhoneDuotone, PiMapPinDuotone, PiCalendarCheckDuotone,
 } from 'react-icons/pi';
 import { publicBookingService, PublicBookingPage, SlotsResponse, formatPrice, MeetingMode, tzCity } from '@/services/booking';
+import CabinetLogo from '@/components/cabinet-logo';
 
 const MODE_ICON: Record<MeetingMode, typeof PiVideoCameraDuotone> = {
   video: PiVideoCameraDuotone,
@@ -102,6 +103,7 @@ export default function BookingPage({ params }: { params: Promise<{ slug: string
     <div className="min-h-screen bg-gray-50 px-4 py-8">
       <div className="mx-auto max-w-3xl">
         <header className="mb-6 text-center">
+          {page.cabinet.branding?.logo_url && <CabinetLogo branding={page.cabinet.branding} className="mx-auto mb-3" />}
           <h1 className="text-2xl font-bold text-gray-900">{page.cabinet.name}</h1>
           <p className="mt-1 text-sm text-gray-600">Prendre rendez-vous en ligne</p>
           {page.cabinet.intro && <p className="mx-auto mt-3 max-w-xl whitespace-pre-line text-sm text-gray-700">{page.cabinet.intro}</p>}

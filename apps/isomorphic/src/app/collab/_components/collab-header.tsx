@@ -39,7 +39,7 @@ export default function CollabHeader() {
             onClick={() => router.push('/collab/dossiers')}
             className="text-sm font-semibold text-red-700 hover:text-red-800"
           >
-            Volonté Canada — Espace collaborateur
+            Espace collaborateur
           </button>
           {showBackToDossiers && (
             <button

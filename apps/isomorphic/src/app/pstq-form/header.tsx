@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button, RadioGroup, AdvancedRadio } from 'rizzui';
@@ -12,6 +11,7 @@ import { pstqFormDataAtom } from '@/app/shared/pstq-form/pstq-form-multi-step';
 import { questionnaireLocaleAtom, type FormLocale } from '@/app/shared/questionnaire-locale';
 import { getCommonT } from '@/app/shared/form-translations';
 import { calculatePSTQScore } from '@/services/pstq-scoring';
+import PublicCabinetLogo from '@/components/public-cabinet-logo';
 
 export default function PSTQHeader() {
   const router = useRouter();
@@ -78,16 +78,7 @@ export default function PSTQHeader() {
 
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between bg-white/10 px-4 py-4 backdrop-blur-lg lg:px-8 4xl:px-10">
-      <Link href="https://volontecanada.ca" target="_blank" rel="noopener noreferrer" className="flex items-center">
-        <Image
-          src="/logo2.png"
-          alt="Logo"
-          width={120}
-          height={40}
-          className="h-auto w-auto"
-          priority
-        />
-      </Link>
+      <div className="flex items-center"><PublicCabinetLogo type="questionnaire" code={questionnaireCode} /></div>
 
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2 rounded-lg border border-white/40 bg-white/10 px-4 py-2 backdrop-blur-sm">

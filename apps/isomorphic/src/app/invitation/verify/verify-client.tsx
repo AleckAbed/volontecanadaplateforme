@@ -63,7 +63,7 @@ export default function VerifyInvitationClient() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center p-4">
-      {/* Background image + voile rouge cohérent avec le branding Volonté Canada */}
+      {/* Image de fond et voile */}
       <div
         className="fixed inset-0 -z-20 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: 'url(/bg0.jpg)' }}
@@ -73,13 +73,6 @@ export default function VerifyInvitationClient() {
       <div className="relative w-full max-w-md">
         <div className="rounded-xl bg-white p-8 shadow-2xl">
           <div className="mb-6 text-center">
-            <Image
-              src="/logo2.png"
-              alt="Volonté Canada"
-              width={150}
-              height={50}
-              className="mx-auto mb-4"
-            />
             <h1 className="text-2xl font-bold text-gray-900">Accès à mon invitation</h1>
             <p className="mt-2 text-sm text-gray-600">
               Veuillez entrer votre email et le code unique reçu par courriel.
@@ -132,9 +125,6 @@ export default function VerifyInvitationClient() {
           </form>
         </div>
 
-        <p className="mt-4 text-center text-xs text-white/90">
-          Volonté Canada — Cabinet d&apos;immigration
-        </p>
       </div>
     </div>
   );
