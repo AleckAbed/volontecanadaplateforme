@@ -27,7 +27,7 @@ export default function FormSummary({
 }: FormSummaryProps) {
   const { step } = useStepper();
   const [locale] = useAtom(questionnaireLocaleAtom);
-  const labels = stepLabel[locale] || stepLabel.fr;
+  const labels = stepLabel[locale as keyof typeof stepLabel] ?? stepLabel.fr;
   return (
     <div className={cn('text-base text-white', className)}>
       <div className="flex">

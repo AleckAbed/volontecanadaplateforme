@@ -158,7 +158,7 @@ export const AudioPlayerProvider = ({
           audioRef.current
             .play()
             .then(() => setIsPlaying(true))
-            .catch((error) => console.error('Error playing audio:', error));
+            .catch((error: any) => console.error('Error playing audio:', error));
         }
       }
     }

@@ -8,7 +8,7 @@ import PublicCabinetLogo from '@/components/public-cabinet-logo';
 
 export default function QuestionnaireExpiredClient() {
   const searchParams = useSearchParams();
-  const code = searchParams.get('code');
+  const code = searchParams?.get('code');
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-red-600/70 to-red-800/70 flex items-center justify-center p-4">

@@ -27,7 +27,7 @@ export default function ViewArticlePage({ params }: { params: Promise<{ id: stri
   useEffect(() => {
     newsService.getArticle(Number(id))
       .then(setArticle)
-      .catch((e) => toast.error(e.message))
+      .catch((e: any) => toast.error(e.message))
       .finally(() => setLoading(false));
   }, [id]);
 

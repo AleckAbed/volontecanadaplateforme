@@ -6,7 +6,7 @@ import MaintenanceScreen, { MaintenanceReason } from '@/app/shared/maintenance-s
 
 function MaintenanceContent() {
   const params = useSearchParams();
-  const reason = (params.get('reason') as MaintenanceReason) ?? 'unavailable';
+  const reason = (params?.get('reason') as MaintenanceReason) ?? 'unavailable';
   return <MaintenanceScreen reason={reason} />;
 }
 

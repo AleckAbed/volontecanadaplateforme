@@ -83,7 +83,7 @@ export default function ClientListTable() {
         const rows = extractClientRows(res);
         setData(rows);
       })
-      .catch((err) => {
+      .catch((err: any) => {
         console.error('getModuleClients:', err);
         const message = err?.message ?? t('clients.toasts.error');
         toast.error(message);

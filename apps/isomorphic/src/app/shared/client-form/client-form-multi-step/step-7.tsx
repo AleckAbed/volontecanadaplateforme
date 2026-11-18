@@ -265,7 +265,7 @@ export default function StepSeven() {
                 label={l.maritalStatus}
                 options={maritalStatusOptions}
                 value={value || ''}
-                onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
+                onChange={(selected) => onChange(typeof selected === 'string' ? selected : (selected as any)?.value || '')}
                 getOptionValue={(option) => option.value}
                 displayValue={(selected) => {
                   const option = maritalStatusOptions.find((opt) => opt.value === selected);

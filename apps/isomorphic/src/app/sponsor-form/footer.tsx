@@ -44,7 +44,7 @@ export default function SponsorFooter({ isLoading, className }: FooterProps) {
     if (typeof window !== 'undefined') {
       try {
         const raw = localStorage.getItem('sponsorFormData');
-        formData = raw ? JSON.parse(raw) : {};
+        formData = raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
       } catch {
         formData = {};
       }

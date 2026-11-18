@@ -43,7 +43,7 @@ export const chatbotService = {
       },
       body: JSON.stringify({ message, history: cleanHistory }),
     });
-    const data = await res.json();
+    const data: any = await res.json();
     if (!res.ok) throw new Error(data.message || 'Erreur du chatbot');
     if (data.data?.disambiguation) {
       return { kind: 'disambiguation', disambiguation: data.data.disambiguation };

@@ -106,7 +106,7 @@ export default function XfaPdfViewer({
               } catch {}
             }
           })
-          .catch((e) => console.warn('[XfaPdfViewer] setup failed:', e));
+          .catch((e: any) => console.warn('[XfaPdfViewer] setup failed:', e));
       } catch (e: any) {
         setError(e.message || 'Erreur de chargement du PDF');
       }
@@ -534,8 +534,8 @@ function restoreFieldFromStore(
  */
 function sweepCurrentInputs(win: any, store: Record<string, any>): void {
   try {
-    const fields = win.document.querySelectorAll<HTMLInputElement>(FORM_FIELD_SELECTOR);
-    fields.forEach((el) => {
+    const fields: NodeListOf<HTMLInputElement> = win.document.querySelectorAll(FORM_FIELD_SELECTOR);
+    fields.forEach((el: HTMLInputElement) => {
       const key = fieldKey(el);
       if (!key) return;
       const tag = el.tagName.toLowerCase();

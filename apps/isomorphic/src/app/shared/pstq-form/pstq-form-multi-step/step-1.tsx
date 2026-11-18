@@ -117,7 +117,7 @@ function buildNiveauOptions(levelLabel: string) {
   }));
 }
 
-function buildScolariteOptions(l: typeof PSTQ_STEP1_LABELS.fr) {
+function buildScolariteOptions(l: (typeof PSTQ_STEP1_LABELS)[keyof typeof PSTQ_STEP1_LABELS]) {
   return [
     { label: l.eduSecondaire, value: 'secondaire' },
     { label: l.eduPostsec, value: 'postsec_general_2ans' },
@@ -329,7 +329,7 @@ export default function StepOne() {
                       placeholder={l.select}
                       options={niveauFrancaisOptions}
                       value={value?.toString()}
-                      onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : selected?.value || '1'))}
+                      onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : (selected as any)?.value || '1'))}
                       getOptionValue={(option) => option.value}
                       displayValue={(selected) => {
                         const option = niveauFrancaisOptions.find((opt) => opt.value === selected?.toString());
@@ -352,7 +352,7 @@ export default function StepOne() {
                       placeholder={l.select}
                       options={niveauFrancaisOptions}
                       value={value?.toString()}
-                      onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : selected?.value || '1'))}
+                      onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : (selected as any)?.value || '1'))}
                       getOptionValue={(option) => option.value}
                       displayValue={(selected) => {
                         const option = niveauFrancaisOptions.find((opt) => opt.value === selected?.toString());
@@ -375,7 +375,7 @@ export default function StepOne() {
                       placeholder={l.select}
                       options={niveauFrancaisOptions}
                       value={value?.toString()}
-                      onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : selected?.value || '1'))}
+                      onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : (selected as any)?.value || '1'))}
                       getOptionValue={(option) => option.value}
                       displayValue={(selected) => {
                         const option = niveauFrancaisOptions.find((opt) => opt.value === selected?.toString());
@@ -398,7 +398,7 @@ export default function StepOne() {
                       placeholder={l.select}
                       options={niveauFrancaisOptions}
                       value={value?.toString()}
-                      onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : selected?.value || '1'))}
+                      onChange={(selected) => onChange(parseInt(typeof selected === 'string' ? selected : (selected as any)?.value || '1'))}
                       getOptionValue={(option) => option.value}
                       displayValue={(selected) => {
                         const option = niveauFrancaisOptions.find((opt) => opt.value === selected?.toString());
@@ -452,7 +452,7 @@ export default function StepOne() {
                   placeholder={l.select}
                   options={scolariteOptions}
                   value={value}
-                  onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
+                  onChange={(selected) => onChange(typeof selected === 'string' ? selected : (selected as any)?.value || '')}
                   getOptionValue={(option) => option.value}
                   displayValue={(selected) => {
                     const option = scolariteOptions.find((opt) => opt.value === selected);

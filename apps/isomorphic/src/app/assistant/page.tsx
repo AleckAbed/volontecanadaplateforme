@@ -75,7 +75,7 @@ export default function VoloAssistantPage() {
           window.location.href = '/signin';
           return;
         }
-        const json = await res.json();
+        const json: any = await res.json();
         const user = json?.data?.user || json?.data || json;
         const id = user?.id ?? user?.email ?? 'unknown';
         const label = user?.name || user?.email || 'Admin';

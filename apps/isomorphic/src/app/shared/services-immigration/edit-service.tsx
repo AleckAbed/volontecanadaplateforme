@@ -50,9 +50,9 @@ export default function EditService({ serviceId }: EditServiceProps) {
   const defaultValues: CreateServiceInput = service
     ? {
         serviceName: service.name,
-        description: service.description,
-        category: service.category,
-        duration: service.duration,
+        description: service.description ?? '',
+        category: service.category ?? '',
+        duration: service.duration ?? '',
         status: service.status,
       }
     : {

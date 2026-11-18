@@ -39,13 +39,13 @@ export function authHeaders(extra?: HeadersInit): Record<string, string> {
  *   un FormData (le navigateur pose alors la boundary multipart) ou si
  *   `asJson` est false.
  */
-export async function authFetch(endpoint: string, options: RequestInit = {}, asJson = true) {
+export async function authFetch(endpoint: string, options: RequestInit = {}, asJson = true): Promise<any> {
   const headers = authHeaders(options.headers);
   if (asJson && options.body && !(options.body instanceof FormData) && !headers['Content-Type']) {
     headers['Content-Type'] = 'application/json';
   }
   const res = await fetch(`${getApiUrl()}${endpoint}`, { ...options, credentials: 'include', headers });
-  const data = await res.json().catch(() => ({}));
+  const data: any = await res.json().catch(() => ({}));
   if (!res.ok) {
     redirectIfTwoFactorRequired(res.status, data);
     throw new Error((data as any)?.message || 'Une erreur est survenue');
@@ -58,13 +58,13 @@ export async function authFetch(endpoint: string, options: RequestInit = {}, asJ
  * existe — certains endpoints publics personnalisent la réponse pour un admin
  * connecté (ex. sources news suivies) ; les autres l'ignorent.
  */
-export async function publicFetch(endpoint: string, options: RequestInit = {}) {
+export async function publicFetch(endpoint: string, options: RequestInit = {}): Promise<any> {
   const headers = authHeaders(options.headers);
   if (options.body && !(options.body instanceof FormData) && !headers['Content-Type']) {
     headers['Content-Type'] = 'application/json';
   }
   const res = await fetch(`${getApiUrl()}${endpoint}`, { ...options, credentials: 'include', headers });
-  const data = await res.json().catch(() => ({}));
+  const data: any = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error((data as any)?.message || 'Une erreur est survenue');
   return data;
 }

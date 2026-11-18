@@ -8,7 +8,7 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import FormSummary from '@/app/shared/client-form/client-form-multi-step/form-summary';
 import { formDataAtom, useStepper } from '@/app/shared/client-form/client-form-multi-step';
 import { questionnaireLocaleAtom } from '@/app/shared/questionnaire-locale';
-import { Input, Select, RadioGroup, AdvancedRadio, Checkbox } from 'rizzui';
+import { Input, Select, RadioGroup, AdvancedRadio, Checkbox, Textarea } from 'rizzui';
 import {
   clientFormStep2Schema,
   ClientFormStep2Input,
@@ -348,7 +348,7 @@ export default function StepTwo() {
                     value: String(n),
                   }))}
                   value={value || '1'}
-                  onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value ?? '1')}
+                  onChange={(selected) => onChange(typeof selected === 'string' ? selected : (selected as any)?.value ?? '1')}
                   getOptionValue={(option) => option.value}
                   displayValue={(selected) => {
                     const n = parseInt(String(selected), 10) || 1;
@@ -414,7 +414,7 @@ export default function StepTwo() {
                     { label: t.no, value: 'no' },
                   ]}
                   value={value || ''}
-                  onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
+                  onChange={(selected) => onChange(typeof selected === 'string' ? selected : (selected as any)?.value || '')}
                   getOptionValue={(option) => option.value}
                   displayValue={(selected) => {
                     const option = [
@@ -427,7 +427,7 @@ export default function StepTwo() {
               )}
             />
             {hasPreviousResidence === 'yes' && (
-              <Input
+              <Textarea
                 label={t.previousResidenceDetails}
                 {...register('previousResidenceDetails')}
                 className="mt-4"
@@ -450,7 +450,7 @@ export default function StepTwo() {
                   placeholder={t.select}
                   options={maritalStatusOptions}
                   value={value || ''}
-                  onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
+                  onChange={(selected) => onChange(typeof selected === 'string' ? selected : (selected as any)?.value || '')}
                   getOptionValue={(option) => option.value}
                   displayValue={(selected) => {
                     const option = maritalStatusOptions.find((opt) => opt.value === selected);
@@ -503,7 +503,7 @@ export default function StepTwo() {
                     { label: t.no, value: 'no' },
                   ]}
                   value={value || ''}
-                  onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
+                  onChange={(selected) => onChange(typeof selected === 'string' ? selected : (selected as any)?.value || '')}
                   getOptionValue={(option) => option.value}
                   displayValue={(selected) => {
                     const option = [
@@ -543,7 +543,7 @@ export default function StepTwo() {
                         placeholder={t.select}
                         options={relationshipTypeOptions}
                         value={value || ''}
-                        onChange={(selected) => onChange(typeof selected === 'string' ? selected : selected?.value || '')}
+                        onChange={(selected) => onChange(typeof selected === 'string' ? selected : (selected as any)?.value || '')}
                         getOptionValue={(option) => option.value}
                         displayValue={(selected) => {
                           const option = relationshipTypeOptions.find((opt) => opt.value === selected);
