@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { PiBellSimpleRingingFill, PiChecksBold } from 'react-icons/pi';
 import { notificationsService, NotificationItem } from '@/services/actions';
+import Link from 'next/link';
 
 const POLL_MS = 60_000;
 
@@ -91,7 +92,10 @@ export default function NotificationBell() {
       {open && (
         <div className="absolute right-0 z-50 mt-2 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl dark:bg-gray-100">
           <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
-            <span className="text-sm font-semibold text-gray-900">Notifications</span>
+            <span className="flex items-center gap-3">
+              <span className="text-sm font-semibold text-gray-900">Notifications</span>
+              <Link href="/admin/notifications" onClick={() => setOpen(false)} className="text-xs text-gray-500 hover:text-gray-800 hover:underline">Préférences</Link>
+            </span>
             {unread > 0 && (
               <button onClick={markAll} className="inline-flex items-center gap-1 text-xs font-medium text-blue-700 hover:underline">
                 <PiChecksBold className="h-3.5 w-3.5" /> Tout marquer comme lu

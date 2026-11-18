@@ -21,6 +21,7 @@ import {
   PiShieldCheck,
   PiListMagnifyingGlass,
   PiLockKey,
+  PiBellRinging,
   PiBuildings,
   PiCalendarPlus,
 } from 'react-icons/pi';
@@ -93,6 +94,7 @@ export function useAdminMenuItems() {
     ...(canManageTeam ? [{ name: t('menu.compliance'), href: '/admin/conformite', icon: <PiShieldCheck /> }] : []),
     ...(canManageTeam ? [{ name: t('menu.audit_log'), href: '/admin/journal', icon: <PiListMagnifyingGlass /> }] : []),
     { name: t('menu.security'), href: '/admin/securite', icon: <PiLockKey /> },
+    { name: t('menu.notifications_prefs'), href: '/admin/notifications', icon: <PiBellRinging /> },
     { name: t('menu.settings_profile'), href: routes.forms.profileSettings, icon: <PiGear /> },
     { name: t('menu.tutorials'), href: '/tutoriels', icon: <PiBookOpen /> },
 
