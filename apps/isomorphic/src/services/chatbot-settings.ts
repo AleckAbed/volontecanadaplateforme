@@ -13,6 +13,10 @@ async function authFetch(endpoint: string, options: RequestInit = {}) {
 }
 
 export interface ChatbotSettingsPayload {
+  /** 2.3 : désactivé par défaut ; l'activation exige accept_foreign_processing. */
+  enabled: boolean;
+  enabled_at?: string | null;
+  accept_foreign_processing?: boolean;
   allow_immigration_questions: boolean;
   immigration_questions_for: 'admin' | 'collab' | 'both';
   allow_dossier_lookup: boolean;

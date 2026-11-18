@@ -139,7 +139,8 @@
     "platform_console": "Platform console",
     "deadlines": "Deadlines",
     "invoices": "Invoicing",
-    "billing": "Subscription & payments"
+    "billing": "Subscription & payments",
+    "compliance": "Compliance & data"
   },
   "header": {
     "lock_session": "Lock session",
