@@ -140,6 +140,9 @@ export const platformService = {
   async login(email: string, password: string) {
     return publicFetch('/platform/login', { method: 'POST', body: JSON.stringify({ email, password }) });
   },
+  async verifyTwoFactor(challenge: string, input: { code?: string; recovery_code?: string }) {
+    return publicFetch('/platform/login/two-factor', { method: 'POST', body: JSON.stringify({ challenge, ...input }) });
+  },
   async me() {
     return publicFetch('/platform/me');
   },

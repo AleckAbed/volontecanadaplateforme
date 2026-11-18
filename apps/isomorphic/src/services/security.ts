@@ -11,6 +11,7 @@ export interface TwoFactorStatus {
   confirmed_at: string | null;
   recovery_codes_left: number;
   required_by_cabinet: boolean;
+  required_for_collaborators: boolean;
   can_manage: boolean;
 }
 
@@ -36,6 +37,9 @@ export const twoFactorService = {
   },
   async setRequired(required: boolean): Promise<string> {
     return (await authFetch('/admin/cabinet/security', { method: 'PUT', body: JSON.stringify({ require_two_factor: required }) })).message;
+  },
+  async setRequiredForCollaborators(required: boolean): Promise<string> {
+    return (await authFetch('/admin/cabinet/security', { method: 'PUT', body: JSON.stringify({ require_two_factor_collaborators: required }) })).message;
   },
   async resetMember(adminId: number): Promise<string> {
     return (await authFetch(`/admin/team/${adminId}/reset-two-factor`, { method: 'POST' })).message;

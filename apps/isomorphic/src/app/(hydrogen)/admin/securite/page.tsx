@@ -229,6 +229,18 @@ function RecoveryCodes({ codes, onDone }: { codes: string[]; onDone: () => void 
 
 function TeamRequirement({ status, onChanged }: { status: TwoFactorStatus; onChanged: () => void }) {
   const [busy, setBusy] = useState(false);
+  const toggleCollaborators = async () => {
+    setBusy(true);
+    try {
+      toast.success(await twoFactorService.setRequiredForCollaborators(!status.required_for_collaborators));
+      onChanged();
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const toggle = async () => {
     setBusy(true);
     try {
@@ -255,6 +267,17 @@ function TeamRequirement({ status, onChanged }: { status: TwoFactorStatus; onCha
         {status.required_by_cabinet ? 'Ne plus l’exiger' : 'L’exiger pour toute l’équipe'}
       </button>
       {!status.enabled && !status.required_by_cabinet && <p className="mt-1 text-xs text-gray-500">Activez-la d’abord pour vous-même.</p>}
+
+      <h3 className="mt-5 text-sm font-semibold text-gray-900">Collaborateurs externes</h3>
+      <p className="mt-1 text-sm text-gray-700">
+        {status.required_for_collaborators
+          ? 'Vos collaborateurs reçoivent un code par courriel à chaque connexion.'
+          : 'Exigez un code envoyé par courriel à chaque connexion de vos collaborateurs (traducteurs, partenaires).'}
+      </p>
+      <button onClick={toggleCollaborators} disabled={busy}
+        className="mt-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50 disabled:opacity-50">
+        {status.required_for_collaborators ? 'Ne plus l’exiger des collaborateurs' : 'L’exiger des collaborateurs'}
+      </button>
     </section>
   );
 }
