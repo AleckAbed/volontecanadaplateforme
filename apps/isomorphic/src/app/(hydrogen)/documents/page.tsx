@@ -138,6 +138,12 @@ export default function DocumentTemplatesPage() {
             <ViewBtn icon={<PiFoldersDuotone className="h-5 w-5" />} label="Explorateur" active={view === 'explorer'} onClick={() => changeView('explorer')} />
           </div>
           <Link
+            href="/documents/catalogue"
+            className="rounded-lg border border-blue-200 px-4 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-50"
+          >
+            Catalogue
+          </Link>
+          <Link
             id="tour-doc-new"
             href="/documents/nouveau"
             className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
