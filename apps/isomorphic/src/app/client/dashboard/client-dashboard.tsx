@@ -10,8 +10,10 @@ import {
   PiCheckCircleFill,
   PiCircleDashedBold,
   PiArrowRightBold,
+  PiReceiptDuotone,
 } from 'react-icons/pi';
 import { clientPortalService, PortalOverview, PortalTask } from '@/services/client-profile';
+import { publicInvoiceService, InvoiceSummary, INVOICE_STATUS, formatMoney } from '@/services/billing';
 
 function formatDate(d: string | null): string {
   if (!d) return '—';
@@ -24,11 +26,13 @@ function formatDate(d: string | null): string {
 export default function ClientDashboard() {
   const router = useRouter();
   const [data, setData] = useState<PortalOverview | null>(null);
+  const [invoices, setInvoices] = useState<InvoiceSummary[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const load = () => {
     setError(null);
     clientPortalService.overview().then(setData).catch((e: any) => setError(e.message || 'Chargement impossible.'));
+    publicInvoiceService.forClient().then(setInvoices).catch(() => setInvoices([]));
   };
 
   useEffect(load, []);
@@ -138,6 +142,32 @@ export default function ClientDashboard() {
           </div>
         )}
       </section>
+
+      {invoices.length > 0 && (
+        <section>
+          <h2 className="mb-3 flex items-center gap-2 font-semibold text-gray-900">
+            <PiReceiptDuotone className="h-5 w-5 text-blue-600" /> Vos factures
+          </h2>
+          <ul className="divide-y divide-gray-100 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+            {invoices.map((inv) => (
+              <li key={inv.id}>
+                <Link href={inv.url ?? '#'} className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-gray-50">
+                  <span className="min-w-0">
+                    <span className="block text-sm font-medium text-gray-900">Facture {inv.number}</span>
+                    <span className="block text-xs text-gray-600">
+                      {inv.status === 'paid' ? `Payée le ${formatDate(inv.paid_at)}` : inv.due_date ? `À payer avant le ${formatDate(inv.due_date)}` : 'À payer'}
+                    </span>
+                  </span>
+                  <span className="flex shrink-0 items-center gap-2">
+                    <span className="text-sm font-semibold tabular-nums text-gray-900">{formatMoney(inv.total_cents)}</span>
+                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${INVOICE_STATUS[inv.status].className}`}>{INVOICE_STATUS[inv.status].label}</span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {doneTasks.length > 0 && (
         <section>

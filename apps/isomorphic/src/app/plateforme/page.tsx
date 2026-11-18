@@ -118,14 +118,15 @@ export default function PlatformConsolePage() {
                 <th className="px-4 py-3 text-right font-semibold">Dossiers</th>
                 <th className="px-4 py-3 font-semibold">Inscrit le</th>
                 <th className="px-4 py-3 font-semibold">Dernière activité</th>
+                <th className="px-4 py-3 font-semibold">Abonnement</th>
                 <th className="px-4 py-3 text-right font-semibold">Statut</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {loading ? (
-                <tr><td colSpan={8} className="px-4 py-8 text-center text-gray-500">Chargement…</td></tr>
+                <tr><td colSpan={9} className="px-4 py-8 text-center text-gray-500">Chargement…</td></tr>
               ) : cabinets.length === 0 ? (
-                <tr><td colSpan={8} className="px-4 py-8 text-center text-gray-500">Aucun cabinet.</td></tr>
+                <tr><td colSpan={9} className="px-4 py-8 text-center text-gray-500">Aucun cabinet.</td></tr>
               ) : cabinets.map((c) => (
                 <tr key={c.id} className={c.is_active ? '' : 'bg-red-50/40'}>
                   <td className="px-4 py-3">
@@ -140,6 +141,13 @@ export default function PlatformConsolePage() {
                   <td className="px-4 py-3 text-right tabular-nums">{c.dossiers_count}</td>
                   <td className="px-4 py-3 text-gray-600">{formatDate(c.created_at)}</td>
                   <td className="px-4 py-3 text-gray-600">{formatDate(c.last_login_at)}</td>
+                  <td className="px-4 py-3 text-xs">
+                    <div className={c.subscription_status === 'active' ? 'font-medium text-emerald-700' : c.subscription_status === 'trialing' ? 'text-gray-700' : 'font-medium text-red-700'}>
+                      {{ trialing: 'Essai', active: 'Actif', past_due: 'En retard', canceled: 'Résilié', unpaid: 'Impayé' }[c.subscription_status] ?? c.subscription_status}
+                      {c.subscription_status === 'trialing' && c.trial_ends_at ? ` → ${formatDate(c.trial_ends_at)}` : ''}
+                    </div>
+                    <div className="text-gray-500">{c.payments_enabled ? 'Encaisse en ligne' : 'Pas d’encaissement en ligne'}</div>
+                  </td>
                   <td className="px-4 py-3 text-right">
                     <button onClick={() => toggle(c)} disabled={busyId === c.id}
                       className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium disabled:opacity-50 ${

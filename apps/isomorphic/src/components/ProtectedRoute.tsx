@@ -26,6 +26,8 @@ const publicRoutes = [
   '/auth/mot-de-passe-oublie',
   '/auth/definir-mot-de-passe',
   '/client/acces',
+  '/facture/', // facture vue par le client via son lien
+
   '/client/mot-de-passe-oublie',
   '/plateforme', // console de l'éditeur : gère sa propre session (cookie platform_token)
   '/questionnaire',

@@ -137,7 +137,9 @@
     "tutorials": "Tutorials",
     "team": "Team",
     "platform_console": "Platform console",
-    "deadlines": "Deadlines"
+    "deadlines": "Deadlines",
+    "invoices": "Invoicing",
+    "billing": "Subscription & payments"
   },
   "header": {
     "lock_session": "Lock session",
