@@ -15,7 +15,25 @@ interface XfaPdfViewerProps {
    * values map so callers can persist either or both.
    */
   onSave?: (pdfBytes: Uint8Array, formData: Record<string, any>) => Promise<void>;
+  /** Appelé à chaque changement d'un champ du PDF (correspondance : relier une case en cliquant). */
+  onFieldChange?: (info: PdfFieldChange) => void;
   className?: string;
+}
+
+/** Champ du PDF qui vient de changer, avec ce qu'il faut pour le reproduire au préremplissage. */
+export interface PdfFieldChange {
+  kind: 'checkbox' | 'radio' | 'select' | 'text';
+  /** Clé du champ dans les valeurs du visualiseur (sans préfixe). */
+  domKey: string;
+  /** Clé du stockage pdf.js (à préfixer par __as__), si le champ en a une. */
+  storageKey: string | null;
+  checked: boolean;
+  /** Valeur que pdf.js enregistre pour ce champ coché ou cette option. */
+  storageValue: any;
+  value: string;
+  label: string;
+  /** « focus » : le champ vient d'être cliqué ; « change » : sa valeur a changé. */
+  event: 'focus' | 'change';
 }
 
 /**
@@ -33,8 +51,11 @@ export default function XfaPdfViewer({
   readOnly = false,
   initialFormData,
   onSave,
+  onFieldChange,
   className = '',
 }: XfaPdfViewerProps) {
+  const onFieldChangeRef = useRef(onFieldChange);
+  onFieldChangeRef.current = onFieldChange;
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const blobUrlRef = useRef<string | null>(null);
   // Authoritative form state — persists across PDF.js virtual-scroll re-renders.
@@ -70,12 +91,15 @@ export default function XfaPdfViewer({
         // Wait for the viewer to start rendering form inputs, then install the
         // continuous tracker AND force all pages to render so virtualization
         // doesn't drop fields out of the DOM.
-        waitForViewerReady(iframeRef.current!)
+        // On attend la page qui porte CE fichier : si le PDF change (nouveau rendu), l'ancienne
+        // page reste prête un instant et on y installerait le suivi et le préremplissage.
+        waitForViewerReady(iframeRef.current!, params.toString())
           .then((win) => {
+            if (cancelled) return;
             if (initialFormData) {
               restoreAnnotationStorage(win, initialFormData);
             }
-            installInputTracker(win, formValuesRef, seenInputsRef.current, observerRef);
+            installInputTracker(win, formValuesRef, seenInputsRef.current, observerRef, onFieldChangeRef);
 
             // Kick off render-all in the background — don't block applyDom on it.
             renderAllPages(win).catch(() => {});
@@ -85,6 +109,8 @@ export default function XfaPdfViewer({
             // PDF.js re-renders pages and wipes our changes.
             if (initialFormData && Object.keys(initialFormData).length > 0) {
               const applyAndLog = () => {
+                // Dès que l'utilisateur a modifié un champ, on ne réapplique plus rien.
+                if ((win as any).__xfaUserEdited) return;
                 try {
                   const applied = applyAnnotationsToDom(win, initialFormData);
                   if (applied > 0) {
@@ -260,7 +286,8 @@ function restoreAnnotationStorage(win: any, values: Record<string, any>): void {
       if (!key.startsWith('__as__')) return;
       const realKey = key.slice('__as__'.length);
       try {
-        storage.setValue(realKey, value);
+        // Liste préremplie : l'option exacte est choisie plus tard, d'après ses libellés.
+        storage.setValue(realKey, value && typeof value === 'object' && Array.isArray((value as any).choices) ? { value: (value as any).value } : value);
         restored++;
       } catch {}
     });
@@ -287,6 +314,7 @@ function applyAnnotationsToDom(win: any, values: Record<string, any>): number {
   try {
     const doc: Document = win.document;
     if (!doc) return 0;
+    const storage = win?.PDFViewerApplication?.pdfDocument?.annotationStorage;
 
     Object.entries(values).forEach(([rawKey, raw]) => {
       if (!rawKey.startsWith('__as__')) return;
@@ -295,36 +323,28 @@ function applyAnnotationsToDom(win: any, values: Record<string, any>): number {
       // PDF.js value objects are typically: { value: 'X' } or { value: true } or { value: ['a','b'] }
       const value = (raw && typeof raw === 'object' && 'value' in raw) ? (raw as any).value : raw;
 
-      // 1. Try direct id match (most common: input id = annotation key)
-      let el: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null =
-        doc.getElementById(key) as any;
+      // Valeur déjà changée dans le stockage (saisie de l'utilisateur, option déjà choisie) : on n'y touche plus.
+      try {
+        const current = storage?.getValue?.(key, { value: undefined })?.value;
+        if (current !== undefined && JSON.stringify(current) !== JSON.stringify(value)) return;
+      } catch {}
 
-      // 2. Try data-element-id attribute
-      if (!el) {
-        el = doc.querySelector(`[data-element-id="${cssEscape(key)}"]`) as any;
-      }
-
-      // 3. Try name attribute (XFA SOM expression sometimes matches)
-      if (!el) {
-        el = doc.querySelector(
-          `${FORM_FIELD_SELECTOR.split(',').map(s => `${s}[name="${cssEscape(key)}"]`).join(',')}`,
-        ) as any;
-      }
-
-      // 4. Last resort: id ends-with the key (PDF.js sometimes prefixes ids)
-      if (!el) {
-        const candidates = doc.querySelectorAll<HTMLInputElement>(FORM_FIELD_SELECTOR);
-        for (const c of Array.from(candidates)) {
-          if (c.id?.endsWith(key) || c.name === key) {
-            el = c as any;
-            break;
-          }
-        }
-      }
-
+      const el = findFieldElement(doc, key);
       if (!el) return;
       try {
-        applyFieldValue(el as any, value);
+        const tag = el.tagName.toLowerCase();
+        const input = el as HTMLInputElement;
+        if (raw && typeof raw === 'object' && Array.isArray((raw as any).choices) && tag === 'select') {
+          const option = matchOption(el as HTMLSelectElement, (raw as any).choices);
+          if (option === null) return;
+          (el as HTMLSelectElement).value = option;
+          storage?.setValue?.(key, { value: option });
+        } else if (tag === 'input' && (input.type === 'checkbox' || input.type === 'radio') && input.hasAttribute('xfaOn')) {
+          // XFA : la case est cochée si la valeur est celle « cochée » de cette case.
+          input.checked = String(value) === input.getAttribute('xfaOn');
+        } else {
+          applyFieldValue(el as any, value);
+        }
         applied++;
       } catch {}
     });
@@ -332,6 +352,24 @@ function applyAnnotationsToDom(win: any, values: Record<string, any>): number {
     console.warn('[XfaPdfViewer] applyAnnotationsToDom error:', e);
   }
   return applied;
+}
+
+/**
+ * Élément de saisie d'une clé du stockage pdf.js : id, attribut « fieldid » (XFA),
+ * « data-element-id » (AcroForm ; en XFA il est sur le conteneur du champ), ou nom.
+ */
+function findFieldElement(doc: Document, key: string): HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null {
+  const isField = (n: Element | null) => !!n && n.matches(FORM_FIELD_SELECTOR);
+  const byId = doc.getElementById(key);
+  if (isField(byId)) return byId as any;
+  const k = cssEscape(key);
+  const byFieldId = doc.querySelector(`.xfaLayer [fieldid="${k}"]`);
+  if (isField(byFieldId)) return byFieldId as any;
+  const byElementId = doc.querySelector(`[data-element-id="${k}"]`);
+  if (isField(byElementId)) return byElementId as any;
+  const inner = byElementId?.querySelector('input, textarea, select');
+  if (inner && isField(inner)) return inner as any;
+  return doc.querySelector(FORM_FIELD_SELECTOR.split(',').map((s) => `${s}[name="${k}"]`).join(',')) as any;
 }
 
 function cssEscape(s: string): string {
@@ -429,13 +467,15 @@ function _renderAllPagesImpl(win: any): void {
 }
 
 /** Wait until viewer has rendered at least one form field. */
-function waitForViewerReady(iframe: HTMLIFrameElement, timeoutMs = 30000): Promise<any> {
+function waitForViewerReady(iframe: HTMLIFrameElement, expectedQuery?: string, timeoutMs = 30000): Promise<any> {
   return new Promise((resolve, reject) => {
     const start = Date.now();
     const check = () => {
       const win = iframe.contentWindow as any;
       const app = win?.PDFViewerApplication;
-      if (app?.pdfDocument && win.document?.querySelector(FORM_FIELD_SELECTOR)) {
+      let current = true;
+      try { current = !expectedQuery || String(win?.location?.search ?? '').includes(expectedQuery); } catch { current = false; }
+      if (current && app?.pdfDocument && win.document?.querySelector(FORM_FIELD_SELECTOR)) {
         resolve(win);
         return;
       }
@@ -484,6 +524,16 @@ function applyFieldValue(
 ): void {
   const tag = el.tagName.toLowerCase();
   try {
+    // Préremplissage d'une liste : { choices: [valeur, libellés…] }.
+    if (value && typeof value === 'object' && Array.isArray(value.choices)) {
+      if (tag === 'select') {
+        const option = matchOption(el as HTMLSelectElement, value.choices);
+        if (option !== null) (el as HTMLSelectElement).value = option;
+      } else if ((el as HTMLInputElement).type !== 'checkbox' && (el as HTMLInputElement).type !== 'radio') {
+        el.value = String(value.choices[0] ?? '');
+      }
+      return;
+    }
     if (tag === 'select') {
       const sel = el as HTMLSelectElement;
       if (sel.multiple && Array.isArray(value)) {
@@ -502,6 +552,53 @@ function applyFieldValue(
     }
     input.value = String(value ?? '');
   } catch {}
+}
+
+const normalizeLabel = (s: string) =>
+  String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+
+/**
+ * Option d'une liste qui correspond à l'une des valeurs (code ou libellé), sans tenir compte
+ * de la casse ni des accents : valeur exacte, puis texte exact, puis mot entier du texte
+ * (« Male » dans « M Male »).
+ */
+export function matchOption(sel: HTMLSelectElement, candidates: string[]): string | null {
+  const options = Array.from(sel.options);
+  const wanted = candidates.map(normalizeLabel).filter(Boolean);
+  for (const c of wanted) {
+    const o = options.find((opt) => normalizeLabel(opt.value) === c);
+    if (o) return o.value;
+  }
+  for (const c of wanted) {
+    const o = options.find((opt) => normalizeLabel(opt.textContent ?? '') === c);
+    if (o) return o.value;
+  }
+  for (const c of wanted.filter((w) => w.length >= 3)) {
+    const o = options.find((opt) => ` ${normalizeLabel(opt.textContent ?? '')} `.includes(` ${c} `));
+    if (o) return o.value;
+  }
+  return null;
+}
+
+/** Décrit un champ qui vient de changer (voir PdfFieldChange). */
+function describeField(el: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement, event: 'focus' | 'change' = 'change'): PdfFieldChange {
+  const tag = el.tagName.toLowerCase();
+  const xfa = !!el.closest('.xfaLayer');
+  // AcroForm : « data-element-id » sur le champ ; XFA : « fieldid ».
+  const storageKey = el.getAttribute('data-element-id') || el.getAttribute('fieldid');
+  const base = { domKey: fieldKey(el), storageKey, checked: false, value: '', label: '', event };
+  if (tag === 'select') {
+    const sel = el as HTMLSelectElement;
+    const opt = sel.options[sel.selectedIndex];
+    return { ...base, kind: 'select', value: sel.value, label: opt?.textContent?.trim() ?? '', storageValue: { value: sel.value } };
+  }
+  const input = el as HTMLInputElement;
+  if (input.type === 'checkbox' || input.type === 'radio') {
+    // XFA : pdf.js enregistre la valeur « cochée » propre à la case ; AcroForm : true.
+    const on = xfa ? input.getAttribute('xfaOn') : true;
+    return { ...base, kind: input.type, checked: input.checked, value: String(on ?? ''), storageValue: { value: on } };
+  }
+  return { ...base, kind: 'text', value: input.value, storageValue: { value: input.value } };
 }
 
 /** Restore a field's value from the in-memory store, if present. */
@@ -570,6 +667,7 @@ function installInputTracker(
   storeRef: { current: Record<string, any> },
   seen: WeakSet<Element>,
   observerRef: { current: MutationObserver | null },
+  changeRef?: { current: ((info: PdfFieldChange) => void) | undefined },
 ): void {
   const doc: Document = win.document;
   if (!doc) return;
@@ -577,6 +675,12 @@ function installInputTracker(
   const onChange = (evt: Event) => {
     const el = evt.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null;
     if (!el || !(el as Element).matches?.(FORM_FIELD_SELECTOR)) return;
+    if (evt.isTrusted) (win as any).__xfaUserEdited = true;
+    // Un seul signal par changement (« input » et « change » arrivent tous deux).
+    // Avant le test de la clé : en XFA, les champs n'ont souvent ni id ni nom (clé « fieldid »).
+    if (evt.type === 'change' && changeRef?.current) {
+      try { changeRef.current(describeField(el)); } catch {}
+    }
     const key = fieldKey(el);
     if (!key) return;
     storeRef.current[key] = readFieldValue(el as any);
@@ -587,6 +691,11 @@ function installInputTracker(
     seen.add(el);
     el.addEventListener('input', onChange as any, true);
     el.addEventListener('change', onChange as any, true);
+    el.addEventListener('focus', () => {
+      if (changeRef?.current) {
+        try { changeRef.current(describeField(el as any, 'focus')); } catch {}
+      }
+    });
     // Restore previously-saved value, if any
     restoreFieldFromStore(el as any, storeRef.current);
   };
@@ -599,11 +708,13 @@ function installInputTracker(
   const obs = new MO((mutations: MutationRecord[]) => {
     mutations.forEach((m) => {
       m.addedNodes.forEach((node) => {
-        if (!(node instanceof Element)) return;
-        if (node.matches?.(FORM_FIELD_SELECTOR)) {
-          attachToField(node);
+        // Pas « instanceof Element » : les nœuds de l'iframe viennent d'un autre contexte JS.
+        if (node.nodeType !== 1) return;
+        const added = node as Element;
+        if (added.matches?.(FORM_FIELD_SELECTOR)) {
+          attachToField(added);
         }
-        const nested = node.querySelectorAll?.(FORM_FIELD_SELECTOR);
+        const nested = added.querySelectorAll?.(FORM_FIELD_SELECTOR);
         nested?.forEach((el: Element) => attachToField(el));
       });
     });

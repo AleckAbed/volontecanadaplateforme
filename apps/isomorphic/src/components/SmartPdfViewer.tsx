@@ -24,6 +24,8 @@ interface SmartPdfViewerProps {
   readOnly?: boolean;
   onSave?: (pdfBytes: Uint8Array, formData: Record<string, any>) => Promise<void>;
   initialFormData?: Record<string, any>;
+  /** Changement d'un champ (visualiseur pdf.js seulement). */
+  onFieldChange?: (info: import('./XfaPdfViewer').PdfFieldChange) => void;
   /** Force un viewer particulier (utile pour les tests). Sinon auto-détection. */
   forceViewer?: 'xfa' | 'adobe';
 }
@@ -47,7 +49,7 @@ async function detectXfa(filePromise: Promise<ArrayBuffer>): Promise<boolean> {
 }
 
 export default function SmartPdfViewer(props: SmartPdfViewerProps) {
-  const { filePromise, forceViewer, ...rest } = props;
+  const { filePromise, forceViewer, onFieldChange, ...rest } = props;
   const hasAdobeKey = !!process.env.NEXT_PUBLIC_ADOBE_CLIENT_ID;
   const [engine, setEngine] = useState<Engine | null>(forceViewer ?? null);
   const [isXfa, setIsXfa] = useState<boolean | null>(null);
@@ -139,6 +141,7 @@ export default function SmartPdfViewer(props: SmartPdfViewerProps) {
             key="xfa"
             filePromise={promiseForChild}
             {...rest}
+            onFieldChange={onFieldChange}
           />
         )}
       </div>

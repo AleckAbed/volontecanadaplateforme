@@ -13,6 +13,25 @@ export interface ProfileField {
   label: string;
   section: string;
   type: 'text' | 'date' | 'email';
+  /** Valeurs codées (sexe, état civil…) : pour relier une case à cocher. */
+  choices?: { value: string; label: string }[] | null;
+}
+
+/** Case, bouton radio ou liste reliés en cliquant dans le PDF. */
+export interface FieldMapRule {
+  group: string;
+  key: string;
+  label: string;
+  mode: 'equals' | 'choice' | 'text';
+  equals: string[];
+  format: string | null;
+  fields: string[];
+}
+
+interface FieldMapSummary {
+  mapped_count: number;
+  mapped_keys: string[];
+  rules: FieldMapRule[];
 }
 
 // ─── Correspondance des champs d'un modèle PDF (admin) ───────────────────────
@@ -22,6 +41,7 @@ export interface FieldMapInfo {
   fields: ProfileField[];
   mapped_count: number;
   mapped_keys: string[];
+  rules: FieldMapRule[];
   token_values: Record<string, any>;
 }
 
@@ -32,12 +52,18 @@ export const fieldMapService = {
   },
   async save(templateId: number, formData: Record<string, any>): Promise<{
     message: string;
-    data: { mapped_count: number; mapped_keys: string[]; unknown_tokens: string[] };
+    data: FieldMapSummary & { unknown_tokens: string[] };
   }> {
     return authFetch(`/admin/document-templates/${templateId}/field-map`, {
       method: 'PUT',
       body: JSON.stringify({ form_data: formData }),
     });
+  },
+  async addRule(templateId: number, rule: { key: string; mode: 'equals' | 'choice' | 'text'; equals?: string[]; format?: string | null; targets: Record<string, any> }): Promise<{ message: string; data: FieldMapSummary }> {
+    return authFetch(`/admin/document-templates/${templateId}/field-map/rules`, { method: 'POST', body: JSON.stringify(rule) });
+  },
+  async removeRule(templateId: number, group: string): Promise<{ message: string; data: FieldMapSummary }> {
+    return authFetch(`/admin/document-templates/${templateId}/field-map/rules/${encodeURIComponent(group)}`, { method: 'DELETE' });
   },
 };
 
