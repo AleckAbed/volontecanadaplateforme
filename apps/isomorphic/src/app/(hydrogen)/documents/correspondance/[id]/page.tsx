@@ -6,7 +6,9 @@ import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import { PiArrowLeftBold, PiCheckCircleFill, PiCopyDuotone, PiInfoDuotone } from 'react-icons/pi';
 import { documentService } from '@/services/documents';
-import { fieldMapService, FieldMapInfo } from '@/services/client-profile';
+import { fieldMapService, FieldMapInfo, FieldMapRule } from '@/services/client-profile';
+import type { PdfFieldChange } from '@/components/XfaPdfViewer';
+import RulesPanel, { PendingRule } from './rules-panel';
 import { useCurrentAdmin } from '@/hooks/use-current-admin';
 
 const SmartPdfViewer = dynamic(() => import('@/components/SmartPdfViewer'), { ssr: false });
@@ -28,6 +30,11 @@ export default function FieldMapPage({ params }: { params: Promise<{ id: string 
   const [info, setInfo] = useState<FieldMapInfo | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [mappedKeys, setMappedKeys] = useState<string[]>([]);
+  const [rules, setRules] = useState<FieldMapRule[]>([]);
+  // Règle en attente du clic dans le PDF (ref : lue depuis le visualiseur).
+  const [armed, setArmedState] = useState<PendingRule | null>(null);
+  const armedRef = useRef<PendingRule | null>(null);
+  const setArmed = (r: PendingRule | null) => { armedRef.current = r; setArmedState(r); };
   const filePromiseRef = useRef<Promise<ArrayBuffer> | null>(null);
 
   useEffect(() => {
@@ -36,6 +43,7 @@ export default function FieldMapPage({ params }: { params: Promise<{ id: string 
         filePromiseRef.current = documentService.fetchTemplatePdf(templateId);
         setInfo(data);
         setMappedKeys(data.mapped_keys);
+        setRules(data.rules);
       })
       .catch((e: any) => setLoadError(e.message || 'Chargement impossible.'));
   }, [templateId]);
@@ -50,6 +58,7 @@ export default function FieldMapPage({ params }: { params: Promise<{ id: string 
     try {
       const res = await fieldMapService.save(templateId, formData);
       setMappedKeys(res.data.mapped_keys);
+      setRules(res.data.rules);
       if (res.data.unknown_tokens.length > 0) {
         toast.error(`Jetons non reconnus : ${res.data.unknown_tokens.join(', ')}`);
       }
@@ -57,6 +66,56 @@ export default function FieldMapPage({ params }: { params: Promise<{ id: string 
     } catch (e: any) {
       toast.error(e.message || 'Enregistrement impossible.');
       throw e;
+    }
+  };
+
+  /** Clic dans le PDF pendant qu'une règle attend : on relie ce champ. */
+  const handleFieldChange = async (f: PdfFieldChange) => {
+    const rule = armedRef.current;
+    if (!rule) return;
+    if (rule.mode === 'text') {
+      // Champ texte : relié dès qu'on clique dedans.
+      if (f.event !== 'focus') return;
+      if (f.kind !== 'text') {
+        toast.error('Ce champ n’est pas un champ texte : choisissez « Case » ou « Liste ».');
+        return;
+      }
+    } else {
+      if (f.event !== 'change' || f.kind === 'text') return;
+      if ((f.kind === 'checkbox' || f.kind === 'radio') && !f.checked) return;
+      if (rule.mode === 'choice' && f.kind !== 'select') {
+        toast.error('Ce champ est une case : choisissez « Case ou bouton radio », ou cliquez une liste déroulante.');
+        return;
+      }
+    }
+    // Clé du stockage pdf.js seulement : en XFA, les boutons radio d'un groupe partagent leur nom.
+    const isList = rule.mode === 'choice';
+    if (!f.storageKey) {
+      toast.error('Ce champ du PDF n’a pas d’identifiant : il ne peut pas être relié.');
+      return;
+    }
+    setArmed(null);
+    try {
+      const res = await fieldMapService.addRule(templateId, {
+        key: rule.field.key, mode: rule.mode, equals: isList ? undefined : rule.equals, format: rule.format || null,
+        targets: { [`__as__${f.storageKey}`]: isList || rule.mode === 'text' ? null : f.storageValue },
+      });
+      setRules(res.data.rules);
+      setMappedKeys(res.data.mapped_keys);
+      toast.success(`Relié : ${rule.summary}${f.kind === 'select' && !isList && f.label ? ` (option « ${f.label} »)` : ''}`);
+    } catch (e: any) {
+      toast.error(e.message || 'Impossible de relier ce champ.');
+    }
+  };
+
+  const removeRule = async (group: string) => {
+    try {
+      const res = await fieldMapService.removeRule(templateId, group);
+      setRules(res.data.rules);
+      setMappedKeys(res.data.mapped_keys);
+      toast.success(res.message);
+    } catch (e: any) {
+      toast.error(e.message || 'Suppression impossible.');
     }
   };
 
@@ -100,7 +159,14 @@ export default function FieldMapPage({ params }: { params: Promise<{ id: string 
             <p>
               Tapez un jeton dans chaque champ du PDF qui correspond à une information du profil
               (ex. <strong>@nom</strong> dans « Nom de famille »), puis enregistrez avec le bouton du visualiseur.
-              Les PDF de ce modèle s&apos;ouvriront préremplis. Seuls les champs texte peuvent être reliés.
+              Les PDF de ce modèle s&apos;ouvriront préremplis.
+            </p>
+          </div>
+          <div className="mb-4 rounded-lg bg-gray-100 p-3 text-xs text-gray-700">
+            <p className="font-medium text-gray-900">Dates</p>
+            <p className="mt-0.5">
+              Ajoutez un format après le jeton : <code className="text-blue-700">@date_naissance:jj/mm/aaaa</code>.
+              Pour les cases séparées, une seule partie : <code className="text-blue-700">:aaaa</code>, <code className="text-blue-700">:mm</code> ou <code className="text-blue-700">:jj</code>.
             </p>
           </div>
           {!canEdit && admin && (
@@ -108,6 +174,7 @@ export default function FieldMapPage({ params }: { params: Promise<{ id: string 
               Lecture seule : seuls un propriétaire ou un administrateur peuvent enregistrer la correspondance.
             </p>
           )}
+          <RulesPanel info={info} rules={rules} canEdit={canEdit} armed={armed} onArm={setArmed} onRemove={removeRule} />
           {Object.entries(sections).map(([section, fields]) => (
             <div key={section} className="mb-4">
               <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500">{section}</div>
@@ -147,6 +214,7 @@ export default function FieldMapPage({ params }: { params: Promise<{ id: string 
             forceViewer="xfa"
             initialFormData={Object.keys(info.token_values).length ? info.token_values : undefined}
             onSave={canEdit ? handleSave : undefined}
+            onFieldChange={canEdit ? handleFieldChange : undefined}
           />
         </div>
       </div>
