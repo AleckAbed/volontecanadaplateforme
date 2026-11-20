@@ -11,6 +11,7 @@ import { immigrationServicesService, ImmigrationServiceItem } from '@/services/i
 import { collaboratorsService, Collaborator } from '@/services/collaborators';
 import { dossierDocumentsService, DossierDocument } from '@/services/dossier-documents';
 import { documentService, DocumentTemplate } from '@/services/documents';
+import DateField from '@/components/ui/date-field';
 
 type Scope = 'client' | 'member' | 'family';
 
@@ -368,21 +369,11 @@ export default function DossierForm({ mode, dossierId }: DossierFormProps) {
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">{t('dossiers.opened_label')}</label>
-                <input
-                  type="date"
-                  value={form.opened_at}
-                  onChange={(e) => setForm({ ...form, opened_at: e.target.value })}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                />
+                <DateField id="opened_at" value={form.opened_at} onChange={(v) => setForm({ ...form, opened_at: v })} />
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">{t('dossiers.deadline_label')}</label>
-                <input
-                  type="date"
-                  value={form.deadline_at}
-                  onChange={(e) => setForm({ ...form, deadline_at: e.target.value })}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                />
+                <DateField id="deadline_at" value={form.deadline_at} onChange={(v) => setForm({ ...form, deadline_at: v })} />
               </div>
               <div className="md:col-span-2">
                 <label className="mb-1 block text-sm font-medium text-gray-700">{t('dossiers.notes_label')}</label>

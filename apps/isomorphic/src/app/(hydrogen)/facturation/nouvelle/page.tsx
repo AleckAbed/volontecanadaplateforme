@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 import { PiArrowLeftBold, PiPlusBold, PiTrashDuotone } from 'react-icons/pi';
 import { invoicesService, InvoiceLineInput, formatMoney } from '@/services/billing';
 import { companyService } from '@/services/companies';
+import DateField from '@/components/ui/date-field';
 
 const EMPTY_LINE: InvoiceLineInput = { description: '', quantity: 1, unit_price: 0, taxable: true };
 
@@ -88,7 +89,7 @@ function NewInvoiceForm() {
           )}
           <div>
             <label htmlFor="due" className="mb-1 block text-sm font-medium text-gray-700">Payable au plus tard le (facultatif)</label>
-            <input id="due" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className={input} />
+            <DateField id="due" value={dueDate} onChange={setDueDate} />
           </div>
         </div>
 

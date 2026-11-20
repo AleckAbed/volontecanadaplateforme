@@ -29,7 +29,7 @@ export default function AppointmentsCard({ dossierId }: { dossierId: number }) {
           return (
             <li key={a.id} className="py-3 text-sm">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-medium capitalize text-gray-900">{a.local_label}</span>
+                <span className="inline-block font-medium first-letter:uppercase text-gray-900">{a.local_label}</span>
                 <span className="text-gray-600">· {a.service ?? 'Rendez-vous'}{a.host ? ` avec ${a.host}` : ''}</span>
                 {a.status === 'cancelled' && <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${st.className}`}>{st.label}</span>}
                 {a.outcome && <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${APPOINTMENT_OUTCOME[a.outcome].className}`}>{APPOINTMENT_OUTCOME[a.outcome].label}</span>}

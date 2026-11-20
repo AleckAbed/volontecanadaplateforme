@@ -82,6 +82,7 @@ export default function PlatformConsolePage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+          <Link href="/plateforme/demandes" className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">Demandes d’ouverture</Link>
           <Link href="/plateforme/catalogue" className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">Catalogue de modèles</Link>
           <button onClick={logout} className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">
             <PiSignOutBold className="h-4 w-4" /> Déconnexion

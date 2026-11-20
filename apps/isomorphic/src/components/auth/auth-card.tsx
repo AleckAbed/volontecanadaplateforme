@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { siteConfig } from '@/config/site.config';
+import AuthShell from './auth-shell';
 
-/** Carte centrée commune aux pages d'accès (inscription, mot de passe, plateforme). */
+/** Carte commune aux pages d'accès, dans le cadre AuthShell (même style pour tous les espaces). */
 export default function AuthCard({
   eyebrow,
   title,
@@ -11,6 +12,7 @@ export default function AuthCard({
   children,
   footer,
   wide = false,
+  spaces = true,
 }: {
   eyebrow?: string;
   title: string;
@@ -18,19 +20,21 @@ export default function AuthCard({
   children: React.ReactNode;
   footer?: React.ReactNode;
   wide?: boolean;
+  /** Sélecteur des espaces (cabinet, client…) en haut ; masqué pour la console plateforme. */
+  spaces?: boolean;
 }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 via-white to-blue-50/30 p-4 sm:p-6">
-      <div className={`w-full ${wide ? 'max-w-xl' : 'max-w-lg'} overflow-hidden rounded-2xl bg-white shadow-xl`}>
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-6 text-white sm:px-7">
-          <p className="text-xs font-semibold uppercase tracking-wider opacity-80">{eyebrow ?? siteConfig.appName}</p>
-          <h1 className="mt-1 text-2xl font-bold">{title}</h1>
-          {subtitle && <p className="mt-1 text-sm opacity-90">{subtitle}</p>}
+    <AuthShell showSpaces={spaces}>
+      <div className={`w-full ${wide ? 'max-w-xl' : 'max-w-md'} rounded-2xl border border-gray-100 bg-white shadow-xl shadow-blue-900/5`}>
+        <div className="px-6 pt-7 sm:px-8">
+          <p className="text-xs font-semibold uppercase tracking-wider text-blue-700">{eyebrow ?? siteConfig.appName}</p>
+          <h1 className="mt-1 text-2xl font-bold text-gray-900">{title}</h1>
+          {subtitle && <p className="mt-1.5 text-sm text-gray-600">{subtitle}</p>}
         </div>
-        <div className="p-6 sm:p-7">{children}</div>
-        {footer && <div className="border-t border-gray-100 bg-gray-50 px-6 py-4 text-center text-sm text-gray-600 sm:px-7">{footer}</div>}
+        <div className="p-6 sm:p-8">{children}</div>
+        {footer && <div className="rounded-b-2xl border-t border-gray-100 bg-gray-50 px-6 py-4 text-center text-sm text-gray-600 sm:px-8">{footer}</div>}
       </div>
-    </div>
+    </AuthShell>
   );
 }
 

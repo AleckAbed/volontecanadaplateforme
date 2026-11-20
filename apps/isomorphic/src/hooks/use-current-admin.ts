@@ -12,6 +12,8 @@ export interface CurrentAdmin {
   role: TeamRole;
   role_label: string;
   permissions: AdminPermissions;
+  /** Menus ouverts pour cette personne (réglés par le propriétaire). */
+  modules?: Partial<Record<import('@/lib/modules').ModuleKey, boolean>>;
   cabinet: { id: number; name: string; slug?: string; branding?: import('@/services/cabinet-profile').CabinetBranding } | null;
 }
 

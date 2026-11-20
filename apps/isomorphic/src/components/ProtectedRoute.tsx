@@ -16,6 +16,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import api from '@/services/api';
 import { removeAuthToken } from '@/lib/auth-storage';
+import { isModuleOpen } from '@/lib/modules';
 
 const publicRoutes = [
   '/signin',
@@ -55,6 +56,13 @@ const authRoutes = [
 function isPublicPath(path: string | null): boolean {
   if (!path) return false;
   return publicRoutes.some((route) => path.startsWith(route));
+}
+
+/** Pages ouvertes à chaque espace : le client n'a que son accueil et /client/… */
+function isAllowedForSpace(userType: string | null, path: string): boolean {
+  const isClientPage = path === '/client' || path.startsWith('/client/');
+  if (userType === 'client') return path === '/' || isClientPage;
+  return !isClientPage;
 }
 
 function isAuthPath(path: string | null): boolean {
@@ -107,6 +115,19 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
           // 3a. Session valide
           if (isAuthPath(path)) {
             // déjà connecté sur une page de signin → renvoie à l'accueil
+            hasRedirected.current = true;
+            router.replace('/');
+            return;
+          }
+          // Chaque espace reste chez lui : un client ne voit jamais une page du cabinet
+          // (même en tapant l'adresse), et le cabinet n'ouvre pas les pages du portail client.
+          if (!isAllowedForSpace(userType, path)) {
+            hasRedirected.current = true;
+            router.replace('/');
+            return;
+          }
+          // Menu masqué par le propriétaire du cabinet : retour à l'accueil.
+          if (userType === 'admin' && !isModuleOpen(res.data?.modules, path)) {
             hasRedirected.current = true;
             router.replace('/');
             return;

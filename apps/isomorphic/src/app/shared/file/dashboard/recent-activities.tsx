@@ -65,12 +65,12 @@ export function ActivityThreadCard({ thread }: any) {
       </div>
       <div className="">
         <Text className="text-sm font-normal text-gray-500">
-          <Text as="span" className="font-medium capitalize text-gray-700">
+          <Text as="span" className="font-medium first-letter:uppercase text-gray-700">
             {username}
           </Text>{' '}
           {logMessage}{' '}
           {alias && (
-            <Text as="span" className="font-medium capitalize text-gray-700">
+            <Text as="span" className="font-medium first-letter:uppercase text-gray-700">
               {alias}
             </Text>
           )}

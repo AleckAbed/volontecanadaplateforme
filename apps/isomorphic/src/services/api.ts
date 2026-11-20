@@ -397,7 +397,7 @@ class ApiService {
     first_name: string;
     last_name: string;
     email: string;
-    password: string;
+    preferred_locale?: 'fr' | 'en' | 'es';
     phone?: string;
     date_of_birth?: string;
     nationality?: string;

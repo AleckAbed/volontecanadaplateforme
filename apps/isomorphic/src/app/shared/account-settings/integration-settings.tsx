@@ -47,7 +47,7 @@ export default function IntegrationSettingsView() {
                   href={currentTeam.url}
                   target={'_blank'}
                   rel={'noopener noreferrer nofollow noindex'}
-                  className="mt-3 inline-block w-auto flex-shrink-0 justify-start p-0 text-xs font-medium capitalize text-gray-900 sm:justify-center"
+                  className="mt-3 inline-block w-auto flex-shrink-0 justify-start p-0 text-xs font-medium first-letter:uppercase text-gray-900 sm:justify-center"
                 >
                   Learn more
                 </a>

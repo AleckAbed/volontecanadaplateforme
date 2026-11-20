@@ -8,6 +8,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
 import { ActionIcon, Input, Title, Text, Button, Select } from 'rizzui';
 import { PiXBold, PiPlusBold, PiTrashBold } from 'react-icons/pi';
+import PhoneField from '@/components/ui/phone-field';
+import DateField from '@/components/ui/date-field';
 import { useModal } from '@/app/shared/modal-views/use-modal';
 import { apiService } from '@/services/api';
 import toast from 'react-hot-toast';
@@ -58,7 +60,7 @@ function buildPayload(data: ClientFormDataType) {
     first_name: data.first_name,
     last_name: data.last_name,
     email: data.email,
-    password: data.password,
+    preferred_locale: data.preferred_locale || 'fr',
     phone: data.phone || undefined,
     date_of_birth: data.date_of_birth || undefined,
     nationality: data.nationality || undefined,
@@ -250,10 +252,12 @@ export default function StepFamilyMembers() {
                 />
               )}
             />
-            <Input
-              label={t('clients.fields.birth_date')}
-              type="date"
-              {...register(`family_members.${index}.date_of_birth`)}
+            <Controller
+              name={`family_members.${index}.date_of_birth`}
+              control={control}
+              render={({ field: { value, onChange } }) => (
+                <DateField id={`member-${index}-birth-date`} label={t('clients.fields.birth_date')} value={value} onChange={onChange} />
+              )}
             />
             <div>
               <label className="mb-1.5 block text-sm font-medium text-gray-700">{t('clients.fields.nationality')}</label>
@@ -287,9 +291,12 @@ export default function StepFamilyMembers() {
               label={t('clients.create_modal.passport')}
               {...register(`family_members.${index}.passport_number`)}
             />
-            <Input
-              label={t('clients.fields.phone')}
-              {...register(`family_members.${index}.phone`)}
+            <Controller
+              name={`family_members.${index}.phone`}
+              control={control}
+              render={({ field: { value, onChange } }) => (
+                <PhoneField id={`member-${index}-phone`} label={t('clients.fields.phone')} value={value} onChange={onChange} />
+              )}
             />
             <Input
               label={t('clients.fields.email')}

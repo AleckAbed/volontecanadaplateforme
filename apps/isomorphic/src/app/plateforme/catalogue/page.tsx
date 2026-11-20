@@ -26,7 +26,7 @@ export default function PlatformCatalogPage() {
   const [busy, setBusy] = useState(false);
 
   const load = () => platformCatalogService.list().then(setItems).catch((e: any) => {
-    if (/401|Unauthenticated/i.test(e.message)) router.replace('/plateforme/connexion');
+    if (/401|Unauthenticated|session|reconnect/i.test(e.message)) router.replace('/plateforme/connexion');
     else toast.error(e.message);
   });
 

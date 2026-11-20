@@ -8,6 +8,7 @@ import {
 } from 'react-icons/pi';
 import { publicBookingService, PublicBookingPage, SlotsResponse, formatPrice, MeetingMode, tzCity } from '@/services/booking';
 import CabinetLogo from '@/components/cabinet-logo';
+import PhoneField from '@/components/ui/phone-field';
 
 const MODE_ICON: Record<MeetingMode, typeof PiVideoCameraDuotone> = {
   video: PiVideoCameraDuotone,
@@ -167,7 +168,7 @@ export default function BookingPage({ params }: { params: Promise<{ slug: string
                 <div className="space-y-4">
                   {Array.from(byDay.entries()).map(([date, list]) => (
                     <div key={date}>
-                      <h3 className="mb-2 text-sm font-semibold capitalize text-gray-800">{dayLabel(date)}</h3>
+                      <h3 className="mb-2 text-sm font-semibold first-letter:uppercase text-gray-800">{dayLabel(date)}</h3>
                       <div className="flex flex-wrap gap-2">
                         {list.map((s) => (
                           <button key={s.start} onClick={() => setStart(s)}
@@ -192,7 +193,7 @@ export default function BookingPage({ params }: { params: Promise<{ slug: string
                 <PiCalendarCheckDuotone className="mt-0.5 h-5 w-5 shrink-0" />
                 <div>
                   <p className="font-semibold">{service.name}</p>
-                  <p className="capitalize">{dayLabel(start.date)} à {start.time}</p>
+                  <p className="first-letter:uppercase">{dayLabel(start.date)} à {start.time}</p>
                   <p>{formatPrice(service.price)}{service.price > 0 && service.taxable ? ' + taxes' : ''}</p>
                 </div>
               </div>
@@ -202,8 +203,7 @@ export default function BookingPage({ params }: { params: Promise<{ slug: string
                   <input required minLength={2} autoComplete="name" className={inputCls} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></label>
                 <label className="block text-sm"><span className="mb-1 block font-medium text-gray-700">Courriel *</span>
                   <input required type="email" autoComplete="email" className={inputCls} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></label>
-                <label className="block text-sm"><span className="mb-1 block font-medium text-gray-700">Téléphone</span>
-                  <input type="tel" autoComplete="tel" className={inputCls} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></label>
+                <PhoneField id="booking-phone" label="Téléphone" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
               </div>
               <label className="block text-sm"><span className="mb-1 block font-medium text-gray-700">Votre situation en quelques mots</span>
                 <textarea rows={3} maxLength={2000} className={inputCls} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></label>

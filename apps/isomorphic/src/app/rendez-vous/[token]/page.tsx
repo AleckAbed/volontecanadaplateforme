@@ -95,7 +95,7 @@ function ManageAppointment({ token }: { token: string }) {
           <span className={`mt-2 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${status.className}`}>{status.label}</span>
 
           <dl className="mt-4 space-y-2 text-sm">
-            <div><dt className="inline font-medium text-gray-700">Quand : </dt><dd className="inline capitalize">{a.local_label}</dd> <span className="text-xs text-gray-500">(heure de {tzCity(a.timezone)}, {a.duration_minutes} min)</span></div>
+            <div><dt className="inline font-medium text-gray-700">Quand : </dt><dd className="inline-block first-letter:uppercase">{a.local_label}</dd> <span className="text-xs text-gray-500">(heure de {tzCity(a.timezone)}, {a.duration_minutes} min)</span></div>
             <div><dt className="inline font-medium text-gray-700">Format : </dt><dd className="inline">{a.meeting_mode_label}{a.location ? ` — ${a.location}` : ''}</dd></div>
             <div><dt className="inline font-medium text-gray-700">Au nom de : </dt><dd className="inline">{a.name}</dd></div>
           </dl>

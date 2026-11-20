@@ -321,6 +321,8 @@ export function useAuth() {
     // Actions
     loginAdmin,
     verifyAdminTwoFactor,
+    /** Session déjà ouverte par l'API (activation du compte) : met l'état à jour et redirige. */
+    finishAdminLogin,
     loginClient,
     logout,
     loadUserProfile,

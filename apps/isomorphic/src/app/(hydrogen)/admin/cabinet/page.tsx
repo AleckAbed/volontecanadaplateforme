@@ -6,6 +6,7 @@ import { PiBuildingsDuotone, PiUploadSimpleBold, PiTrashDuotone } from 'react-ic
 import CabinetLogo from '@/components/cabinet-logo';
 import { cabinetProfileService, CabinetProfile } from '@/services/cabinet-profile';
 import { useCurrentAdmin } from '@/hooks/use-current-admin';
+import PhoneField from '@/components/ui/phone-field';
 
 const PRESETS = ['#2563eb', '#0f766e', '#7c3aed', '#b91c1c', '#c2410c', '#0f172a'];
 
@@ -98,11 +99,8 @@ export default function CabinetProfilePage() {
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 disabled:bg-gray-50" maxLength={120} />
           </label>
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block text-sm">
-              <span className="font-medium text-gray-700">Téléphone</span>
-              <input value={form.phone} disabled={!canEdit} onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 disabled:bg-gray-50" maxLength={40} />
-            </label>
+            <PhoneField id="cabinet-phone" label="Téléphone" value={form.phone} disabled={!canEdit}
+              onChange={(v) => setForm({ ...form, phone: v })} />
             <label className="block text-sm">
               <span className="font-medium text-gray-700">Site web</span>
               <input value={form.website} disabled={!canEdit} placeholder="https://" onChange={(e) => setForm({ ...form, website: e.target.value })}

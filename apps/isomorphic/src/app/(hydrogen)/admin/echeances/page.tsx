@@ -13,6 +13,7 @@ import {
 } from 'react-icons/pi';
 import { deadlinesService, DeadlineItem, DeadlinePayload, Urgency } from '@/services/actions';
 import { useCurrentAdmin } from '@/hooks/use-current-admin';
+import DateField from '@/components/ui/date-field';
 
 const GROUPS: { key: Urgency; label: string; tone: string }[] = [
   { key: 'overdue', label: 'En retard', tone: 'text-red-700' },
@@ -213,7 +214,7 @@ function DeadlineForm({ types, onClose, onSaved }: {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4" role="dialog" aria-modal="true" aria-labelledby="deadline-form-title">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-[6px] p-4" role="dialog" aria-modal="true" aria-labelledby="deadline-form-title">
       <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
           <h2 id="deadline-form-title" className="text-lg font-semibold text-gray-900">Nouvelle échéance</h2>
@@ -234,7 +235,7 @@ function DeadlineForm({ types, onClose, onSaved }: {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="dl-date" className="mb-1 block text-sm font-medium text-gray-700">Date</label>
-              <input id="dl-date" type="date" value={form.due_date} onChange={(e) => set('due_date', e.target.value)} required className={input} />
+              <DateField id="dl-date" value={form.due_date} onChange={(v) => set('due_date', v)} />
             </div>
             <div>
               <label htmlFor="dl-remind" className="mb-1 block text-sm font-medium text-gray-700">Rappel (jours avant)</label>

@@ -25,8 +25,12 @@ import {
   PiBuildings,
   PiBuildingOffice,
   PiCalendarPlus,
+  PiHouse,
+  PiHandshake,
+  PiPaperPlaneTilt,
 } from 'react-icons/pi';
 import { useCurrentAdmin } from '@/hooks/use-current-admin';
+import { isModuleOpen } from '@/lib/modules';
 
 /**
  * Menu admin actif (Helium layout).
@@ -47,7 +51,7 @@ export function useAdminMenuItems() {
 
   const items = [
     { name: t('menu.section_dashboard') },
-    { name: t('menu.dashboard'), href: '/', icon: <PiChartBar /> },
+    { name: t('menu.dashboard'), href: '/', icon: <PiHouse /> },
     { name: t('menu.analytics'), href: routes.analytics, icon: <PiChartBar /> },
     { name: t('menu.file_explorer'), href: '/file-manager', icon: <PiFile /> },
 
@@ -58,13 +62,13 @@ export function useAdminMenuItems() {
     { name: t('menu.deadlines'), href: '/admin/echeances', icon: <PiCalendarCheck /> },
     { name: t('menu.appointments'), href: '/admin/rendez-vous', icon: <PiCalendarPlus /> },
     { name: t('menu.invoices'), href: '/facturation', icon: <PiReceipt /> },
-    { name: t('menu.collaborators'), href: '/admin/collaborators', icon: <PiUsers /> },
+    { name: t('menu.collaborators'), href: '/admin/collaborators', icon: <PiHandshake /> },
 
     { name: t('menu.section_services') },
     { name: t('menu.immigration_services'), href: '/services-immigration', icon: <PiBriefcase /> },
 
     { name: t('menu.section_forms') },
-    { name: t('menu.envois'), href: routes.invitations.list, icon: <PiFileText /> },
+    { name: t('menu.envois'), href: routes.invitations.list, icon: <PiPaperPlaneTilt /> },
     { name: t('menu.document_templates'), href: routes.configuration.documents, icon: <PiFileText /> },
     ...(canManage
       ? [{
@@ -100,11 +104,13 @@ export function useAdminMenuItems() {
     { name: t('menu.settings_profile'), href: routes.forms.profileSettings, icon: <PiGear /> },
     { name: t('menu.tutorials'), href: '/tutoriels', icon: <PiBookOpen /> },
 
-    { name: 'Assistant' },
+    { name: t('menu.section_assistant') },
     { name: 'Volo — Assistant IA', href: '/assistant', icon: <PiSparkle />, target: '_blank' },
   ];
 
-  return items;
+  // Menus masqués par le propriétaire, puis titres de section restés vides.
+  const open = items.filter((item: any) => !item.href || isModuleOpen(admin?.modules, item.href));
+  return open.filter((item: any, i) => item.href || (open[i + 1] && (open[i + 1] as any).href));
 }
 
 export const adminMenuItems = [] as ReturnType<typeof useAdminMenuItems>;

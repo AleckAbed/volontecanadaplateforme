@@ -9,7 +9,7 @@ import cn from '@core/utils/class-names';
 import { PiCaretDownBold } from 'react-icons/pi';
 import { menuItems } from '@/layouts/helium/helium-menu-items';
 import { useAdminMenuItems } from '@/layouts/helium/admin-menu-items';
-import { clientMenuItems } from '@/layouts/helium/client-menu-items';
+import { useClientMenuItems } from '@/layouts/helium/client-menu-items';
 import { useAuth } from '@/hooks/useAuth';
 import StatusBadge from '@core/components/get-status-badge';
 
@@ -17,6 +17,7 @@ export function HeliumSidebarMenu() {
   const pathname = usePathname();
   const { userType } = useAuth();
   const adminMenuItems = useAdminMenuItems();
+  const clientMenuItems = useClientMenuItems();
 
   const currentMenuItems = useMemo(() => {
     if (userType === 'admin') {
@@ -25,7 +26,7 @@ export function HeliumSidebarMenu() {
       return clientMenuItems;
     }
     return adminMenuItems;
-  }, [userType, adminMenuItems]);
+  }, [userType, adminMenuItems, clientMenuItems]);
 
   return (
     <div className="mt-4 pb-3 3xl:mt-6">
@@ -88,7 +89,7 @@ export function HeliumSidebarMenu() {
                           href={dropdownItem?.href}
                           key={dropdownItem?.name + index}
                           className={cn(
-                            'group mx-3.5 mb-0.5 flex items-center justify-between rounded-md px-2.5 py-2 font-medium capitalize last-of-type:mb-1 lg:last-of-type:mb-2 2xl:mx-5 2xl:px-3.5',
+                            'group mx-3.5 mb-0.5 flex items-center justify-between rounded-md px-2.5 py-2 font-medium last-of-type:mb-1 lg:last-of-type:mb-2 2xl:mx-5 2xl:px-3.5',
                             isChildActive
                               ? 'text-gray-200 dark:text-gray-700'
                               : 'text-gray-400 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-500'
@@ -120,7 +121,7 @@ export function HeliumSidebarMenu() {
                     target={(item as any)?.target}
                     rel={(item as any)?.target === '_blank' ? 'noopener noreferrer' : undefined}
                     className={cn(
-                      'group relative mx-3 my-0.5 flex items-center justify-between rounded-md px-3 py-2 font-medium capitalize lg:my-1 2xl:mx-5 2xl:my-2',
+                      'group relative mx-3 my-0.5 flex items-center justify-between rounded-md px-3 py-2 font-medium lg:my-1 2xl:mx-5 2xl:my-2',
                       isActive
                         ? 'before:top-2/5 text-white before:absolute before:-start-3 before:block before:h-4/5 before:w-1 before:rounded-ee-md before:rounded-se-md before:bg-white dark:text-gray-900 2xl:before:-start-5'
                         : 'text-gray-300/70 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-500 dark:hover:text-gray-700'

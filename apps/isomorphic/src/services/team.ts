@@ -66,7 +66,39 @@ export interface AccessLinkInfo {
   name: string;
   email: string;
   cabinet_name: string | null;
+  /** Le cabinet exige la double authentification et la personne ne l'a pas encore. */
+  two_factor_required?: boolean;
+  has_two_factor?: boolean;
 }
+
+export interface TwoFactorActivationSetup {
+  method: 'totp' | 'email';
+  secret?: string;
+  otpauth_uri?: string;
+  email_hint?: string;
+}
+
+export interface ModuleAccessData {
+  modules: { key: string; label: string; href: string }[];
+  roles: { value: TeamRole; label: string; modules: Record<string, boolean> }[];
+  members: { id: number; name: string; role: TeamRole; role_label: string; overrides: Record<string, boolean>; effective: Record<string, boolean> }[];
+}
+
+/** Menus ouverts aux membres (réglés par le propriétaire, appliqués aussi par l'API). */
+export const moduleAccessService = {
+  async get(): Promise<ModuleAccessData> {
+    const res = await authFetch('/admin/team/module-access');
+    return res.data;
+  },
+  async saveRoles(roles: Record<string, Record<string, boolean>>): Promise<string> {
+    const res = await authFetch('/admin/team/module-access', { method: 'PUT', body: JSON.stringify({ roles }) });
+    return res.message;
+  },
+  async saveMember(id: number, overrides: Record<string, boolean>): Promise<string> {
+    const res = await authFetch(`/admin/team/${id}/module-access`, { method: 'PUT', body: JSON.stringify({ overrides }) });
+    return res.message;
+  },
+};
 
 export const accessService = {
   async forgotPassword(email: string): Promise<string> {
@@ -77,12 +109,16 @@ export const accessService = {
     const res = await publicFetch('/admin/access/check', { method: 'POST', body: JSON.stringify({ token }) });
     return res.data;
   },
-  async complete(token: string, password: string, password_confirmation: string): Promise<string> {
-    const res = await publicFetch('/admin/access/complete', {
+  async twoFactorSetup(token: string, method: 'totp' | 'email'): Promise<TwoFactorActivationSetup> {
+    const res = await publicFetch('/admin/access/two-factor/setup', { method: 'POST', body: JSON.stringify({ token, method }) });
+    return res.data;
+  },
+  /** Renvoie la réponse complète : la session peut être ouverte directement (data.logged_in). */
+  async complete(token: string, password: string, password_confirmation: string, two_factor_code?: string): Promise<any> {
+    return publicFetch('/admin/access/complete', {
       method: 'POST',
-      body: JSON.stringify({ token, password, password_confirmation }),
+      body: JSON.stringify({ token, password, password_confirmation, two_factor_code: two_factor_code || undefined }),
     });
-    return res.message;
   },
 };
 
@@ -158,6 +194,48 @@ export const platformService = {
   },
   async setActive(id: number, is_active: boolean): Promise<string> {
     const res = await publicFetch(`/platform/cabinets/${id}`, { method: 'PATCH', body: JSON.stringify({ is_active }) });
+    return res.message;
+  },
+  async cabinetRequests(status: CabinetRequestStatus | 'all' = 'pending'): Promise<{ items: CabinetRequestItem[]; pending: number }> {
+    const res = await publicFetch(`/platform/cabinet-requests?status=${status}`);
+    return { items: res.data, pending: res.meta?.pending ?? 0 };
+  },
+  async approveCabinetRequest(id: number, cabinet_name?: string): Promise<string> {
+    const res = await publicFetch(`/platform/cabinet-requests/${id}/approve`, { method: 'POST', body: JSON.stringify({ cabinet_name }) });
+    return res.message;
+  },
+  async declineCabinetRequest(id: number, reason: string, notify = true): Promise<string> {
+    const res = await publicFetch(`/platform/cabinet-requests/${id}/decline`, { method: 'POST', body: JSON.stringify({ reason, notify }) });
+    return res.message;
+  },
+};
+
+export type CabinetRequestStatus = 'pending' | 'approved' | 'declined';
+
+export interface CabinetRequestItem {
+  id: number;
+  cabinet_name: string;
+  province: string | null;
+  contact_name: string;
+  email: string;
+  phone: string | null;
+  team_size: string | null;
+  license_number: string | null;
+  message: string | null;
+  status: CabinetRequestStatus;
+  cabinet_id: number | null;
+  decline_reason: string | null;
+  decided_at: string | null;
+  created_at: string;
+}
+
+/** Demande d'ouverture de cabinet (publique). */
+export const cabinetRequestService = {
+  async submit(payload: {
+    cabinet_name: string; province: string; name: string; email: string; phone?: string;
+    team_size?: string; license_number?: string; message?: string; accept_terms: boolean; website?: string;
+  }): Promise<string> {
+    const res = await publicFetch('/cabinet-requests', { method: 'POST', body: JSON.stringify(payload) });
     return res.message;
   },
 };

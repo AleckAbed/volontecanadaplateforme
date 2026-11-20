@@ -19,6 +19,7 @@ import {
 } from 'react-icons/pi';
 import { collaboratorsService, Collaborator } from '@/services/collaborators';
 import TourButton from '@/components/TourButton';
+import PhoneField from '@/components/ui/phone-field';
 
 const COLLABORATORS_TOUR = [
   {
@@ -495,15 +496,7 @@ function CollaboratorFormModal({
                 </div>
               </Field>
               <Field label={t('collaborators.phone')}>
-                <div className="relative">
-                  <PiPhoneDuotone className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                  <input
-                    type="text"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 py-2 pl-9 pr-3 text-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                  />
-                </div>
+                <PhoneField id="collab-phone" value={phone} onChange={setPhone} />
               </Field>
             </div>
           </Section>

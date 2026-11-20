@@ -17,14 +17,21 @@ import {
   PiXBold,
 } from 'react-icons/pi';
 import { useTranslation } from 'react-i18next';
-import { pageLinks, searchPages } from './page-links.data';
+import { searchMenu } from './page-links.data';
+import { useAuth } from '@/hooks/useAuth';
+import { useAdminMenuItems } from '@/layouts/helium/admin-menu-items';
+import { useClientMenuItems } from '@/layouts/helium/client-menu-items';
 
 export default function SearchList({ onClose }: { onClose?: () => void }) {
   const { t } = useTranslation();
   const inputRef = useRef(null);
   const [searchText, setSearchText] = useState('');
 
-  const menuItemsFiltered = searchPages(searchText);
+  const { userType } = useAuth();
+  const adminItems = useAdminMenuItems();
+  const clientMenuItems = useClientMenuItems();
+  // Le menu de l'espace connecté : un client ne voit jamais les pages du cabinet.
+  const menuItemsFiltered = searchMenu(userType === 'client' ? clientMenuItems : adminItems, searchText);
 
   useEffect(() => {
     if (inputRef?.current) {
@@ -100,7 +107,7 @@ export default function SearchList({ onClose }: { onClose?: () => void }) {
                   </span>
 
                   <span className="ms-3 grid gap-0.5">
-                    <span className="font-medium capitalize text-gray-900 dark:text-gray-700">
+                    <span className="font-medium first-letter:uppercase text-gray-900 dark:text-gray-700">
                       {item.name}
                     </span>
                     <span className="text-gray-500">

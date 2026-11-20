@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslation } from 'react-i18next';
 import { PiHouse, PiUser } from 'react-icons/pi';
 
 type ClientMenuItem = {
@@ -8,10 +11,12 @@ type ClientMenuItem = {
   dropdownItems?: { name: string; href: string; badge?: string }[];
 };
 
-// Menu pour les Clients du Cabinet d'Immigration.
-// Seules les pages qui existent réellement sont listées (portail S4).
-export const clientMenuItems: ClientMenuItem[] = [
-  { name: 'Mon Espace' },
-  { name: 'Tableau de bord', href: '/', icon: <PiHouse /> },
-  { name: 'Mon profil', href: '/client/profil', icon: <PiUser /> },
-];
+// Menu des clients du cabinet : seules les pages qui existent réellement (portail S4).
+export function useClientMenuItems(): ClientMenuItem[] {
+  const { t } = useTranslation();
+  return [
+    { name: t('menu.client_section', 'Mon espace') },
+    { name: t('menu.client_dashboard', 'Tableau de bord'), href: '/', icon: <PiHouse /> },
+    { name: t('menu.client_profile', 'Mon profil'), href: '/client/profil', icon: <PiUser /> },
+  ];
+}
