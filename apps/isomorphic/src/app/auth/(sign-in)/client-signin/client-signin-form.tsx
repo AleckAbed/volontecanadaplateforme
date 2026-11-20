@@ -43,7 +43,7 @@ export default function ClientSignInForm() {
               size={isMedium ? 'lg' : 'xl'}
               label="Email"
               placeholder="Entrez votre email"
-              rounded="pill"
+              rounded="lg"
               className="[&>label>span]:font-medium"
               {...register('email')}
               error={errors.email?.message}
@@ -53,7 +53,7 @@ export default function ClientSignInForm() {
               label="Mot de passe"
               placeholder="Entrez votre mot de passe"
               size={isMedium ? 'lg' : 'xl'}
-              rounded="pill"
+              rounded="lg"
               className="[&>label>span]:font-medium"
               {...register('password')}
               error={errors.password?.message}
@@ -69,16 +69,16 @@ export default function ClientSignInForm() {
               />
               <Link
                 href="/client/mot-de-passe-oublie"
-                className="text-sm font-semibold text-blue underline transition-colors hover:text-gray-900 hover:no-underline"
+                className="text-sm font-semibold text-[var(--auth-accent)] underline transition-colors hover:text-gray-900 hover:no-underline"
               >
                 Mot de passe oublié ?
               </Link>
             </div>
             <Button
-              className="border-primary-light w-full border-2 text-base font-bold"
+              className="w-full !bg-[var(--auth-accent)] text-base font-bold hover:!bg-[var(--auth-accent-dark)]"
               type="submit"
               size={isMedium ? 'lg' : 'xl'}
-              rounded="pill"
+              rounded="lg"
               isLoading={isLoading}
               disabled={isLoading}
             >
@@ -87,15 +87,6 @@ export default function ClientSignInForm() {
           </div>
         )}
       </Form>
-      <Text className="mt-5 text-center text-[15px] leading-loose text-gray-500 lg:text-start">
-        Vous êtes administrateur ?{' '}
-        <Link
-          href="/auth/admin-signin"
-          className="font-semibold text-gray-700 transition-colors hover:text-blue"
-        >
-          Connexion Administrateur
-        </Link>
-      </Text>
     </>
   );
 }

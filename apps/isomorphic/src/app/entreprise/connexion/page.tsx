@@ -28,9 +28,8 @@ export default function CompanyLoginPage() {
 
   return (
     <AuthCard
-      eyebrow="Espace entreprise"
-      title="Connexion"
-      subtitle="Suivez les dossiers d’immigration de vos employés."
+      title={<>Bonjour !<br />Suivez vos employés.</>}
+      subtitle="Connectez-vous avec le courriel invité par votre cabinet."
       footer={<AuthLink href="/entreprise/mot-de-passe-oublie">Mot de passe oublié ?</AuthLink>}
     >
       <form onSubmit={submit} className="space-y-5">

@@ -9,7 +9,7 @@ export const metadata = {
 export default function AdminSignIn() {
   return (
     <AuthWrapperTwo 
-      title="Espace Administrateur" 
+      title={<>Bon retour !<br />Connectez-vous à votre cabinet.</>} 
       isSignIn 
       isSocialLoginActive={false}
     >

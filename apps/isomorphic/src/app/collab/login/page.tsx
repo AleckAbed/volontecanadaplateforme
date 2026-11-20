@@ -7,6 +7,7 @@ import { collabWorkspaceService } from '@/services/collaborators';
 import { setAuthToken } from '@/lib/auth-storage';
 import CodeStep from '@/components/auth/code-step';
 import AuthShell from '@/components/auth/auth-shell';
+import { inputClass, primaryButtonClass } from '@/components/auth/auth-card';
 
 export default function CollaboratorLoginPage() {
   const router = useRouter();
@@ -46,8 +47,8 @@ export default function CollaboratorLoginPage() {
 
   return (
     <AuthShell>
-      <div className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-6 shadow-xl shadow-blue-900/5 sm:p-8">
-        <h1 className="text-2xl font-bold text-gray-900">Espace collaborateur</h1>
+      <div>
+        <h1 className="text-3xl font-bold leading-tight text-gray-900 sm:text-[2.1rem]">Bonjour !<br />Vos dossiers assignés vous attendent.</h1>
         <p className="mt-2 text-sm text-gray-500">
           Connectez-vous pour accéder aux dossiers sur lesquels vous êtes assigné.
         </p>
@@ -74,30 +75,34 @@ export default function CollaboratorLoginPage() {
         ) : (
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Courriel</label>
+            <label htmlFor="collab-email" className="mb-1 block text-sm font-medium text-gray-700">Courriel</label>
             <input
+              id="collab-email"
               type="email"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               autoFocus
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className={inputClass}
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Mot de passe</label>
+            <label htmlFor="collab-password" className="mb-1 block text-sm font-medium text-gray-700">Mot de passe</label>
             <input
+              id="collab-password"
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className={inputClass}
             />
           </div>
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+            className={primaryButtonClass}
           >
             {submitting ? 'Connexion…' : 'Se connecter'}
           </button>

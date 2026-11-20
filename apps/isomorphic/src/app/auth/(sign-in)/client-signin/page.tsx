@@ -9,7 +9,7 @@ export const metadata = {
 export default function ClientSignIn() {
   return (
     <AuthWrapperTwo 
-      title="Espace Client" 
+      title={<>Bonjour !<br />Retrouvez votre dossier.</>} 
       isSignIn 
       isSocialLoginActive={false}
     >

@@ -64,12 +64,12 @@ export default function TwoFactorStep({ challenge, onCancel }: { challenge: TwoF
         autoFocus
         maxLength={useRecovery ? 9 : 6}
         size="xl"
-        rounded="pill"
+        rounded="lg"
         error={error ?? undefined}
         disabled={isLoading}
       />
 
-      <Button type="submit" size="xl" rounded="pill" className="w-full text-base font-bold" isLoading={isLoading} disabled={isLoading || !code.trim()}>
+      <Button type="submit" size="xl" rounded="lg" className="w-full !bg-[var(--auth-accent)] text-base font-bold hover:!bg-[var(--auth-accent-dark)]" isLoading={isLoading} disabled={isLoading || !code.trim()}>
         Vérifier
       </Button>
 
