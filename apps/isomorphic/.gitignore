@@ -53,3 +53,10 @@ next-env.d.ts
 tsconfig.tsbuildinfo
 # build de vérification (NEXT_DIST_DIR)
 /.next-verif/
+
+# Tests de bout en bout (Playwright)
+/.next-e2e/
+/.next-verif/
+/test-results/
+/playwright-report/
+/e2e/.auth/

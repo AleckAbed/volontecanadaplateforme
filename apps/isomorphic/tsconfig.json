@@ -2,7 +2,11 @@
   "compilerOptions": {
     "baseUrl": ".",
     "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -16,10 +20,18 @@
     "jsx": "preserve",
     "incremental": true,
     "paths": {
-      "@/*": ["src/*"],
-      "@public/*": ["public/*"],
-      "@shared/*": ["src/app/shared*"],
-      "@core/*": ["../../packages/isomorphic-core/src/*"]
+      "@/*": [
+        "src/*"
+      ],
+      "@public/*": [
+        "public/*"
+      ],
+      "@shared/*": [
+        "src/app/shared*"
+      ],
+      "@core/*": [
+        "../../packages/isomorphic-core/src/*"
+      ]
     },
     "plugins": [
       {
@@ -29,13 +41,16 @@
   },
   "extends": "typescript-config/nextjs.json",
   "include": [
-    "next-env.d.ts",
-    "additional.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
     "**/*.cjs",
     "**/*.mjs",
-    ".next/types/**/*.ts"
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "additional.d.ts",
+    "next-env.d.ts",
+    ".next-e2e/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }
