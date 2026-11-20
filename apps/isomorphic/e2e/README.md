@@ -20,9 +20,9 @@ Tout est séparé du développement :
 
 | | Développement | Tests de bout en bout |
 | --- | --- | --- |
-| API | port 8000, `api/.env` | port 8001, `api/.env.e2e` |
+| API | port 8000, `api/.env` | 127.0.0.1:8001, `api/.env.e2e` |
 | Base | MySQL `volont` | SQLite `api/database/e2e.sqlite`, remise à zéro à chaque lancement |
-| Front | port 3001, `.next` | port 3101, `.next-e2e` |
+| Front | port 3001, `.next` | 127.0.0.1:3101, `.next-e2e` |
 | Courriels | SMTP configuré | jamais envoyés (mailer `array`) |
 | Stripe, Google, Sentry | selon `.env` | désactivés |
 
@@ -35,5 +35,6 @@ Tout est séparé du développement :
 - `auth.setup.ts` : une connexion par rôle (propriétaire, adjoint, client, entreprise), enregistrée puis réutilisée.
 - `cabinet.spec.ts` : accueil, menu selon le rôle, entreprises clientes, mot de passe refusé.
 - `portails.spec.ts` : portail client, espace entreprise, réservation en ligne.
+- `securite.spec.ts` : en-têtes de sécurité du front et de l’API, visualiseur PDF toujours affichable.
 
 Pour un nouveau parcours : un fichier `*.spec.ts` dans `e2e/`, avec `test.use({ storageState: authState('owner') })` pour démarrer déjà connecté. Si le parcours a besoin de données, on les ajoute dans `E2eSeeder.php`.
