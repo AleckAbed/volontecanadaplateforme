@@ -60,7 +60,8 @@ test('R1 — un cabinet demande son ouverture (plus d’inscription libre)', asy
 test('R2 — chaque espace a sa page de connexion, et l’accueil demande le type de compte', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveURL(/\/connexion$/);
-  await expect(page.getByRole('heading', { name: 'Bienvenue. Qui êtes-vous ?' })).toBeVisible();
+  // Première compilation de la page en mode développement : délai plus long.
+  await expect(page.getByRole('heading', { name: 'Bienvenue. Qui êtes-vous ?' })).toBeVisible({ timeout: 60_000 });
 
   const spaces: [string, RegExp, string][] = [
     ['Je suis client', /\/auth\/client-signin/, 'client'],
@@ -96,7 +97,7 @@ test.describe.serial('Cabinet : propriétaire', () => {
   test('R8 — menu en casse française et « Accueil » traduit', async ({ page }) => {
     await page.goto('/');
     const menu = page.locator('aside, nav').first();
-    await expect(menu.getByRole('link', { name: 'Accueil' })).toBeVisible();
+    await expect(menu.locator('a', { hasText: 'Accueil' })).toBeVisible();
     await expect(menu.getByRole('link', { name: 'Rendez-vous' })).toBeVisible();
     await expect(menu.getByText('Rendez-Vous', { exact: true })).toHaveCount(0);
   });
