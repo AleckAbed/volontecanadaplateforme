@@ -1,0 +1,111 @@
+# Intégration continue du front : types, lint, compilation, audit, et parcours de bout en bout
+# (Playwright) contre l'API du dépôt VolontecanadaApi, branche du même nom si elle existe.
+name: Front
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  build:
+    name: Types, lint et compilation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.1.4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: TypeScript
+        working-directory: apps/isomorphic
+        run: npx tsc --noEmit
+      - name: Lint
+        working-directory: apps/isomorphic
+        run: npx next lint
+      - name: Compilation de production
+        working-directory: apps/isomorphic
+        run: npx next build
+
+  audit:
+    name: Audit des dépendances
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.1.4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      # Bloque sur une faille critique ; les alertes moindres (dépendances indirectes) sont suivies à part.
+      - run: pnpm audit --audit-level=critical
+
+  e2e:
+    name: Parcours de bout en bout (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: isomorphic
+      - name: Branche de l'API correspondante
+        id: api-ref
+        run: |
+          branch="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+          if git ls-remote --exit-code --heads https://github.com/AleckAbed/VolontecanadaApi.git "$branch" >/dev/null; then
+            echo "ref=$branch" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=master" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        with:
+          repository: AleckAbed/VolontecanadaApi
+          ref: ${{ steps.api-ref.outputs.ref }}
+          path: api
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo_sqlite, sqlite3, zip, intl, openssl
+          coverage: none
+      - name: Dépendances de l'API
+        working-directory: api
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.1.4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: isomorphic/pnpm-lock.yaml
+      - name: Dépendances du front
+        working-directory: isomorphic
+        run: pnpm install --frozen-lockfile
+      - name: Navigateur Chromium
+        working-directory: isomorphic/apps/isomorphic
+        run: npx playwright install --with-deps chromium
+      - name: Parcours
+        working-directory: isomorphic/apps/isomorphic
+        env:
+          CI: 'true'
+        run: npx playwright test
+      - name: Rapport en cas d'échec
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapport-playwright
+          path: |
+            isomorphic/apps/isomorphic/playwright-report
+            isomorphic/apps/isomorphic/test-results
+          retention-days: 7
