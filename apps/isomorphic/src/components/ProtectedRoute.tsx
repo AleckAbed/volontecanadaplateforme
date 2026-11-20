@@ -84,15 +84,18 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (hasRedirected.current) return;
 
     const path = window.location.pathname || pathname || '';
 
-    // 1. Routes publiques (formulaires client, signin, etc.) — pas de check
+    // 1. Routes publiques (formulaires client, signin, choix de l'espace…) — pas de check.
+    // Avant le garde « déjà redirigé » : après une redirection vers une page publique
+    // (ex. /connexion), la page doit s'afficher au lieu de rester en chargement.
     if (isPublicPath(path)) {
+      hasRedirected.current = false;
       setIsChecking(false);
       return;
     }
+    if (hasRedirected.current) return;
 
     let userType: string | null = null;
     try { userType = localStorage.getItem('user_type'); } catch {}
