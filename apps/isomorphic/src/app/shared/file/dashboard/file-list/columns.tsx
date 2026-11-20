@@ -47,7 +47,7 @@ export const fileListColumns = [
     header: 'Type',
     enableSorting: false,
     cell: (info) => (
-      <Text className="capitalize text-gray-500">{info.getValue()}</Text>
+      <Text className="first-letter:uppercase text-gray-500">{info.getValue()}</Text>
     ),
   }),
   columnHelper.accessor('modified', {

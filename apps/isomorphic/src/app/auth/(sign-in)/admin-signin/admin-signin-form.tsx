@@ -108,7 +108,7 @@ export default function AdminSignInForm() {
           href="/auth/inscription"
           className="font-semibold text-gray-700 transition-colors hover:text-blue"
         >
-          Créer votre espace
+          Demander l’ouverture
         </Link>
       </Text>
       <Text className="mt-1 text-center text-[15px] leading-loose text-gray-500 lg:text-start xl:text-base">

@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { PiListMagnifyingGlassDuotone } from 'react-icons/pi';
 import { auditService, AuditPage, AuditFilters, AuditItem } from '@/services/security';
+import DateField from '@/components/ui/date-field';
 
 const FILTER_KEYS = ['action', 'subject_type', 'actor', 'dossier_id', 'client_id', 'from', 'to', 'page'] as const;
 
@@ -74,10 +75,10 @@ function Journal() {
         <Select label="Élément" value={filters.subject_type ?? ''} onChange={(v) => setFilter('subject_type', v)}
           options={[['', 'Tous'], ...Object.entries(data?.subjects ?? {})]} />
         <label className="text-sm text-gray-700">Du
-          <input type="date" value={filters.from ?? ''} onChange={(e) => setFilter('from', e.target.value)} className="mt-1 block w-full rounded-lg border border-gray-300 px-2 py-1.5" />
+          <DateField id="journal-from" value={filters.from ?? ''} onChange={(v) => setFilter('from', v)} />
         </label>
         <label className="text-sm text-gray-700">Au
-          <input type="date" value={filters.to ?? ''} onChange={(e) => setFilter('to', e.target.value)} className="mt-1 block w-full rounded-lg border border-gray-300 px-2 py-1.5" />
+          <DateField id="journal-to" value={filters.to ?? ''} onChange={(v) => setFilter('to', v)} />
         </label>
       </div>
 

@@ -74,7 +74,7 @@ export default function AppointmentsTab() {
             return (
               <li key={a.id} className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
-                  <p className="font-semibold capitalize text-gray-900">{a.local_label}</p>
+                  <p className="font-semibold first-letter:uppercase text-gray-900">{a.local_label}</p>
                   <p className="text-sm text-gray-700">
                     {a.client_id ? <Link href={`/admin/clients/${a.client_id}`} className="text-blue-700 hover:underline">{a.name}</Link> : a.name}
                     {' · '}{a.service ?? 'Rendez-vous'}{a.host ? ` · avec ${a.host}` : ''}
@@ -125,7 +125,7 @@ export default function AppointmentsTab() {
 
 function Dialog({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-label={title}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-[6px] p-4" role="dialog" aria-modal="true" aria-label={title}>
       <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-5 shadow-xl">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-base font-semibold text-gray-900">{title}</h2>
@@ -152,7 +152,7 @@ function MoveDialog({ appointment, onClose, onDone }: { appointment: AdminAppoin
   };
   return (
     <Dialog title={`Déplacer le rendez-vous de ${appointment.name}`} onClose={onClose}>
-      <p className="mb-3 text-sm text-gray-600">Actuellement : <span className="capitalize">{appointment.local_label}</span>. Le client recevra une nouvelle invitation par courriel.</p>
+      <p className="mb-3 text-sm text-gray-600">Actuellement : <span className="inline-block first-letter:uppercase">{appointment.local_label}</span>. Le client recevra une nouvelle invitation par courriel.</p>
       <SlotPicker load={(from) => bookingAdminService.rescheduleSlots(appointment.id, from)} current={appointment.starts_at} onPick={move} busy={busy} />
     </Dialog>
   );
@@ -188,7 +188,7 @@ function FollowUpDialog({ appointment, past, onClose, onDone }: { appointment: A
   return (
     <Dialog title={`Suivi du rendez-vous de ${appointment.name}`} onClose={onClose}>
       <div className="space-y-4 text-sm">
-        <p className="capitalize text-gray-600">{appointment.local_label} · {appointment.service ?? 'Rendez-vous'}</p>
+        <p className="first-letter:uppercase text-gray-600">{appointment.local_label} · {appointment.service ?? 'Rendez-vous'}</p>
         {past && (
           <fieldset>
             <legend className="font-medium text-gray-700">Le rendez-vous</legend>

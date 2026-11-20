@@ -236,3 +236,57 @@ export function searchPages(query: string): PageLink[] {
   }
   return result;
 }
+
+// ─── Recherche dans le menu réel de la personne connectée ─────────────────────
+// La recherche ne propose que les entrées du menu affiché (rôle, droits, langue) :
+// jamais une page que la personne ne voit pas dans sa barre latérale.
+
+export interface SearchMenuItem {
+  name: string;
+  href?: string;
+  dropdownItems?: { name: string; href: string }[];
+}
+
+/** Mots-clés (synonymes fr/en/es) par adresse, repris de l'index historique. */
+const keywordsByHref: Record<string, string[]> = Object.fromEntries(
+  pageLinks.filter((p) => p.href).map((p) => [p.href as string, [p.name, ...(p.keywords ?? [])]])
+);
+
+export function searchMenu(items: SearchMenuItem[], query: string): PageLink[] {
+  const links: PageLink[] = [];
+  let section = '';
+  for (const item of items) {
+    if (!item.href && !item.dropdownItems?.length) {
+      section = item.name;
+      continue;
+    }
+    const entries = item.dropdownItems?.length
+      ? item.dropdownItems.map((d) => ({ name: `${item.name} · ${d.name}`, href: d.href }))
+      : [{ name: item.name, href: item.href as string }];
+    for (const e of entries) {
+      if (!e.href || e.href === '#') continue;
+      links.push({ name: e.name, href: e.href, section, keywords: keywordsByHref[e.href] ?? [] });
+    }
+  }
+
+  const q = normalize(query);
+  const tokens = q.split(/\s+/).filter(Boolean);
+  const matches = tokens.length === 0
+    ? links
+    : links.filter((p) => {
+        const haystack = normalize([p.name, p.section ?? '', (p.keywords ?? []).join(' ')].join(' '));
+        return tokens.every((t) => haystack.includes(t));
+      });
+
+  const result: PageLink[] = [];
+  const seen = new Set<string>();
+  for (const m of matches) {
+    const sec = m.section ?? '';
+    if (sec && !seen.has(sec)) {
+      result.push({ name: sec });
+      seen.add(sec);
+    }
+    result.push(m);
+  }
+  return result;
+}

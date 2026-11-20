@@ -688,7 +688,7 @@ function AddBaseDocumentModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-900/40 backdrop-blur-[6px] p-4">
       <div className="w-full max-w-lg rounded-xl bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
           <h3 className="text-lg font-semibold text-gray-900">Ajouter un document d&apos;immigration IRCC</h3>
@@ -840,7 +840,7 @@ function PdfPreviewModal({
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex bg-black/50 ${
+      className={`fixed inset-0 z-[9999] flex bg-gray-900/40 backdrop-blur-[6px] ${
         fullscreen ? 'p-0 items-stretch justify-stretch' : 'items-center justify-center p-4'
       }`}
     >
@@ -1200,7 +1200,7 @@ function ExportZipModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-900/40 backdrop-blur-[6px] p-4">
       <div className="flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-gray-200 bg-gradient-to-r from-purple-600 to-indigo-600 px-5 py-4 text-white">
           <div className="flex items-center gap-2">

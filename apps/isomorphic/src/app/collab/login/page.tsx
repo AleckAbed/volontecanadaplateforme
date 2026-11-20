@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { collabWorkspaceService } from '@/services/collaborators';
 import { setAuthToken } from '@/lib/auth-storage';
 import CodeStep from '@/components/auth/code-step';
+import AuthShell from '@/components/auth/auth-shell';
 
 export default function CollaboratorLoginPage() {
   const router = useRouter();
@@ -44,10 +45,10 @@ export default function CollaboratorLoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-sm">
-        <h1 className="mt-2 text-center text-2xl font-bold text-gray-900">Espace collaborateur</h1>
-        <p className="mt-2 text-center text-sm text-gray-500">
+    <AuthShell>
+      <div className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-6 shadow-xl shadow-blue-900/5 sm:p-8">
+        <h1 className="text-2xl font-bold text-gray-900">Espace collaborateur</h1>
+        <p className="mt-2 text-sm text-gray-500">
           Connectez-vous pour accéder aux dossiers sur lesquels vous êtes assigné.
         </p>
 
@@ -107,6 +108,6 @@ export default function CollaboratorLoginPage() {
           Pas de compte ? Contactez l&apos;administrateur.
         </p>
       </div>
-    </div>
+    </AuthShell>
   );
 }

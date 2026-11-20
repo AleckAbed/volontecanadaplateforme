@@ -5,7 +5,9 @@ import { useAtom } from 'jotai';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ActionIcon, Input, Title, Text, Password } from 'rizzui';
+import { ActionIcon, Input, Title, Text } from 'rizzui';
+import PhoneField from '@/components/ui/phone-field';
+import DateField from '@/components/ui/date-field';
 import { PiXBold } from 'react-icons/pi';
 import { Controller } from 'react-hook-form';
 import { useModal } from '@/app/shared/modal-views/use-modal';
@@ -28,8 +30,8 @@ const demandeurSchema = z.object({
   first_name: z.string().min(1, { message: messages.firstNameRequired }),
   last_name: z.string().min(1, { message: messages.lastNameRequired }),
   email: validateEmail,
-  // Facultatif : sans mot de passe, le cabinet envoie plutôt un lien « Inviter au portail ».
-  password: z.union([z.literal(''), z.string().min(8, { message: 'Au moins 8 caractères.' })]).optional(),
+  // Pas de mot de passe ici : le client le choisit lui-même via l'invitation au portail.
+  preferred_locale: z.enum(['fr', 'en', 'es']),
   phone: z.string().optional(),
   date_of_birth: z.string().optional(),
   nationality: z.string().optional(),
@@ -46,7 +48,7 @@ function buildPayload(data: ClientFormDataType) {
     first_name: data.first_name,
     last_name: data.last_name,
     email: data.email,
-    password: data.password,
+    preferred_locale: data.preferred_locale || 'fr',
     phone: data.phone || undefined,
     date_of_birth: data.date_of_birth || undefined,
     nationality: data.nationality || undefined,
@@ -98,7 +100,7 @@ export default function StepDemandeur() {
       first_name: formData.first_name,
       last_name: formData.last_name,
       email: formData.email,
-      password: formData.password || '',
+      preferred_locale: formData.preferred_locale || 'fr',
       phone: formData.phone,
       date_of_birth: formData.date_of_birth,
       nationality: formData.nationality,
@@ -115,7 +117,7 @@ export default function StepDemandeur() {
       first_name: data.first_name,
       last_name: data.last_name,
       email: data.email,
-      password: data.password,
+      preferred_locale: data.preferred_locale,
       phone: data.phone ?? '',
       date_of_birth: data.date_of_birth ?? '',
       nationality: data.nationality ?? '',
@@ -187,22 +189,28 @@ export default function StepDemandeur() {
           className="md:col-span-2"
           error={errors.email?.message}
         />
-        <Password
-          label={t('clients.create_modal.password')}
-          placeholder={t('clients.create_modal.password_hint')}
-          {...register('password')}
-          error={errors.password?.message}
+        <div>
+          <label htmlFor="preferred_locale" className="mb-1.5 block text-sm font-medium text-gray-700">{t('clients.fields.preferred_locale')}</label>
+          <select id="preferred_locale" {...register('preferred_locale')} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
+            <option value="fr">Français</option>
+            <option value="en">English</option>
+            <option value="es">Español</option>
+          </select>
+          <p className="mt-1 text-xs text-gray-500">{t('clients.fields.preferred_locale_hint')}</p>
+        </div>
+        <Controller
+          name="phone"
+          control={control}
+          render={({ field: { value, onChange } }) => (
+            <PhoneField id="client-phone" label={t('clients.fields.phone')} value={value} onChange={onChange} error={errors.phone?.message} />
+          )}
         />
-        <Input
-          label={t('clients.fields.phone')}
-          placeholder={t('clients.create_modal.phone_placeholder')}
-          {...register('phone')}
-          error={errors.phone?.message}
-        />
-        <Input
-          label={t('clients.fields.birth_date')}
-          type="date"
-          {...register('date_of_birth')}
+        <Controller
+          name="date_of_birth"
+          control={control}
+          render={({ field: { value, onChange } }) => (
+            <DateField id="client-birth-date" label={t('clients.fields.birth_date')} value={value} onChange={onChange} />
+          )}
         />
         <div>
           <label className="mb-1.5 block text-sm font-medium text-gray-700">{t('clients.fields.nationality')}</label>

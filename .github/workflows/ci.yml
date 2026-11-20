@@ -27,15 +27,16 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: TypeScript
+      # La compilation d'abord : elle génère next-env.d.ts (types des images), absent du dépôt.
+      - name: Compilation de production
+        working-directory: apps/isomorphic
+        run: npx next build
+      - name: TypeScript (y compris les tests Playwright)
         working-directory: apps/isomorphic
         run: npx tsc --noEmit
       - name: Lint
         working-directory: apps/isomorphic
         run: npx next lint
-      - name: Compilation de production
-        working-directory: apps/isomorphic
-        run: npx next build
 
   audit:
     name: Audit des dépendances

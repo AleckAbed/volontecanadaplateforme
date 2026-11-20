@@ -24,7 +24,7 @@ export type ClientFormDataType = {
   first_name: string;
   last_name: string;
   email: string;
-  password: string;
+  preferred_locale: 'fr' | 'en' | 'es';
   phone: string;
   date_of_birth: string;
   nationality: string;
@@ -40,7 +40,7 @@ export const initialClientFormData: ClientFormDataType = {
   first_name: '',
   last_name: '',
   email: '',
-  password: '',
+  preferred_locale: 'fr',
   phone: '',
   date_of_birth: '',
   nationality: '',

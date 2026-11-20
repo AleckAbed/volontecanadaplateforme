@@ -33,7 +33,7 @@ export default function PlatformLoginPage() {
   };
 
   return (
-    <AuthCard eyebrow="Éditeur de la plateforme" title="Console plateforme" subtitle="Accès réservé à l'équipe de l'éditeur.">
+    <AuthCard spaces={false} eyebrow="Éditeur de la plateforme" title="Console plateforme" subtitle="Accès réservé à l'équipe de l'éditeur.">
       {challenge ? (
         <CodeStep
           hint="Entrez le code à 6 chiffres de votre application d’authentification."

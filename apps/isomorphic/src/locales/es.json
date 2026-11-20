@@ -98,6 +98,7 @@
     "confirm_delete": "¿Estás seguro de eliminar este elemento?"
   },
   "menu": {
+    "section_assistant": "Asistente",
     "section_dashboard": "Panel",
     "section_clients": "Gestión de clientes",
     "section_agenda": "Agenda y citas",
@@ -105,7 +106,7 @@
     "section_forms": "Formularios y documentos",
     "section_communication": "Comunicación",
     "section_admin": "Administración",
-    "dashboard": "Panel",
+    "dashboard": "Inicio",
     "analytics": "Estadísticas",
     "clients": "Clientes",
     "companies": "Empresas",
@@ -145,7 +146,10 @@
     "deadlines": "Plazos",
     "invoices": "Facturación",
     "billing": "Suscripción y pagos",
-    "compliance": "Cumplimiento y datos"
+    "compliance": "Cumplimiento y datos",
+    "client_section": "Mi espacio",
+    "client_dashboard": "Panel",
+    "client_profile": "Mi perfil"
   },
   "header": {
     "lock_session": "Bloquear sesión",
@@ -196,6 +200,8 @@
     "edit_title": "Editar cliente",
     "details_title": "Ficha del cliente",
     "fields": {
+      "preferred_locale": "Idioma de comunicación",
+      "preferred_locale_hint": "Sus correos y su espacio de cliente estarán en este idioma.",
       "first_name": "Nombre",
       "last_name": "Apellido",
       "email": "Correo",
@@ -817,5 +823,16 @@
     "hide_password": "Ocultar contraseña",
     "anonymous": "Anónimo",
     "admin_fallback": "Admin"
+  },
+  "auth_shell": {
+    "headline": "La plataforma de los despachos de inmigración",
+    "point_files": "Expedientes, formularios del IRCC y plazos en un solo lugar",
+    "point_portal": "Un portal seguro para sus clientes y sus documentos",
+    "point_canada": "Datos alojados en Canadá, autenticación en dos pasos",
+    "spaces": "Espacios",
+    "space_firm": "Despacho",
+    "space_client": "Cliente",
+    "space_company": "Empresa",
+    "space_collaborator": "Colaborador"
   }
 }

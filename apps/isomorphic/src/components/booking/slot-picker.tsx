@@ -68,7 +68,7 @@ export default function SlotPicker({
       <div className="space-y-3">
         {days.map((day) => (
           <div key={day}>
-            <p className="mb-1.5 text-sm font-medium capitalize text-gray-800">{dayLabel(day)}</p>
+            <p className="mb-1.5 text-sm font-medium first-letter:uppercase text-gray-800">{dayLabel(day)}</p>
             <div className="flex flex-wrap gap-2">
               {data!.slots.filter((s) => s.date === day).map((s) => {
                 const isCurrent = current && new Date(current).getTime() === new Date(s.start).getTime();

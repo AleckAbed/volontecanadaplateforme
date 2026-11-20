@@ -164,7 +164,7 @@ export default function QuestionnaireDetailsPage() {
               
               return (
                 <div key={key} className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-                  <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 capitalize">
+                  <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 first-letter:uppercase">
                     {key.replace(/_/g, ' ')}
                   </p>
                   <p className="mt-1 text-sm text-gray-900 dark:text-white">
@@ -187,7 +187,7 @@ export default function QuestionnaireDetailsPage() {
           
           return (
             <div key={key} className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 capitalize">
+              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 first-letter:uppercase">
                 {key.replace(/_/g, ' ')}
               </p>
               <p className="mt-1 text-sm text-gray-900 dark:text-white">

@@ -290,7 +290,7 @@ export default function EnvoiDetailsPage({ params }: { params: Promise<{ id: str
       {/* PDF viewer modal */}
       {viewingItem && pdfPromise && (
         <div
-          className={`fixed inset-0 z-[9999] flex bg-black/50 ${
+          className={`fixed inset-0 z-[9999] flex bg-gray-900/40 backdrop-blur-[6px] ${
             fullscreen ? 'p-0 items-stretch justify-stretch' : 'items-center justify-center p-4'
           }`}
         >
@@ -334,7 +334,7 @@ export default function EnvoiDetailsPage({ params }: { params: Promise<{ id: str
       {/* Form responses preview modal */}
       {viewingFormItem && (
         <div
-          className={`fixed inset-0 z-[9999] flex bg-black/50 ${
+          className={`fixed inset-0 z-[9999] flex bg-gray-900/40 backdrop-blur-[6px] ${
             formFullscreen ? 'p-0 items-stretch justify-stretch' : 'items-center justify-center p-4'
           }`}
         >

@@ -9,6 +9,7 @@ import { authFetch } from '@/lib/api-client';
 import { companyService, CompanyDetail, CompanyRequestItem, REQUEST_STATUS } from '@/services/companies';
 import { formatMoney, INVOICE_STATUS } from '@/services/billing';
 import { useCurrentAdmin } from '@/hooks/use-current-admin';
+import PhoneField from '@/components/ui/phone-field';
 
 const input = 'mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm';
 const card = 'rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5';
@@ -298,7 +299,9 @@ function CompanyInfo({ data, onSaved }: { data: CompanyDetail; onSaved: () => vo
       </div>
       {editing ? (
         <div className="mt-2 space-y-2">
-          {fields.map(([k, label]) => (
+          {fields.map(([k, label]) => k === 'phone' ? (
+            <PhoneField key={k} id="company-edit-phone" label={label} value={(form[k] as string) ?? ''} onChange={(v) => setForm({ ...form, phone: v })} />
+          ) : (
             <label key={k} className="block text-sm text-gray-700">{label}
               <input value={(form[k] as string) ?? ''} onChange={(e) => setForm({ ...form, [k]: e.target.value })} className={input} />
             </label>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState, use, useId, isValidElement, cloneElement } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import {
@@ -13,6 +13,8 @@ import { useTranslation } from 'react-i18next';
 import { apiService } from '@/services/api';
 import CountrySelect from '@/app/shared/client-form/country-select';
 import CanadaAddressInput from '@/components/CanadaAddressInput';
+import PhoneField from '@/components/ui/phone-field';
+import DateField from '@/components/ui/date-field';
 
 interface FamilyMemberInput {
   id?: number; // existing
@@ -33,6 +35,7 @@ interface ClientForm {
   first_name: string;
   last_name: string;
   email: string;
+  preferred_locale: 'fr' | 'en' | 'es';
   phone: string;
   date_of_birth: string;
   nationality: string;
@@ -57,6 +60,7 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
     first_name: '',
     last_name: '',
     email: '',
+    preferred_locale: 'fr',
     phone: '',
     date_of_birth: '',
     nationality: '',
@@ -79,6 +83,7 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
             first_name: c.first_name || '',
             last_name: c.last_name || '',
             email: c.email || '',
+            preferred_locale: (['fr', 'en', 'es'].includes(c.preferred_locale) ? c.preferred_locale : 'fr'),
             phone: c.phone || '',
             date_of_birth: c.date_of_birth || '',
             nationality: c.nationality || '',
@@ -143,6 +148,7 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
         first_name: form.first_name.trim(),
         last_name: form.last_name.trim(),
         email: form.email.trim(),
+        preferred_locale: form.preferred_locale,
         phone: form.phone.trim() || null,
         date_of_birth: form.date_of_birth || null,
         nationality: form.nationality.trim() || null,
@@ -243,22 +249,19 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
                 required
               />
             </Field>
-            <Field label={t('clients.fields.phone')}>
-              <input
-                type="text"
-                value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+            <Field label={t('clients.fields.preferred_locale')}>
+              <select
+                value={form.preferred_locale}
+                onChange={(e) => setForm({ ...form, preferred_locale: e.target.value as ClientForm['preferred_locale'] })}
                 className="input"
-              />
+              >
+                <option value="fr">Français</option>
+                <option value="en">English</option>
+                <option value="es">Español</option>
+              </select>
             </Field>
-            <Field label={t('clients.fields.birth_date')}>
-              <input
-                type="date"
-                value={form.date_of_birth}
-                onChange={(e) => setForm({ ...form, date_of_birth: e.target.value })}
-                className="input"
-              />
-            </Field>
+            <PhoneField id="edit-phone" label={t('clients.fields.phone')} value={form.phone} onChange={(v) => setForm((f) => ({ ...f, phone: v }))} />
+            <DateField id="edit-birth-date" label={t('clients.fields.birth_date')} value={form.date_of_birth} onChange={(v) => setForm((f) => ({ ...f, date_of_birth: v }))} />
             <Field label={t('clients.fields.nationality')}>
               <CountrySelect
                 value={form.nationality}
@@ -408,13 +411,7 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
                           <option key={k} value={k}>{t(`clients.relationship.${k}`)}</option>
                         ))}
                       </select>
-                      <input
-                        type="date"
-                        placeholder={t('clients.fields.birth_date')}
-                        value={m.date_of_birth || ''}
-                        onChange={(e) => updateMember(idx, { date_of_birth: e.target.value })}
-                        className="input-sm"
-                      />
+                      <DateField id={`member-${idx}-birth`} value={m.date_of_birth || ''} onChange={(v) => updateMember(idx, { date_of_birth: v })} />
                       <input
                         type="email"
                         placeholder={t('clients.email_member_placeholder')}
@@ -422,13 +419,7 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
                         onChange={(e) => updateMember(idx, { email: e.target.value })}
                         className="input-sm"
                       />
-                      <input
-                        type="text"
-                        placeholder={t('clients.fields.phone')}
-                        value={m.phone || ''}
-                        onChange={(e) => updateMember(idx, { phone: e.target.value })}
-                        className="input-sm"
-                      />
+                      <PhoneField id={`member-${idx}-phone`} value={m.phone || ''} onChange={(v) => updateMember(idx, { phone: v })} />
                       <div>
                         <label className="mb-0.5 block text-[11px] uppercase text-gray-500">{t('clients.fields.nationality')}</label>
                         <CountrySelect
@@ -516,10 +507,14 @@ export default function EditClientPage({ params }: { params: Promise<{ id: strin
 function Field({
   label, children, className = '',
 }: { label: string; children: React.ReactNode; className?: string }) {
+  // Relie le libellé au champ (lecteurs d'écran, clic sur le libellé, tests).
+  const autoId = useId();
+  const child = isValidElement<{ id?: string }>(children) ? children : null;
+  const id = child?.props.id ?? autoId;
   return (
     <div className={className}>
-      <label className="mb-1 block text-sm font-medium text-gray-700">{label}</label>
-      {children}
+      <label htmlFor={id} className="mb-1 block text-sm font-medium text-gray-700">{label}</label>
+      {child ? cloneElement(child, { id }) : children}
     </div>
   );
 }

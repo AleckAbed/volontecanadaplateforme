@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { PiBuildingOfficeDuotone, PiSignOutBold, PiUserPlusBold } from 'react-icons/pi';
 import { companyPortalService, CompanyPortal, REQUEST_STATUS } from '@/services/companies';
 import { formatMoney, INVOICE_STATUS, InvoiceStatus } from '@/services/billing';
+import PhoneField from '@/components/ui/phone-field';
 
 const ITEM_STATUS: Record<string, string> = {
   pending: 'À faire',
@@ -211,7 +212,7 @@ function RequestForm({ onSent }: { onSent: () => void }) {
       <label className="text-sm text-gray-700">Prénom<input required value={form.first_name} onChange={(e) => setForm({ ...form, first_name: e.target.value })} className={input} /></label>
       <label className="text-sm text-gray-700">Nom<input required value={form.last_name} onChange={(e) => setForm({ ...form, last_name: e.target.value })} className={input} /></label>
       <label className="text-sm text-gray-700">Courriel de l’employé<input required type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={input} /></label>
-      <label className="text-sm text-gray-700">Téléphone<input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={input} /></label>
+      <PhoneField id="employee-phone" label="Téléphone" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
       <label className="text-sm text-gray-700">Poste<input value={form.job_title} onChange={(e) => setForm({ ...form, job_title: e.target.value })} className={input} /></label>
       <label className="text-sm text-gray-700">Démarche souhaitée<input value={form.request_type} onChange={(e) => setForm({ ...form, request_type: e.target.value })} placeholder="Ex. permis de travail, résidence permanente" className={input} /></label>
       <label className="inline-flex items-center gap-2 text-sm text-gray-700 sm:col-span-2"><input type="checkbox" checked={form.with_family} onChange={(e) => setForm({ ...form, with_family: e.target.checked })} /> La famille de l’employé est aussi concernée</label>

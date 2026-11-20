@@ -126,7 +126,7 @@ function renderOptionDisplayValue(value: string) {
       return (
         <div className="flex items-center">
           <Badge color="success" renderAsDot />
-          <Text className="ms-2 font-medium capitalize text-green-dark">
+          <Text className="ms-2 font-medium first-letter:uppercase text-green-dark">
             Actif
           </Text>
         </div>
@@ -135,7 +135,7 @@ function renderOptionDisplayValue(value: string) {
       return (
         <div className="flex items-center">
           <Badge color="danger" renderAsDot />
-          <Text className="ms-2 font-medium capitalize text-red-dark">
+          <Text className="ms-2 font-medium first-letter:uppercase text-red-dark">
             Inactif
           </Text>
         </div>
@@ -144,7 +144,7 @@ function renderOptionDisplayValue(value: string) {
       return (
         <div className="flex items-center">
           <Badge renderAsDot className="bg-orange-dark" />
-          <Text className="ms-2 font-medium capitalize text-orange-dark">
+          <Text className="ms-2 font-medium first-letter:uppercase text-orange-dark">
             En attente
           </Text>
         </div>

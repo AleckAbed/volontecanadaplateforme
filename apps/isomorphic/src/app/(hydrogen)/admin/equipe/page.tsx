@@ -19,6 +19,7 @@ import {
   ROLE_DESCRIPTIONS,
 } from '@/services/team';
 import { twoFactorService } from '@/services/security';
+import ModuleAccessPanel from './module-access-panel';
 
 const ROLES: TeamRole[] = ['owner', 'admin', 'advisor', 'assistant'];
 
@@ -224,6 +225,8 @@ export default function TeamPage() {
 
       <RolesLegend />
 
+      <ModuleAccessPanel />
+
       {showInvite && (
         <InviteModal
           canAssignOwner={canAssignOwner}
@@ -280,7 +283,7 @@ function InviteModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4" role="dialog" aria-modal="true" aria-labelledby="invite-title">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-[6px] p-4" role="dialog" aria-modal="true" aria-labelledby="invite-title">
       <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
           <h2 id="invite-title" className="text-lg font-semibold text-gray-900">Inviter un membre</h2>

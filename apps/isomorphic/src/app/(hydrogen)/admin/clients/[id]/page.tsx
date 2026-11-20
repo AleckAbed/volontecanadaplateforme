@@ -54,6 +54,9 @@ interface ClientDetail {
   first_name: string;
   last_name: string;
   email: string;
+  /** active : le client a créé son espace ; invited : invitation envoyée, pas encore activée. */
+  portal_status?: 'active' | 'invited' | 'none';
+  preferred_locale?: 'fr' | 'en' | 'es';
   phone?: string;
   date_of_birth?: string;
   nationality?: string;
@@ -81,10 +84,15 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
 
   const handlePortalInvite = async () => {
     if (!client) return;
-    if (!confirm(`Envoyer à ${client.email} un lien pour accéder à son portail client ?`)) return;
+    const active = client.portal_status === 'active';
+    const question = active
+      ? `${client.email} a déjà son espace client. Le prévenir par courriel que du nouveau l'attend ?`
+      : `Inviter ${client.email} à créer son espace client ?`;
+    if (!confirm(question)) return;
     try {
       setInviting(true);
       toast.success(await inviteClientToPortal(client.id));
+      if (!active) setClient((c) => (c ? { ...c, portal_status: 'invited' } : c));
     } catch (e: any) {
       toast.error(e.message || 'Envoi impossible.');
     } finally {
@@ -141,14 +149,31 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
           <PiArrowLeftBold className="h-4 w-4" /> {t('clients.back_to_list')}
         </button>
         <div className="flex flex-wrap items-center justify-end gap-2">
-          <button
-            onClick={handlePortalInvite}
-            disabled={inviting || !client.email}
-            title="Envoie au client un lien pour choisir son mot de passe et accéder à son portail"
-            className="inline-flex items-center gap-2 rounded-lg border border-blue-300 px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50 disabled:opacity-50"
-          >
-            <PiPaperPlaneTiltDuotone className="h-4 w-4" /> {inviting ? 'Envoi…' : 'Inviter au portail'}
-          </button>
+          {client.portal_status === 'active' ? (
+            <>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-700" title="Le client a créé son espace client">
+                <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden /> Espace client actif
+              </span>
+              <button
+                onClick={handlePortalInvite}
+                disabled={inviting || !client.email}
+                title="Prévient le client par courriel que du nouveau l'attend dans son espace"
+                className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              >
+                <PiPaperPlaneTiltDuotone className="h-4 w-4" /> {inviting ? 'Envoi…' : 'Prévenir le client'}
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={handlePortalInvite}
+              disabled={inviting || !client.email}
+              title="Invite le client à créer son espace client (il choisit lui-même son mot de passe)"
+              className="inline-flex items-center gap-2 rounded-lg border border-blue-300 px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50 disabled:opacity-50"
+            >
+              <PiPaperPlaneTiltDuotone className="h-4 w-4" />
+              {inviting ? 'Envoi…' : client.portal_status === 'invited' ? 'Renvoyer l’invitation' : 'Inviter à créer son espace'}
+            </button>
+          )}
           <Link
             href={`/admin/clients/${client.id}/edit`}
             className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"

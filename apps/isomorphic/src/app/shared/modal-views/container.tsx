@@ -19,8 +19,9 @@ export default function GlobalModal() {
       onClose={closeModal}
       customSize={customSize}
       size={size}
-      overlayClassName="dark:bg-opacity-40 dark:backdrop-blur-lg"
-      containerClassName="dark:bg-gray-100"
+      // Effet verre : arrière-plan assombri et légèrement flouté, la fenêtre ressort au centre.
+      overlayClassName="!bg-gray-900/40 backdrop-blur-[6px] dark:!bg-black/50"
+      containerClassName="shadow-2xl ring-1 ring-black/5 dark:bg-gray-100"
       className="z-[9999] [&_.pointer-events-none]:overflow-visible"
     >
       {view}

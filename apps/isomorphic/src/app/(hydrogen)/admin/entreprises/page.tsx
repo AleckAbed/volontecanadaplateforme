@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { PiBuildingOfficeDuotone, PiMagnifyingGlassBold, PiPlusBold } from 'react-icons/pi';
 import { companyService, CompanySummary } from '@/services/companies';
+import PhoneField from '@/components/ui/phone-field';
 
 /** Clients « entreprise » : employeurs qui envoient leurs employés au cabinet. */
 export default function CompaniesPage() {
@@ -62,9 +63,9 @@ export default function CompaniesPage() {
           <label className="text-sm text-gray-700">Courriel de facturation
             <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={input} />
           </label>
-          <label className="text-sm text-gray-700">Téléphone
-            <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={input} />
-          </label>
+          <div className="text-sm text-gray-700">
+            <PhoneField id="company-phone" label="Téléphone" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
+          </div>
           <div className="flex items-end gap-2">
             <button disabled={busy || !form.name.trim()} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50">{busy ? 'Création…' : 'Créer'}</button>
             <button type="button" onClick={() => setCreating(false)} className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700">Annuler</button>

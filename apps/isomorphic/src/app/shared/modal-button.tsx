@@ -25,7 +25,7 @@ export default function ModalButton({
   return (
     <Button
       className={cn(
-        'mt-5 w-full text-xs capitalize @lg:w-auto sm:text-sm lg:mt-0',
+        'mt-5 w-full text-xs first-letter:uppercase @lg:w-auto sm:text-sm lg:mt-0',
         className
       )}
       onClick={() =>

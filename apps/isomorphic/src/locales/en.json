@@ -98,6 +98,7 @@
     "confirm_delete": "Are you sure you want to delete this item?"
   },
   "menu": {
+    "section_assistant": "Assistant",
     "section_dashboard": "Dashboard",
     "section_clients": "Client Management",
     "section_agenda": "Agenda & Appointments",
@@ -105,7 +106,7 @@
     "section_forms": "Forms & Documents",
     "section_communication": "Communication",
     "section_admin": "Administration",
-    "dashboard": "Dashboard",
+    "dashboard": "Home",
     "analytics": "Analytics",
     "clients": "Clients",
     "companies": "Companies",
@@ -145,7 +146,10 @@
     "deadlines": "Deadlines",
     "invoices": "Invoicing",
     "billing": "Subscription & payments",
-    "compliance": "Compliance & data"
+    "compliance": "Compliance & data",
+    "client_section": "My space",
+    "client_dashboard": "Dashboard",
+    "client_profile": "My profile"
   },
   "header": {
     "lock_session": "Lock session",
@@ -196,6 +200,8 @@
     "edit_title": "Edit client",
     "details_title": "Client details",
     "fields": {
+      "preferred_locale": "Communication language",
+      "preferred_locale_hint": "Emails and the client portal will be in this language.",
       "first_name": "First name",
       "last_name": "Last name",
       "email": "Email",
@@ -817,5 +823,16 @@
     "hide_password": "Hide password",
     "anonymous": "Anonymous",
     "admin_fallback": "Admin"
+  },
+  "auth_shell": {
+    "headline": "The platform for immigration firms",
+    "point_files": "Files, IRCC forms and deadlines in one place",
+    "point_portal": "A secure portal for your clients and their documents",
+    "point_canada": "Data hosted in Canada, two-factor authentication",
+    "spaces": "Spaces",
+    "space_firm": "Firm",
+    "space_client": "Client",
+    "space_company": "Company",
+    "space_collaborator": "Collaborator"
   }
 }
