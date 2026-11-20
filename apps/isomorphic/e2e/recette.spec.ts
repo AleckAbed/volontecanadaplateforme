@@ -57,11 +57,24 @@ test('R1 — un cabinet demande son ouverture (plus d’inscription libre)', asy
   await expect(page.getByRole('heading', { name: 'Demande envoyée' })).toBeVisible();
 });
 
-test('R2 — les pages de connexion partagent le même cadre, sans texte du gabarit', async ({ page }) => {
-  for (const url of ['/auth/admin-signin', '/auth/client-signin', '/entreprise/connexion', '/collab/login', '/auth/mot-de-passe-oublie']) {
-    await page.goto(url);
-    await expect(page.getByRole('navigation', { name: 'Espaces' })).toBeVisible();
-    await expect(page.getByText(/Join 30,000|Start turning your ideas/)).toHaveCount(0);
+test('R2 — chaque espace a sa page de connexion, et l’accueil demande le type de compte', async ({ page }) => {
+  await page.goto('/');
+  await expect(page).toHaveURL(/\/connexion$/);
+  await expect(page.getByRole('heading', { name: 'Bienvenue. Qui êtes-vous ?' })).toBeVisible();
+
+  const spaces: [string, RegExp, string][] = [
+    ['Je suis client', /\/auth\/client-signin/, 'client'],
+    ['Je travaille dans un cabinet', /\/auth\/admin-signin/, 'firm'],
+    ['Je représente une entreprise', /\/entreprise\/connexion/, 'company'],
+    ['Je suis collaborateur externe', /\/collab\/login/, 'collaborator'],
+  ];
+  for (const [label, url, actor] of spaces) {
+    await page.goto('/connexion');
+    await page.getByRole('link', { name: new RegExp(label) }).click();
+    await expect(page).toHaveURL(url);
+    await expect(page.locator(`[data-actor="${actor}"]`)).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Choisir un autre espace' })).toBeVisible();
+    await expect(page.getByText(/Join 30,000|Start turning your ideas|Signe avec/)).toHaveCount(0);
   }
 });
 

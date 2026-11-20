@@ -12,7 +12,7 @@ export default function SignInRedirect() {
 
   useEffect(() => {
     // Rediriger vers la nouvelle page de connexion admin
-    router.replace('/auth/admin-signin');
+    router.replace('/connexion');
   }, [router]);
 
   return (

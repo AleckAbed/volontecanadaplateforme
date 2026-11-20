@@ -17,10 +17,8 @@ export default function AuthWrapperTwo({
 }) {
   return (
     <AuthShell>
-      <div className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-6 shadow-xl shadow-blue-900/5 sm:p-8">
-        <h1 className="mb-6 text-2xl font-bold text-gray-900">{title}</h1>
-        {children}
-      </div>
+      <h1 className="mb-8 text-3xl font-bold leading-tight text-gray-900 sm:text-[2.1rem]">{title}</h1>
+      {children}
     </AuthShell>
   );
 }

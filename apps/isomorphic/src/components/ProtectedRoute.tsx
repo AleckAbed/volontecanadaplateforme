@@ -19,6 +19,7 @@ import { removeAuthToken } from '@/lib/auth-storage';
 import { isModuleOpen } from '@/lib/modules';
 
 const publicRoutes = [
+  '/connexion', // choix de l'espace avant la connexion
   '/signin',
   '/signin/client',
   '/auth/admin-signin',
@@ -99,8 +100,8 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     // 2. Pas de marqueur user_type → pas connecté → redirection signin
     if (userType !== 'admin' && userType !== 'client') {
       hasRedirected.current = true;
-      const target = '/auth/admin-signin';
-      router.replace(`${target}?redirect=${encodeURIComponent(path)}`);
+      // Pas encore d'espace connu : la personne choisit d'abord son type de compte.
+      router.replace(path === '/' ? '/connexion' : `/connexion?redirect=${encodeURIComponent(path)}`);
       return;
     }
 

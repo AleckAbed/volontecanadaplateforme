@@ -19,7 +19,7 @@ export default function HomePage() {
 
   useEffect(() => {
     if (isAuthenticated === false) {
-      router.push('/auth/admin-signin');
+      router.push('/connexion');
     }
   }, [isAuthenticated, router]);
 
